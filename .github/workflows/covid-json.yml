@@ -13,9 +13,9 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: wget json
-        run: wget -O data.json https://infographics.channelnewsasia.com/covid-19/sgsitrepv2.json
+        run: wget -O /echarts/covid-sg-data.json https://infographics.channelnewsasia.com/covid-19/sgsitrepv2.json
       - name: stage change files
-        run: git add data.json
+        run: git add /echarts/covid-sg-data.json
       - name: commit
         run: |
           git config --global user.email "action@github.local"
