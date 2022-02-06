@@ -18,8 +18,8 @@ jobs:
         run: git add data.json
       - name: commit
         run: |
-          git config user.email "action@github.local"
-          git configl user.name "action"
+          git config --global user.email "action@github.local"
+          git config --global user.name "action"
           git commit -m "auto update data.json"
       - name: push
         run: git push origin HEAD:main
