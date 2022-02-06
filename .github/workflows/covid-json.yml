@@ -1,0 +1,22 @@
+name: covid-json
+
+# 触发条件
+on:
+  schedule:
+    - cron: '30 */3 * * *'
+  # 手动触发
+  workflow_dispatch:
+
+jobs:
+  updateJson:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: wget json
+        run: wget -O data.json https://infographics.channelnewsasia.com/covid-19/sgsitrepv2.json
+      - name: stage change files
+        run: git add data.json
+      - name: commit
+        run: git commit -m "auto update data.json"
+      - name: push
+        run: git push origin HEAD:main
