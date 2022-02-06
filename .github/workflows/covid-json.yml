@@ -17,7 +17,7 @@ jobs:
       - name: stage change files
         run: git add data.json
       - name: commit
-        run:
+        run: |
           git config user.email "action@github.local"
           git configl user.name "action"
           git commit -m "auto update data.json"
