@@ -4,33 +4,156 @@
   hm.src = 'https://hm.baidu.com/hm.js?' + 'dbcf1d37406cd9c1b966d9a2e254995f';
   var s = document.getElementsByTagName("script")[0];
   s.parentNode.insertBefore(hm, s);
-  })();</script><meta name="generator" content="Hexo 4.2.0"></head><body><div class="body_container"><div id="header"><div class="site-name"><h1 class="hidden">Termux简单入门</h1><a id="logo" href="/.">提莫的博客</a><p class="description">沪漂~</p></div><div id="nav-menu"><a class="current" href="/."><i class="fa fa-home"> 首页</i></a><a href="/archives/"><i class="fa fa-archive"> 归档</i></a><a href="/tags/"><i class="fa fa-tags"> 标签</i></a><a href="/about/"><i class="fa fa-user"> 关于</i></a><a href="/down/"><i class="fa fa-download"> 下载</i></a><a href="/books/"><i class="fa fa-book"> 电子书</i></a></div></div><div class="pure-g" id="layout"><div class="pure-u-1 pure-u-md-3-4"><div class="content_container"><div class="post"><h1 class="post-title">Termux简单入门</h1><div class="post-meta">Oct 24, 2021<script src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" async></script><span id="busuanzi_container_page_pv"> | <span id="busuanzi_value_page_pv"></span><span> 阅读</span></span></div><div class="clear"><div class="toc-article" id="toc"><div class="toc-title">文章目录</div><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#下载"><span class="toc-number">1.</span> <span class="toc-text">下载</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#安装ssh服务"><span class="toc-number"></span> <span class="toc-text">安装ssh服务</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#运行SSH-Server"><span class="toc-number"></span> <span class="toc-text">运行SSH Server</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#设置密码"><span class="toc-number"></span> <span class="toc-text">设置密码</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#获得Android-IP"><span class="toc-number"></span> <span class="toc-text">获得Android IP</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#PC端连接"><span class="toc-number">1.</span> <span class="toc-text">PC端连接</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#在Android上执行"><span class="toc-number"></span> <span class="toc-text">在Android上执行</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#添加到授信列表"><span class="toc-number"></span> <span class="toc-text">添加到授信列表</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#启动服务，并设置为开机启动"><span class="toc-number"></span> <span class="toc-text">启动服务，并设置为开机启动</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#运行服务"><span class="toc-number"></span> <span class="toc-text">运行服务</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#停止服务"><span class="toc-number"></span> <span class="toc-text">停止服务</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#禁用服务"><span class="toc-number"></span> <span class="toc-text">禁用服务</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#Docker"><span class="toc-number">1.</span> <span class="toc-text">Docker</span></a></li></ol></div></div><div class="post-content"><p>Termux 是一款Android 终端模拟器和 Linux 环境应用程序，无需 root 或设置即可直接运行。自动安装最小的基本系统 - 使用 APT 包管理器可以使用其他包。</p>
+  })();</script><meta name="generator" content="Hexo 4.2.0"></head><body><div class="body_container"><div id="header"><div class="site-name"><h1 class="hidden">Termux简单入门</h1><a id="logo" href="/.">提莫的博客</a><p class="description">沪漂~</p></div><div id="nav-menu"><a class="current" href="/."><i class="fa fa-home"> 首页</i></a><a href="/archives/"><i class="fa fa-archive"> 归档</i></a><a href="/tags/"><i class="fa fa-tags"> 标签</i></a><a href="/about/"><i class="fa fa-user"> 关于</i></a><a href="/down/"><i class="fa fa-download"> 下载</i></a><a href="/books/"><i class="fa fa-book"> 电子书</i></a></div></div><div class="pure-g" id="layout"><div class="pure-u-1 pure-u-md-3-4"><div class="content_container"><div class="post"><h1 class="post-title">Termux简单入门</h1><div class="post-meta">Oct 24, 2021<script src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" async></script><span id="busuanzi_container_page_pv"> | <span id="busuanzi_value_page_pv"></span><span> 阅读</span></span></div><div class="clear"><div class="toc-article" id="toc"><div class="toc-title">文章目录</div><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#下载"><span class="toc-number">1.</span> <span class="toc-text">下载</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#开光"><span class="toc-number">2.</span> <span class="toc-text">开光</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#远程连接"><span class="toc-number">3.</span> <span class="toc-text">远程连接</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#通过密码方式"><span class="toc-number">3.1.</span> <span class="toc-text">通过密码方式</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#通过公钥方式"><span class="toc-number">3.2.</span> <span class="toc-text">通过公钥方式</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#通过服务方式启动"><span class="toc-number">4.</span> <span class="toc-text">通过服务方式启动</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#开机启动"><span class="toc-number">5.</span> <span class="toc-text">开机启动</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Docker"><span class="toc-number">6.</span> <span class="toc-text">Docker</span></a></li></ol></div></div><div class="post-content"><p>Termux 是一款Android 终端模拟器和 Linux 环境应用程序，无需 root 或设置即可直接运行。自动安装最小的基本系统 - 使用 APT 包管理器可以使用其他包。</p>
 <a id="more"></a>
 
 <h2 id="下载"><a href="#下载" class="headerlink" title="下载"></a>下载</h2><p>play商店的版本是老版本，建议安装最新版本。如果是Play版本，大概率会碰到403的问题（需要执行<code>apt upgrade  -y</code>）。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">## 开光</span><br></pre></td></tr></table></figure>
-<p>apt update -y<br>pkg install -y vim termux-services openssh nmap wget</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">## 远程连接</span><br><span class="line">安装过openssh后，在电脑上操作就更简单了</span><br></pre></td></tr></table></figure>
-<h1 id="安装ssh服务"><a href="#安装ssh服务" class="headerlink" title="安装ssh服务"></a>安装ssh服务</h1><p>pkg install openssh -y</p>
-<h1 id="运行SSH-Server"><a href="#运行SSH-Server" class="headerlink" title="运行SSH Server"></a>运行SSH Server</h1><p>sshd</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">### 通过密码方式</span><br></pre></td></tr></table></figure>
-<h1 id="设置密码"><a href="#设置密码" class="headerlink" title="设置密码"></a>设置密码</h1><p>passwd</p>
-<h1 id="获得Android-IP"><a href="#获得Android-IP" class="headerlink" title="获得Android IP"></a>获得Android IP</h1><p>ifconfig | grep inet</p>
-<h2 id="PC端连接"><a href="#PC端连接" class="headerlink" title="PC端连接"></a>PC端连接</h2><p>androidIP:8022</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">### 通过公钥方式</span><br></pre></td></tr></table></figure>
-<h1 id="在Android上执行"><a href="#在Android上执行" class="headerlink" title="在Android上执行"></a>在Android上执行</h1><p>ssh-keygen</p>
-<h1 id="添加到授信列表"><a href="#添加到授信列表" class="headerlink" title="添加到授信列表"></a>添加到授信列表</h1><p>cd /data/data/com.termux/files/home/.ssh/<br>cat id_rsa.pub &gt;&gt; authorized_keys</p>
-<p>pkill sshd<br>sshd</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"></span><br><span class="line">## 通过服务方式启动</span><br><span class="line">Package | Daemon | Port | Description</span><br><span class="line">- | - | - | - </span><br><span class="line">apache2 | httpd | 8080 | Apache Web Server HTTP Web Server</span><br><span class="line">at | atd |  | AT and batch delayed command scheduling utility and daemon at</span><br><span class="line">bitcoin | bitcoind |  | Bitcoin Core</span><br><span class="line">busybox | telnetd | 8023 | Remote terminal service Telnet</span><br><span class="line">busybox | ftpd | 8021 | FTP (File Transfer Protocol) FTP</span><br><span class="line">cronie | crond |  | Daemon that runs specified programs at scheduled times cron</span><br><span class="line">emacs | emacsd |  | Extensible, customizable text editor-and more EMACS</span><br><span class="line">ipfs | ipfs |  | A peer-to-peer hypermedia distribution protocol IPFS</span><br><span class="line">libmosquitto | mosquitto | 1883 | MQTT is a lightweight, publish-subscribe network protocol MQTT</span><br><span class="line">lighttpd | lighttpd | 8080 | Lighttpd Small webserver HTTP Web Server</span><br><span class="line">lnd | lnd |  | Lightning Network Daemon</span><br><span class="line">mariadb | mysqld | 3306 | MariaDB Community-developed fork of the MySQL from its original authors</span><br><span class="line">mpd | mpd |  | Music Player Daemon (MPD)</span><br><span class="line">mpdscribble | mpdscribble |  | MPD client which submits tracks being played</span><br><span class="line">nginx | nginx | 8080 | NGINX Web server HTTP Web Server</span><br><span class="line">openssh | sshd | 8022 | OpenSSH SSH</span><br><span class="line">postgresql | postgres | 5432 | PostgreSQL database PostgreSQL</span><br><span class="line">privoxy | privoxy |  | Privoxy is non-caching web proxy with advanced filtering capabilities HTTP Proxy</span><br><span class="line">tor | tor |  | The Onion Router anonymizing overlay network Tor</span><br><span class="line">transmission | transmission |  | BitTorrent client BitTorrent</span><br></pre></td></tr></table></figure>
-<p>在安装 termux-services 完成后，需要重启app（杀进程）</p>
-<h1 id="启动服务，并设置为开机启动"><a href="#启动服务，并设置为开机启动" class="headerlink" title="启动服务，并设置为开机启动"></a>启动服务，并设置为开机启动</h1><p>sv-enable <service></service></p>
-<h1 id="运行服务"><a href="#运行服务" class="headerlink" title="运行服务"></a>运行服务</h1><p>sv up <service></service></p>
-<h1 id="停止服务"><a href="#停止服务" class="headerlink" title="停止服务"></a>停止服务</h1><p>sv down <service></service></p>
-<h1 id="禁用服务"><a href="#禁用服务" class="headerlink" title="禁用服务"></a>禁用服务</h1><p>sv-disable <service></service></p>
-<p>例如：<br>pkg install nginx -y<br>sv-enable nginx</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">## 开机启动</span><br><span class="line"></span><br><span class="line">需安装APP：[Termux:Boot](https:&#x2F;&#x2F;f-droid.org&#x2F;repo&#x2F;com.termux.boot_7.apk)</span><br><span class="line">运行一次，并添加到电池优化白名单</span><br><span class="line"></span><br><span class="line">添加配置</span><br></pre></td></tr></table></figure>
-<p>mkdir ~/.termux/boot/<br>vim ~/.termux/boot/startup.sh</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&#96;&#96;&#96;</span><br><span class="line">#!&#x2F;data&#x2F;data&#x2F;com.termux&#x2F;files&#x2F;usr&#x2F;bin&#x2F;sh</span><br><span class="line">termux-wake-lock      # 防止休眠</span><br><span class="line">. $PREFIX&#x2F;etc&#x2F;profile # Termux-services</span><br></pre></td></tr></table></figure>
+<p>从 <a href="https://f-droid.org/repo/com.termux_117.apk" target="_blank" rel="noopener">F-Droid</a> 下载</p>
+<h2 id="开光"><a href="#开光" class="headerlink" title="开光"></a>开光</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">apt update -y</span><br><span class="line">pkg install -y vim termux-services openssh nmap wget</span><br></pre></td></tr></table></figure>
+
+<h2 id="远程连接"><a href="#远程连接" class="headerlink" title="远程连接"></a>远程连接</h2><p>安装过openssh后，在电脑上操作就更简单了</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"># 安装ssh服务</span><br><span class="line">pkg install openssh -y</span><br><span class="line"></span><br><span class="line"># 运行SSH Server</span><br><span class="line">sshd</span><br></pre></td></tr></table></figure>
+<h3 id="通过密码方式"><a href="#通过密码方式" class="headerlink" title="通过密码方式"></a>通过密码方式</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"># 设置密码</span><br><span class="line">passwd</span><br><span class="line"></span><br><span class="line"># 获得Android IP</span><br><span class="line">ifconfig | grep inet</span><br><span class="line"></span><br><span class="line">## PC端连接</span><br><span class="line">androidIP:8022</span><br></pre></td></tr></table></figure>
+
+<h3 id="通过公钥方式"><a href="#通过公钥方式" class="headerlink" title="通过公钥方式"></a>通过公钥方式</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"># 在Android上执行</span><br><span class="line">ssh-keygen</span><br><span class="line"># 添加到授信列表</span><br><span class="line">cd &#x2F;data&#x2F;data&#x2F;com.termux&#x2F;files&#x2F;home&#x2F;.ssh&#x2F;</span><br><span class="line">cat id_rsa.pub &gt;&gt; authorized_keys</span><br><span class="line"></span><br><span class="line">pkill sshd</span><br><span class="line">sshd</span><br></pre></td></tr></table></figure>
+
+
+<h2 id="通过服务方式启动"><a href="#通过服务方式启动" class="headerlink" title="通过服务方式启动"></a>通过服务方式启动</h2><table>
+<thead>
+<tr>
+<th>Package</th>
+<th>Daemon</th>
+<th>Port</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>apache2</td>
+<td>httpd</td>
+<td>8080</td>
+<td>Apache Web Server HTTP Web Server</td>
+</tr>
+<tr>
+<td>at</td>
+<td>atd</td>
+<td></td>
+<td>AT and batch delayed command scheduling utility and daemon at</td>
+</tr>
+<tr>
+<td>bitcoin</td>
+<td>bitcoind</td>
+<td></td>
+<td>Bitcoin Core</td>
+</tr>
+<tr>
+<td>busybox</td>
+<td>telnetd</td>
+<td>8023</td>
+<td>Remote terminal service Telnet</td>
+</tr>
+<tr>
+<td>busybox</td>
+<td>ftpd</td>
+<td>8021</td>
+<td>FTP (File Transfer Protocol) FTP</td>
+</tr>
+<tr>
+<td>cronie</td>
+<td>crond</td>
+<td></td>
+<td>Daemon that runs specified programs at scheduled times cron</td>
+</tr>
+<tr>
+<td>emacs</td>
+<td>emacsd</td>
+<td></td>
+<td>Extensible, customizable text editor-and more EMACS</td>
+</tr>
+<tr>
+<td>ipfs</td>
+<td>ipfs</td>
+<td></td>
+<td>A peer-to-peer hypermedia distribution protocol IPFS</td>
+</tr>
+<tr>
+<td>libmosquitto</td>
+<td>mosquitto</td>
+<td>1883</td>
+<td>MQTT is a lightweight, publish-subscribe network protocol MQTT</td>
+</tr>
+<tr>
+<td>lighttpd</td>
+<td>lighttpd</td>
+<td>8080</td>
+<td>Lighttpd Small webserver HTTP Web Server</td>
+</tr>
+<tr>
+<td>lnd</td>
+<td>lnd</td>
+<td></td>
+<td>Lightning Network Daemon</td>
+</tr>
+<tr>
+<td>mariadb</td>
+<td>mysqld</td>
+<td>3306</td>
+<td>MariaDB Community-developed fork of the MySQL from its original authors</td>
+</tr>
+<tr>
+<td>mpd</td>
+<td>mpd</td>
+<td></td>
+<td>Music Player Daemon (MPD)</td>
+</tr>
+<tr>
+<td>mpdscribble</td>
+<td>mpdscribble</td>
+<td></td>
+<td>MPD client which submits tracks being played</td>
+</tr>
+<tr>
+<td>nginx</td>
+<td>nginx</td>
+<td>8080</td>
+<td>NGINX Web server HTTP Web Server</td>
+</tr>
+<tr>
+<td>openssh</td>
+<td>sshd</td>
+<td>8022</td>
+<td>OpenSSH SSH</td>
+</tr>
+<tr>
+<td>postgresql</td>
+<td>postgres</td>
+<td>5432</td>
+<td>PostgreSQL database PostgreSQL</td>
+</tr>
+<tr>
+<td>privoxy</td>
+<td>privoxy</td>
+<td></td>
+<td>Privoxy is non-caching web proxy with advanced filtering capabilities HTTP Proxy</td>
+</tr>
+<tr>
+<td>tor</td>
+<td>tor</td>
+<td></td>
+<td>The Onion Router anonymizing overlay network Tor</td>
+</tr>
+<tr>
+<td>transmission</td>
+<td>transmission</td>
+<td></td>
+<td>BitTorrent client BitTorrent</td>
+</tr>
+</tbody></table>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">在安装 termux-services 完成后，需要重启app（杀进程）</span><br><span class="line"></span><br><span class="line"># 启动服务，并设置为开机启动</span><br><span class="line">sv-enable &lt;service&gt;</span><br><span class="line"># 运行服务</span><br><span class="line">sv up &lt;service&gt;</span><br><span class="line"># 停止服务</span><br><span class="line">sv down &lt;service&gt;</span><br><span class="line"># 禁用服务</span><br><span class="line">sv-disable &lt;service&gt;</span><br><span class="line"></span><br><span class="line">例如：</span><br><span class="line">pkg install nginx -y</span><br><span class="line">sv-enable nginx</span><br></pre></td></tr></table></figure>
+
+<h2 id="开机启动"><a href="#开机启动" class="headerlink" title="开机启动"></a>开机启动</h2><p>需安装APP：<a href="https://f-droid.org/repo/com.termux.boot_7.apk" target="_blank" rel="noopener">Termux:Boot</a><br>运行一次，并添加到电池优化白名单</p>
+<p>添加配置</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">mkdir ~&#x2F;.termux&#x2F;boot&#x2F;</span><br><span class="line">vim ~&#x2F;.termux&#x2F;boot&#x2F;startup.sh</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">#!&#x2F;data&#x2F;data&#x2F;com.termux&#x2F;files&#x2F;usr&#x2F;bin&#x2F;sh</span><br><span class="line">termux-wake-lock      # 防止休眠</span><br><span class="line">. $PREFIX&#x2F;etc&#x2F;profile # Termux-services</span><br></pre></td></tr></table></figure>
 <p>赋予执行权限</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">chmod +x ~&#x2F;.termux&#x2F;boot&#x2F;startup.sh</span><br></pre></td></tr></table></figure>
 
