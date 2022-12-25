@@ -1,5 +1,5 @@
 {
-  "range": "'Community cases/Hospitalisations'!A1:AI1000",
+  "range": "'Community cases/Hospitalisations'!A1:AI2000",
   "majorDimension": "ROWS",
   "values": [
     [
@@ -21816,6 +21816,24 @@
       "10",
       "5",
       "99"
+    ],
+    [
+      "Dec 24",
+      "",
+      "",
+      "",
+      "0.87",
+      "",
+      "",
+      "0",
+      "",
+      "",
+      "",
+      "",
+      "74",
+      "11",
+      "4",
+      "89"
     ]
   ]
 }
