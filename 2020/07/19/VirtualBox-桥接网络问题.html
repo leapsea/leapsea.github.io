@@ -1,0 +1,176 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="专注于IT互联网，包括但不限于Go语言(golang)、Java、Android、项目管理、软件架构等">
+<title>VirtualBox-桥接网络问题 · 我的小站</title>
+
+<link rel="stylesheet" href="https://leapsea.github.io/css/blog.css?v=5">
+<link rel="stylesheet" href="https://leapsea.github.io/css/recent-posts.css?v=2">
+<link rel="stylesheet" href="https://leapsea.github.io/css/code-highlighting.css">
+
+  </head>
+  <body class="">
+    <a class="skip-link" href="#main-content">跳到主要内容</a>
+    <header class="site-header">
+  <div class="header-inner">
+    <a class="brand" href="https://leapsea.github.io/" aria-label="我的小站 首页">
+      <span><strong>我的小站</strong><small>专注于Android、Kotlin、Go语言(golang)、移动互联网、项目管理、软件架构</small></span>
+    </a>
+    <nav class="site-nav" aria-label="主导航">
+      <a class="" href="https://leapsea.github.io/"><svg class="site-icon" viewBox="0 0 22 22" aria-hidden="true" focusable="false"><path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1z" /></svg>
+ 首页</a>
+      
+      
+        
+        
+        
+        
+        <a class="" href="https://leapsea.github.io/archives/"><svg class="site-icon" viewBox="0 0 22 22" aria-hidden="true" focusable="false"><path d="M3 4h18v4H3zm2 6h14v10H5zm4 3v2h6v-2z" /></svg>
+ 归档</a>
+      
+        
+        
+        
+        
+        <a class="" href="https://leapsea.github.io/tags/"><svg class="site-icon" viewBox="0 0 22 22" aria-hidden="true" focusable="false"><path d="M3 4h8l10 10-7 7L4 11zm5 3a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3" /></svg>
+ 标签</a>
+      
+        
+        
+        
+        
+        <a class="" href="https://leapsea.github.io/about/"><svg class="site-icon" viewBox="0 0 22 22" aria-hidden="true" focusable="false"><path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8m-8 9a8 8 0 0 1 16 0z" /></svg>
+ 关于</a>
+      
+        
+        
+        
+        
+        <a class="" href="https://leapsea.github.io/down/"><svg class="site-icon" viewBox="0 0 22 22" aria-hidden="true" focusable="false"><path d="M11 3h2v10l4-4 1.4 1.4L12 17l-6.4-6.6L7 9l4 4zm-6 16h14v2H5z" /></svg>
+ 下载</a>
+      
+        
+        
+        
+        
+        <a class="" href="https://leapsea.github.io/books/"><svg class="site-icon" viewBox="0 0 22 22" aria-hidden="true" focusable="false"><path d="M4 3h14a2 2 0 0 1 2 2v16H6a2 2 0 0 1-2-2zm3 3v2h10V6zm0 4v2h10v-2z" /></svg>
+ 电子书</a>
+      
+        
+        
+        
+        
+        
+      
+        
+        
+        
+        
+        
+      
+        
+        
+        
+        
+        
+      
+        
+        
+        
+        
+        
+      
+    </nav>
+  </div>
+</header>
+
+    <main id="main-content" class="site-shell">
+      
+  <div class="classic-layout article-grid">
+    <article class="article content-main">
+      <header class="article-header">
+        <div class="article-kicker">POSTS</div>
+        <h1>VirtualBox-桥接网络问题</h1>
+        <div class="post-meta">
+  <time datetime="2020-07-19">2020年07月19日</time>
+  <span class="meta-separator" aria-hidden="true">·</span><span>1 分钟阅读</span>
+  
+    
+    
+    <span class="meta-separator" aria-hidden="true">·</span><a href="https://leapsea.github.io/categories/%E8%96%9B%E5%AE%9A%E8%B0%94%E7%9A%84bug/">薛定谔的bug</a>
+  
+</div>
+
+      </header>
+      
+        <aside class="article-toc" aria-label="文章目录">
+          <p class="toc-title">目录</p>
+          <nav id="TableOfContents">
+  <ul>
+    <li>
+      <ul>
+        <li><a href="#问题">问题</a></li>
+        <li><a href="#解决">解决</a></li>
+        <li><a href="#挖坑">挖坑</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+        </aside>
+      
+      <div class="article-body"><h3 id="问题">问题</h3>
+<p>今天打算基于以前在 <code>VirtualBox</code> 中安装的 <code>CentOS</code> 系统里面安装单机版的 <code>Kubernetes</code>。网络设置为桥接模式，但是无论如何都获取不到IP。这就诡异了</p>
+<h3 id="解决">解决</h3>
+<p>经过一系列折腾之后（Ps：在不改变CentOS系统设置的前提下）使用有线网络就可以桥接成功。而无线网络桥接后无法获取IP。</p>
+<h3 id="挖坑">挖坑</h3>
+<p>可能是跟驱动有关，具体什么原因，这里不再深究。毕竟我用这个的目的是为了使用 <code>Kubernetes</code></p>
+</div>
+      <div class="article-tags"><a href="https://leapsea.github.io/tags/%E8%99%9A%E6%8B%9F%E6%9C%BA/">#虚拟机</a><a href="https://leapsea.github.io/tags/%E7%BD%91%E7%BB%9C/">#网络</a></div>
+
+      <footer class="article-footer">
+        <a href="https://leapsea.github.io/2020/07/08/Golang%E5%AD%A6%E4%B9%A0%E8%B5%84%E6%96%99.html">← Golang学习资料</a>
+        <a class="next" href="https://leapsea.github.io/2020/08/12/%E6%90%AD%E5%BB%BAFlutter%E5%BC%80%E5%8F%91%E7%8E%AF%E5%A2%83.html">搭建Flutter开发环境 →</a>
+      </footer>
+    </article>
+    <aside class="sidebar">
+  <form class="site-search" role="search" action="https://leapsea.github.io/search/" method="get">
+    <label class="sr-only" for="site-search-input">搜索</label>
+    <input id="site-search-input" type="search" name="q" placeholder="Search" aria-label="搜索">
+    <button type="submit" aria-label="提交搜索"><svg class="site-icon" viewBox="0 0 22 22" aria-hidden="true" focusable="false"><path d="M10 3a7 7 0 1 0 4.4 12.4l5.3 5.3 1.4-1.4-5.3-5.3A7 7 0 0 0 10 3m0 2a5 5 0 1 1 0 10 5 5 0 0 1 0-10" /></svg>
+</button>
+  </form>
+  <section class="widget widget-category">
+    <h3 class="widget-title"><svg class="site-icon" viewBox="0 0 22 22" aria-hidden="true" focusable="false"><path d="M3 5h7l2 2h9v12H3zm2 4v8h14V9z" /></svg>
+<span>分类</span></h3>
+    <ul class="widget-list"><li><a href="https://leapsea.github.io/categories/Golang/">Golang</a><span>(5)</span></li><li><a href="https://leapsea.github.io/categories/Android/">Android</a><span>(3)</span></li><li><a href="https://leapsea.github.io/categories/Docker/">Docker</a><span>(3)</span></li><li><a href="https://leapsea.github.io/categories/%E5%94%A0%E5%8F%A8/">唠叨</a><span>(3)</span></li><li><a href="https://leapsea.github.io/categories/%E6%8A%98%E8%85%BE/">折腾</a><span>(3)</span></li><li><a href="https://leapsea.github.io/categories/Kubernetes/">Kubernetes</a><span>(2)</span></li><li><a href="https://leapsea.github.io/categories/Linux/">Linux</a><span>(2)</span></li><li><a href="https://leapsea.github.io/categories/%E5%B7%A5%E5%85%B7/">工具</a><span>(2)</span></li><li><a href="https://leapsea.github.io/categories/%E9%87%8F%E5%8C%96%E4%BA%A4%E6%98%93/">量化交易</a><span>(2)</span></li><li><a href="https://leapsea.github.io/categories/Flutter/">Flutter</a><span>(1)</span></li><li><a href="https://leapsea.github.io/categories/Google/">Google</a><span>(1)</span></li><li><a href="https://leapsea.github.io/categories/%E5%85%A5%E4%BE%B5%E6%A3%80%E6%B5%8B/">入侵检测</a><span>(1)</span></li><li><a href="https://leapsea.github.io/categories/%E5%85%BB%E7%94%9F/">养生</a><span>(1)</span></li><li><a href="https://leapsea.github.io/categories/%E5%AD%A6%E4%B9%A0%E8%B5%84%E6%96%99/">学习资料</a><span>(1)</span></li><li><a href="https://leapsea.github.io/categories/%E6%84%8F%E5%A4%96%E6%94%B6%E8%8E%B7/">意外收获</a><span>(1)</span></li><li><a href="https://leapsea.github.io/categories/%E6%95%88%E7%8E%87/">效率</a><span>(1)</span></li><li><a href="https://leapsea.github.io/categories/%E7%96%AB%E6%83%85/">疫情</a><span>(1)</span></li><li><a href="https://leapsea.github.io/categories/%E7%B3%BB%E7%BB%9F/">系统</a><span>(1)</span></li><li><a href="https://leapsea.github.io/categories/%E8%96%85%E7%BE%8A%E6%AF%9B/">薅羊毛</a><span>(1)</span></li><li><a href="https://leapsea.github.io/categories/%E8%96%9B%E5%AE%9A%E8%B0%94%E7%9A%84bug/">薛定谔的bug</a><span>(1)</span></li></ul>
+  </section>
+  <section class="widget">
+    <h3 class="widget-title"><svg class="site-icon" viewBox="0 0 22 22" aria-hidden="true" focusable="false"><path d="m12 2 3 6 7 .9-5 4.8 1.2 6.8L12 17l-6.2 3.5L7 13.7 2 8.9 9 8z" /></svg>
+ 标签</h3>
+    <div class="tag-list"><a href="https://leapsea.github.io/tags/Golang/">Golang(7)</a><a href="https://leapsea.github.io/tags/Android/">Android(6)</a><a href="https://leapsea.github.io/tags/Docker/">Docker(4)</a><a href="https://leapsea.github.io/tags/Linux/">Linux(4)</a><a href="https://leapsea.github.io/tags/HTTP/">HTTP(3)</a><a href="https://leapsea.github.io/tags/Windows/">Windows(3)</a><a href="https://leapsea.github.io/tags/%E8%99%9A%E6%8B%9F%E6%9C%BA/">虚拟机(3)</a><a href="https://leapsea.github.io/tags/Kafka/">Kafka(2)</a><a href="https://leapsea.github.io/tags/Kubernetes/">Kubernetes(2)</a><a href="https://leapsea.github.io/tags/Termux/">Termux(2)</a><a href="https://leapsea.github.io/tags/%E4%BF%A1%E6%81%AF%E5%AE%89%E5%85%A8/">信息安全(2)</a><a href="https://leapsea.github.io/tags/%E5%8D%9A%E5%AE%A2/">博客(2)</a><a href="https://leapsea.github.io/tags/%E5%BC%80%E5%8F%91%E5%B7%A5%E5%85%B7/">开发工具(2)</a><a href="https://leapsea.github.io/tags/%E7%BD%91%E7%BB%9C/">网络(2)</a><a href="https://leapsea.github.io/tags/%E9%87%8F%E5%8C%96%E4%BA%A4%E6%98%93/">量化交易(2)</a><a href="https://leapsea.github.io/tags/Flutter/">Flutter(1)</a><a href="https://leapsea.github.io/tags/SSH/">SSH(1)</a><a href="https://leapsea.github.io/tags/%E5%81%A5%E5%BA%B7/">健康(1)</a><a href="https://leapsea.github.io/tags/%E5%9B%BE%E5%BA%8A/">图床(1)</a><a href="https://leapsea.github.io/tags/%E5%BE%AE%E6%9C%8D%E5%8A%A1/">微服务(1)</a><a href="https://leapsea.github.io/tags/%E6%95%B0%E6%8D%AE%E5%88%86%E6%9E%90/">数据分析(1)</a><a href="https://leapsea.github.io/tags/%E6%95%B0%E6%8D%AE%E5%BA%93/">数据库(1)</a><a href="https://leapsea.github.io/tags/%E6%96%B0%E5%86%A0/">新冠(1)</a><a href="https://leapsea.github.io/tags/%E7%A1%AC%E4%BB%B6/">硬件(1)</a><a href="https://leapsea.github.io/tags/%E8%87%AA%E5%8A%A8%E5%8C%96/">自动化(1)</a></div>
+  </section>
+  <section class="widget widget-recent-posts">
+    <h3 class="widget-title"><svg class="site-icon" viewBox="0 0 22 22" aria-hidden="true" focusable="false"><path d="M5 2h9l5 5v15H5zm8 2v5h5M8 13h8v2H8zm0 4h8v2H8z" /></svg>
+ 最近文章</h3>
+    <ul class="recent-list recent-posts"><li><a href="https://leapsea.github.io/2026/09/23/%E4%BB%8E-Hexo-%E5%88%B0-Hugo%E4%B8%BB%E9%A2%98%E6%A0%B7%E5%BC%8F%E4%B8%8E%E4%BB%A3%E7%A0%81%E9%AB%98%E4%BA%AE.html" title="从 Hexo 到 Hugo：主题、样式与代码高亮">从 Hexo 到 Hugo：主题、样式与代码高亮</a></li><li><a href="https://leapsea.github.io/2022/03/30/http%E9%87%8D%E5%AE%9A%E5%90%91.html" title="http重定向">http重定向</a></li><li><a href="https://leapsea.github.io/2022/02/06/%E6%96%B0%E5%8A%A0%E5%9D%A1%E7%96%AB%E6%83%85%E5%8F%AF%E8%A7%86%E5%8C%96%E7%BB%9F%E8%AE%A1.html" title="新加坡疫情可视化统计">新加坡疫情可视化统计</a></li><li><a href="https://leapsea.github.io/2021/11/13/%E4%BA%AC%E8%B1%86%E8%84%9A%E6%9C%AC.html" title="京豆脚本">京豆脚本</a></li><li><a href="https://leapsea.github.io/2021/10/24/Termux%E7%AE%80%E5%8D%95%E5%85%A5%E9%97%A8.html" title="Termux简单入门">Termux简单入门</a></li><li><a href="https://leapsea.github.io/2021/08/13/Golang%E7%BC%96%E7%A0%81%E8%A7%84%E8%8C%83.html" title="Golang编码规范">Golang编码规范</a></li><li><a href="https://leapsea.github.io/2021/08/09/%E5%9F%BA%E4%BA%8EBacktrader-AKShare%E5%BF%AB%E9%80%9F%E6%90%AD%E5%BB%BA%E9%87%8F%E5%8C%96%E5%9B%9E%E6%B5%8B%E5%B9%B3%E5%8F%B0.html" title="基于Backtrader&#43;AKShare快速搭建量化回测平台">基于Backtrader&#43;AKShare快速搭建量化回测平台</a></li><li><a href="https://leapsea.github.io/2021/08/06/idea%E5%BF%AB%E9%80%9F%E5%AE%9E%E7%8E%B0%E5%AE%A2%E6%88%B7%E7%AB%AFhttp%E8%B0%83%E7%94%A8.html" title="idea快速实现客户端http调用">idea快速实现客户端http调用</a></li><li><a href="https://leapsea.github.io/2021/07/31/Android%E7%B3%BB%E7%BB%9F%E7%9A%84%E6%95%B0%E6%8D%AE%E5%A4%87%E4%BB%BD%E4%B8%8E%E8%BF%98%E5%8E%9F.html" title="Android系统的数据备份与还原">Android系统的数据备份与还原</a></li><li><a href="https://leapsea.github.io/2021/07/29/Linux%E6%9C%8D%E5%8A%A1%E5%99%A8%E5%BC%80%E5%85%89.html" title="Linux服务器开光">Linux服务器开光</a></li></ul>
+  </section>
+  <section class="widget widget-links">
+    <h3 class="widget-title"><svg class="site-icon" viewBox="0 0 22 22" aria-hidden="true" focusable="false"><path d="M14 3h7v7h-2V6.4l-9.3 9.3-1.4-1.4L17.6 5H14zM5 5h6v2H7v10h10v-4h2v6H5z" /></svg>
+<span>友情链接</span></h3>
+    <ul class="recent-list"><li><a href="https://leapsea.github.io/">我的小站</a></li><li><a href="https://fictiony.github.io/">F大</a></li></ul>
+  </section>
+</aside>
+
+  </div>
+
+    </main>
+    <footer class="site-footer">
+  <div class="site-footer-inner">
+    <p>Copyright © 2026 <a href="https://leapsea.github.io/">我的小站</a> · Powered by <a href="https://gohugo.io/">Hugo</a></p>
+  </div>
+</footer>
+
+  </body>
+</html>

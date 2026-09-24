@@ -1,0 +1,48 @@
+/* Shiki 与原始代码回退使用相同单列结构，行号由 CSS 行盒生成。 */
+.article-body .shiki-source,
+.article-body pre.shiki-rendered {
+  overflow-x: auto;
+  margin: 20px 0;
+  border: 1px solid #e5e5e5;
+  border-radius: 3px;
+}
+
+.article-body .shiki-source,
+.article-body pre.shiki-rendered {
+  padding: 14px;
+  font-size: 13px;
+  line-height: 1.65;
+}
+
+.article-body .shiki-source {
+  background: #f7f7f7;
+  color: #555;
+}
+
+.article-body .shiki-source code {
+  padding: 0;
+  font-size: inherit;
+}
+
+.article-body pre.shiki-rendered code {
+  counter-reset: shiki-line;
+  white-space: normal;
+}
+
+.article-body pre.shiki-rendered .line {
+  display: block;
+  width: max-content;
+  min-width: 100%;
+  white-space: pre;
+}
+
+.article-body pre.shiki-rendered .line::before {
+  display: inline-block;
+  width: 2.5em;
+  margin-right: 1.1em;
+  color: #9a9a9a;
+  text-align: right;
+  counter-increment: shiki-line;
+  content: counter(shiki-line);
+  user-select: none;
+}

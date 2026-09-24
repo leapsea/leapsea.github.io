@@ -1,0 +1,469 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="专注于IT互联网，包括但不限于Go语言(golang)、Java、Android、项目管理、软件架构等">
+<title>Termux简单入门 · 我的小站</title>
+
+<link rel="stylesheet" href="https://leapsea.github.io/css/blog.css?v=5">
+<link rel="stylesheet" href="https://leapsea.github.io/css/recent-posts.css?v=2">
+<link rel="stylesheet" href="https://leapsea.github.io/css/code-highlighting.css">
+
+  </head>
+  <body class="">
+    <a class="skip-link" href="#main-content">跳到主要内容</a>
+    <header class="site-header">
+  <div class="header-inner">
+    <a class="brand" href="https://leapsea.github.io/" aria-label="我的小站 首页">
+      <span><strong>我的小站</strong><small>专注于Android、Kotlin、Go语言(golang)、移动互联网、项目管理、软件架构</small></span>
+    </a>
+    <nav class="site-nav" aria-label="主导航">
+      <a class="" href="https://leapsea.github.io/"><svg class="site-icon" viewBox="0 0 22 22" aria-hidden="true" focusable="false"><path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1z" /></svg>
+ 首页</a>
+      
+      
+        
+        
+        
+        
+        <a class="" href="https://leapsea.github.io/archives/"><svg class="site-icon" viewBox="0 0 22 22" aria-hidden="true" focusable="false"><path d="M3 4h18v4H3zm2 6h14v10H5zm4 3v2h6v-2z" /></svg>
+ 归档</a>
+      
+        
+        
+        
+        
+        <a class="" href="https://leapsea.github.io/tags/"><svg class="site-icon" viewBox="0 0 22 22" aria-hidden="true" focusable="false"><path d="M3 4h8l10 10-7 7L4 11zm5 3a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3" /></svg>
+ 标签</a>
+      
+        
+        
+        
+        
+        <a class="" href="https://leapsea.github.io/about/"><svg class="site-icon" viewBox="0 0 22 22" aria-hidden="true" focusable="false"><path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8m-8 9a8 8 0 0 1 16 0z" /></svg>
+ 关于</a>
+      
+        
+        
+        
+        
+        <a class="" href="https://leapsea.github.io/down/"><svg class="site-icon" viewBox="0 0 22 22" aria-hidden="true" focusable="false"><path d="M11 3h2v10l4-4 1.4 1.4L12 17l-6.4-6.6L7 9l4 4zm-6 16h14v2H5z" /></svg>
+ 下载</a>
+      
+        
+        
+        
+        
+        <a class="" href="https://leapsea.github.io/books/"><svg class="site-icon" viewBox="0 0 22 22" aria-hidden="true" focusable="false"><path d="M4 3h14a2 2 0 0 1 2 2v16H6a2 2 0 0 1-2-2zm3 3v2h10V6zm0 4v2h10v-2z" /></svg>
+ 电子书</a>
+      
+        
+        
+        
+        
+        
+      
+        
+        
+        
+        
+        
+      
+        
+        
+        
+        
+        
+      
+        
+        
+        
+        
+        
+      
+    </nav>
+  </div>
+</header>
+
+    <main id="main-content" class="site-shell">
+      
+  <div class="classic-layout article-grid">
+    <article class="article content-main">
+      <header class="article-header">
+        <div class="article-kicker">POSTS</div>
+        <h1>Termux简单入门</h1>
+        <div class="post-meta">
+  <time datetime="2021-10-24">2021年10月24日</time>
+  <span class="meta-separator" aria-hidden="true">·</span><span>2 分钟阅读</span>
+  
+    
+    
+    <span class="meta-separator" aria-hidden="true">·</span><a href="https://leapsea.github.io/categories/Linux/">Linux</a>
+  
+</div>
+
+      </header>
+      
+        <aside class="article-toc" aria-label="文章目录">
+          <p class="toc-title">目录</p>
+          <nav id="TableOfContents">
+  <ul>
+    <li><a href="#下载">下载</a></li>
+    <li><a href="#开光">开光</a></li>
+    <li><a href="#远程连接">远程连接</a>
+      <ul>
+        <li><a href="#通过密码方式">通过密码方式</a></li>
+        <li><a href="#通过公钥方式">通过公钥方式</a></li>
+      </ul>
+    </li>
+    <li><a href="#通过服务方式启动">通过服务方式启动</a></li>
+    <li><a href="#开机启动">开机启动</a></li>
+    <li><a href="#docker">Docker</a></li>
+    <li><a href="#其他工具">其他工具</a></li>
+  </ul>
+</nav>
+        </aside>
+      
+      <div class="article-body"><p>Termux 是一款Android 终端模拟器和 Linux 环境应用程序，无需 root 或设置即可直接运行。自动安装最小的基本系统 - 使用 APT 包管理器可以使用其他包。</p>
+<h2 id="下载">下载</h2>
+<p>play商店的版本是老版本，建议安装最新版本。如果是Play版本，大概率会碰到403的问题（需要执行<code>apt upgrade  -y</code>）。</p>
+<p>从 <a href="https://f-droid.org/repo/com.termux_117.apk" target="_blank" rel="noopener noreferrer">F-Droid</a>
+ 下载</p>
+<h2 id="开光">开光</h2>
+<pre class="shiki-source" data-shiki-language="text" data-shiki-code="apt update -y
+pkg install -y vim termux-services openssh nmap wget"><code>apt update -y
+pkg install -y vim termux-services openssh nmap wget</code></pre>
+<h2 id="远程连接">远程连接</h2>
+<p>安装过openssh后，在电脑上操作就更简单了</p>
+<pre class="shiki-source" data-shiki-language="text" data-shiki-code="# 安装ssh服务
+pkg install openssh -y
+
+# 运行SSH Server
+sshd"><code># 安装ssh服务
+pkg install openssh -y
+
+# 运行SSH Server
+sshd</code></pre>
+<h3 id="通过密码方式">通过密码方式</h3>
+<pre class="shiki-source" data-shiki-language="text" data-shiki-code="# 设置密码
+passwd
+
+# 获得Android IP
+ifconfig | grep inet
+
+## PC端连接
+androidIP:8022"><code># 设置密码
+passwd
+
+# 获得Android IP
+ifconfig | grep inet
+
+## PC端连接
+androidIP:8022</code></pre>
+<h3 id="通过公钥方式">通过公钥方式</h3>
+<pre class="shiki-source" data-shiki-language="text" data-shiki-code="# 在Android上执行
+ssh-keygen
+# 添加到授信列表
+cd /data/data/com.termux/files/home/.ssh/
+cat id_rsa.pub &gt;&gt; authorized_keys
+
+pkill sshd
+sshd"><code># 在Android上执行
+ssh-keygen
+# 添加到授信列表
+cd /data/data/com.termux/files/home/.ssh/
+cat id_rsa.pub &gt;&gt; authorized_keys
+
+pkill sshd
+sshd</code></pre>
+<h2 id="通过服务方式启动">通过服务方式启动</h2>
+<table>
+	<thead>
+			<tr>
+					<th>Package</th>
+					<th>Daemon</th>
+					<th>Port</th>
+					<th>Description</th>
+			</tr>
+	</thead>
+	<tbody>
+			<tr>
+					<td>apache2</td>
+					<td>httpd</td>
+					<td>8080</td>
+					<td>Apache Web Server HTTP Web Server</td>
+			</tr>
+			<tr>
+					<td>at</td>
+					<td>atd</td>
+					<td></td>
+					<td>AT and batch delayed command scheduling utility and daemon at</td>
+			</tr>
+			<tr>
+					<td>bitcoin</td>
+					<td>bitcoind</td>
+					<td></td>
+					<td>Bitcoin Core</td>
+			</tr>
+			<tr>
+					<td>busybox</td>
+					<td>telnetd</td>
+					<td>8023</td>
+					<td>Remote terminal service Telnet</td>
+			</tr>
+			<tr>
+					<td>busybox</td>
+					<td>ftpd</td>
+					<td>8021</td>
+					<td>FTP (File Transfer Protocol) FTP</td>
+			</tr>
+			<tr>
+					<td>cronie</td>
+					<td>crond</td>
+					<td></td>
+					<td>Daemon that runs specified programs at scheduled times cron</td>
+			</tr>
+			<tr>
+					<td>emacs</td>
+					<td>emacsd</td>
+					<td></td>
+					<td>Extensible, customizable text editor-and more EMACS</td>
+			</tr>
+			<tr>
+					<td>ipfs</td>
+					<td>ipfs</td>
+					<td></td>
+					<td>A peer-to-peer hypermedia distribution protocol IPFS</td>
+			</tr>
+			<tr>
+					<td>libmosquitto</td>
+					<td>mosquitto</td>
+					<td>1883</td>
+					<td>MQTT is a lightweight, publish-subscribe network protocol MQTT</td>
+			</tr>
+			<tr>
+					<td>lighttpd</td>
+					<td>lighttpd</td>
+					<td>8080</td>
+					<td>Lighttpd Small webserver HTTP Web Server</td>
+			</tr>
+			<tr>
+					<td>lnd</td>
+					<td>lnd</td>
+					<td></td>
+					<td>Lightning Network Daemon</td>
+			</tr>
+			<tr>
+					<td>mariadb</td>
+					<td>mysqld</td>
+					<td>3306</td>
+					<td>MariaDB Community-developed fork of the MySQL from its original authors</td>
+			</tr>
+			<tr>
+					<td>mpd</td>
+					<td>mpd</td>
+					<td></td>
+					<td>Music Player Daemon (MPD)</td>
+			</tr>
+			<tr>
+					<td>mpdscribble</td>
+					<td>mpdscribble</td>
+					<td></td>
+					<td>MPD client which submits tracks being played</td>
+			</tr>
+			<tr>
+					<td>nginx</td>
+					<td>nginx</td>
+					<td>8080</td>
+					<td>NGINX Web server HTTP Web Server</td>
+			</tr>
+			<tr>
+					<td>openssh</td>
+					<td>sshd</td>
+					<td>8022</td>
+					<td>OpenSSH SSH</td>
+			</tr>
+			<tr>
+					<td>postgresql</td>
+					<td>postgres</td>
+					<td>5432</td>
+					<td>PostgreSQL database PostgreSQL</td>
+			</tr>
+			<tr>
+					<td>privoxy</td>
+					<td>privoxy</td>
+					<td></td>
+					<td>Privoxy is non-caching web proxy with advanced filtering capabilities HTTP Proxy</td>
+			</tr>
+			<tr>
+					<td>tor</td>
+					<td>tor</td>
+					<td></td>
+					<td>The Onion Router anonymizing overlay network Tor</td>
+			</tr>
+			<tr>
+					<td>transmission</td>
+					<td>transmission</td>
+					<td></td>
+					<td>BitTorrent client BitTorrent</td>
+			</tr>
+	</tbody>
+</table>
+<pre class="shiki-source" data-shiki-language="shell" data-shiki-code="在安装 termux-services 完成后，需要重启app（杀进程）
+
+# 启动服务，并设置为开机启动
+sv-enable &lt;service&gt;
+# 运行服务
+sv up &lt;service&gt;
+# 停止服务
+sv down &lt;service&gt;
+# 禁用服务
+sv-disable &lt;service&gt;
+
+例如：
+pkg install nginx -y
+sv-enable nginx"><code>在安装 termux-services 完成后，需要重启app（杀进程）
+
+# 启动服务，并设置为开机启动
+sv-enable &lt;service&gt;
+# 运行服务
+sv up &lt;service&gt;
+# 停止服务
+sv down &lt;service&gt;
+# 禁用服务
+sv-disable &lt;service&gt;
+
+例如：
+pkg install nginx -y
+sv-enable nginx</code></pre>
+<h2 id="开机启动">开机启动</h2>
+<p>需安装APP：<a href="https://f-droid.org/repo/com.termux.boot_7.apk" target="_blank" rel="noopener noreferrer">Termux:Boot</a>
+
+运行一次，并添加到电池优化白名单</p>
+<p>添加配置</p>
+<pre class="shiki-source" data-shiki-language="shell" data-shiki-code="mkdir ~/.termux/boot/
+vim ~/.termux/boot/startup.sh"><code>mkdir ~/.termux/boot/
+vim ~/.termux/boot/startup.sh</code></pre>
+<pre class="shiki-source" data-shiki-language="text" data-shiki-code="#!/data/data/com.termux/files/usr/bin/sh
+termux-wake-lock      # 防止休眠
+. $PREFIX/etc/profile # Termux-services"><code>#!/data/data/com.termux/files/usr/bin/sh
+termux-wake-lock      # 防止休眠
+. $PREFIX/etc/profile # Termux-services</code></pre>
+<p>赋予执行权限</p>
+<pre class="shiki-source" data-shiki-language="shell" data-shiki-code="chmod &#43;x ~/.termux/boot/startup.sh"><code>chmod &#43;x ~/.termux/boot/startup.sh</code></pre>
+<h2 id="docker">Docker</h2>
+<p>目前的方案是，模拟x86，然后运行Docker。效率感人<br>
+<a href="https://gist.github.com/oofnikj/e79aef095cd08756f7f26ed244355d62" target="_blank" rel="noopener noreferrer">原作者</a>
+的后续步骤看不懂了，暂时不折腾</p>
+<p><a href="https://gist.github.com/FreddieOliveira/efe850df7ff3951cb62d74bd770dce27" target="_blank" rel="noopener noreferrer">另外一个方案</a>
+，需要编译Android内核。但是不需要虚拟机了</p>
+<pre class="shiki-source" data-shiki-language="shell" data-shiki-code="# 安装必要的包
+pkg install -y qemu-utils qemu-common qemu-system-x86_64-headless
+# 下载镜像
+wget https://dl-cdn.alpinelinux.org/alpine/v3.14/releases/x86_64/alpine-virt-3.14.2-x86_64.iso
+# 创建硬盘
+qemu-img create -f qcow2 alpine.img 4G
+# 启动
+qemu-system-x86_64 -machine q35 -m 1024 -smp cpus=2 -cpu qemu64 \
+  -drive if=pflash,format=raw,read-only,file=$PREFIX/share/qemu/edk2-x86_64-code.fd \
+  -netdev user,id=n1,hostfwd=tcp::2222-:22 -device virtio-net,netdev=n1 \
+  -cdrom alpine-virt-3.12.3-x86_64.iso \
+  -nographic alpine.img
+
+# 启动完成后，使用root登录，没有密码
+# 设置网络
+setup-interfaces
+ifup eth0
+
+# 安装
+wget https://gist.githubusercontent.com/oofnikj/e79aef095cd08756f7f26ed244355d62/raw/answerfile
+sed -i -E &#39;s/(local kernel_opts)=.*/\1=&#34;console=ttyS0&#34;/&#39; /sbin/setup-disk
+setup-alpine -f answerfile"><code># 安装必要的包
+pkg install -y qemu-utils qemu-common qemu-system-x86_64-headless
+# 下载镜像
+wget https://dl-cdn.alpinelinux.org/alpine/v3.14/releases/x86_64/alpine-virt-3.14.2-x86_64.iso
+# 创建硬盘
+qemu-img create -f qcow2 alpine.img 4G
+# 启动
+qemu-system-x86_64 -machine q35 -m 1024 -smp cpus=2 -cpu qemu64 \
+  -drive if=pflash,format=raw,read-only,file=$PREFIX/share/qemu/edk2-x86_64-code.fd \
+  -netdev user,id=n1,hostfwd=tcp::2222-:22 -device virtio-net,netdev=n1 \
+  -cdrom alpine-virt-3.12.3-x86_64.iso \
+  -nographic alpine.img
+
+# 启动完成后，使用root登录，没有密码
+# 设置网络
+setup-interfaces
+ifup eth0
+
+# 安装
+wget https://gist.githubusercontent.com/oofnikj/e79aef095cd08756f7f26ed244355d62/raw/answerfile
+sed -i -E &#39;s/(local kernel_opts)=.*/\1=&#34;console=ttyS0&#34;/&#39; /sbin/setup-disk
+setup-alpine -f answerfile</code></pre>
+<h2 id="其他工具">其他工具</h2>
+<pre class="shiki-source" data-shiki-language="shell" data-shiki-code="# golang
+wget https://golang.org/dl/go1.17.2.linux-arm64.tar.gz
+
+# mysql
+pkg install mariadb"><code># golang
+wget https://golang.org/dl/go1.17.2.linux-arm64.tar.gz
+
+# mysql
+pkg install mariadb</code></pre>
+<p>刷Linux原生系统（类似LineageOS）
+<a href="https://postmarketos.org/" target="_blank" rel="noopener noreferrer">https://postmarketos.org/</a>
+</p>
+<p>弱弱的问一下，android手机为什么不能刷linux？<br>
+<a href="https://www.zhihu.com/question/277198849" target="_blank" rel="noopener noreferrer">https://www.zhihu.com/question/277198849</a>
+</p>
+<p><a href="https://devices.ubuntu-touch.io/" target="_blank" rel="noopener noreferrer">https://devices.ubuntu-touch.io/</a>
+</p>
+</div>
+      <div class="article-tags"><a href="https://leapsea.github.io/tags/Termux/">#Termux</a><a href="https://leapsea.github.io/tags/Android/">#Android</a></div>
+
+      <footer class="article-footer">
+        <a href="https://leapsea.github.io/2021/08/13/Golang%E7%BC%96%E7%A0%81%E8%A7%84%E8%8C%83.html">← Golang编码规范</a>
+        <a class="next" href="https://leapsea.github.io/2021/11/13/%E4%BA%AC%E8%B1%86%E8%84%9A%E6%9C%AC.html">京豆脚本 →</a>
+      </footer>
+    </article>
+    <aside class="sidebar">
+  <form class="site-search" role="search" action="https://leapsea.github.io/search/" method="get">
+    <label class="sr-only" for="site-search-input">搜索</label>
+    <input id="site-search-input" type="search" name="q" placeholder="Search" aria-label="搜索">
+    <button type="submit" aria-label="提交搜索"><svg class="site-icon" viewBox="0 0 22 22" aria-hidden="true" focusable="false"><path d="M10 3a7 7 0 1 0 4.4 12.4l5.3 5.3 1.4-1.4-5.3-5.3A7 7 0 0 0 10 3m0 2a5 5 0 1 1 0 10 5 5 0 0 1 0-10" /></svg>
+</button>
+  </form>
+  <section class="widget widget-category">
+    <h3 class="widget-title"><svg class="site-icon" viewBox="0 0 22 22" aria-hidden="true" focusable="false"><path d="M3 5h7l2 2h9v12H3zm2 4v8h14V9z" /></svg>
+<span>分类</span></h3>
+    <ul class="widget-list"><li><a href="https://leapsea.github.io/categories/Golang/">Golang</a><span>(5)</span></li><li><a href="https://leapsea.github.io/categories/Android/">Android</a><span>(3)</span></li><li><a href="https://leapsea.github.io/categories/Docker/">Docker</a><span>(3)</span></li><li><a href="https://leapsea.github.io/categories/%E5%94%A0%E5%8F%A8/">唠叨</a><span>(3)</span></li><li><a href="https://leapsea.github.io/categories/%E6%8A%98%E8%85%BE/">折腾</a><span>(3)</span></li><li><a href="https://leapsea.github.io/categories/Kubernetes/">Kubernetes</a><span>(2)</span></li><li><a href="https://leapsea.github.io/categories/Linux/">Linux</a><span>(2)</span></li><li><a href="https://leapsea.github.io/categories/%E5%B7%A5%E5%85%B7/">工具</a><span>(2)</span></li><li><a href="https://leapsea.github.io/categories/%E9%87%8F%E5%8C%96%E4%BA%A4%E6%98%93/">量化交易</a><span>(2)</span></li><li><a href="https://leapsea.github.io/categories/Flutter/">Flutter</a><span>(1)</span></li><li><a href="https://leapsea.github.io/categories/Google/">Google</a><span>(1)</span></li><li><a href="https://leapsea.github.io/categories/%E5%85%A5%E4%BE%B5%E6%A3%80%E6%B5%8B/">入侵检测</a><span>(1)</span></li><li><a href="https://leapsea.github.io/categories/%E5%85%BB%E7%94%9F/">养生</a><span>(1)</span></li><li><a href="https://leapsea.github.io/categories/%E5%AD%A6%E4%B9%A0%E8%B5%84%E6%96%99/">学习资料</a><span>(1)</span></li><li><a href="https://leapsea.github.io/categories/%E6%84%8F%E5%A4%96%E6%94%B6%E8%8E%B7/">意外收获</a><span>(1)</span></li><li><a href="https://leapsea.github.io/categories/%E6%95%88%E7%8E%87/">效率</a><span>(1)</span></li><li><a href="https://leapsea.github.io/categories/%E7%96%AB%E6%83%85/">疫情</a><span>(1)</span></li><li><a href="https://leapsea.github.io/categories/%E7%B3%BB%E7%BB%9F/">系统</a><span>(1)</span></li><li><a href="https://leapsea.github.io/categories/%E8%96%85%E7%BE%8A%E6%AF%9B/">薅羊毛</a><span>(1)</span></li><li><a href="https://leapsea.github.io/categories/%E8%96%9B%E5%AE%9A%E8%B0%94%E7%9A%84bug/">薛定谔的bug</a><span>(1)</span></li></ul>
+  </section>
+  <section class="widget">
+    <h3 class="widget-title"><svg class="site-icon" viewBox="0 0 22 22" aria-hidden="true" focusable="false"><path d="m12 2 3 6 7 .9-5 4.8 1.2 6.8L12 17l-6.2 3.5L7 13.7 2 8.9 9 8z" /></svg>
+ 标签</h3>
+    <div class="tag-list"><a href="https://leapsea.github.io/tags/Golang/">Golang(7)</a><a href="https://leapsea.github.io/tags/Android/">Android(6)</a><a href="https://leapsea.github.io/tags/Docker/">Docker(4)</a><a href="https://leapsea.github.io/tags/Linux/">Linux(4)</a><a href="https://leapsea.github.io/tags/HTTP/">HTTP(3)</a><a href="https://leapsea.github.io/tags/Windows/">Windows(3)</a><a href="https://leapsea.github.io/tags/%E8%99%9A%E6%8B%9F%E6%9C%BA/">虚拟机(3)</a><a href="https://leapsea.github.io/tags/Kafka/">Kafka(2)</a><a href="https://leapsea.github.io/tags/Kubernetes/">Kubernetes(2)</a><a href="https://leapsea.github.io/tags/Termux/">Termux(2)</a><a href="https://leapsea.github.io/tags/%E4%BF%A1%E6%81%AF%E5%AE%89%E5%85%A8/">信息安全(2)</a><a href="https://leapsea.github.io/tags/%E5%8D%9A%E5%AE%A2/">博客(2)</a><a href="https://leapsea.github.io/tags/%E5%BC%80%E5%8F%91%E5%B7%A5%E5%85%B7/">开发工具(2)</a><a href="https://leapsea.github.io/tags/%E7%BD%91%E7%BB%9C/">网络(2)</a><a href="https://leapsea.github.io/tags/%E9%87%8F%E5%8C%96%E4%BA%A4%E6%98%93/">量化交易(2)</a><a href="https://leapsea.github.io/tags/Flutter/">Flutter(1)</a><a href="https://leapsea.github.io/tags/SSH/">SSH(1)</a><a href="https://leapsea.github.io/tags/%E5%81%A5%E5%BA%B7/">健康(1)</a><a href="https://leapsea.github.io/tags/%E5%9B%BE%E5%BA%8A/">图床(1)</a><a href="https://leapsea.github.io/tags/%E5%BE%AE%E6%9C%8D%E5%8A%A1/">微服务(1)</a><a href="https://leapsea.github.io/tags/%E6%95%B0%E6%8D%AE%E5%88%86%E6%9E%90/">数据分析(1)</a><a href="https://leapsea.github.io/tags/%E6%95%B0%E6%8D%AE%E5%BA%93/">数据库(1)</a><a href="https://leapsea.github.io/tags/%E6%96%B0%E5%86%A0/">新冠(1)</a><a href="https://leapsea.github.io/tags/%E7%A1%AC%E4%BB%B6/">硬件(1)</a><a href="https://leapsea.github.io/tags/%E8%87%AA%E5%8A%A8%E5%8C%96/">自动化(1)</a></div>
+  </section>
+  <section class="widget widget-recent-posts">
+    <h3 class="widget-title"><svg class="site-icon" viewBox="0 0 22 22" aria-hidden="true" focusable="false"><path d="M5 2h9l5 5v15H5zm8 2v5h5M8 13h8v2H8zm0 4h8v2H8z" /></svg>
+ 最近文章</h3>
+    <ul class="recent-list recent-posts"><li><a href="https://leapsea.github.io/2026/09/23/%E4%BB%8E-Hexo-%E5%88%B0-Hugo%E4%B8%BB%E9%A2%98%E6%A0%B7%E5%BC%8F%E4%B8%8E%E4%BB%A3%E7%A0%81%E9%AB%98%E4%BA%AE.html" title="从 Hexo 到 Hugo：主题、样式与代码高亮">从 Hexo 到 Hugo：主题、样式与代码高亮</a></li><li><a href="https://leapsea.github.io/2022/03/30/http%E9%87%8D%E5%AE%9A%E5%90%91.html" title="http重定向">http重定向</a></li><li><a href="https://leapsea.github.io/2022/02/06/%E6%96%B0%E5%8A%A0%E5%9D%A1%E7%96%AB%E6%83%85%E5%8F%AF%E8%A7%86%E5%8C%96%E7%BB%9F%E8%AE%A1.html" title="新加坡疫情可视化统计">新加坡疫情可视化统计</a></li><li><a href="https://leapsea.github.io/2021/11/13/%E4%BA%AC%E8%B1%86%E8%84%9A%E6%9C%AC.html" title="京豆脚本">京豆脚本</a></li><li><a href="https://leapsea.github.io/2021/10/24/Termux%E7%AE%80%E5%8D%95%E5%85%A5%E9%97%A8.html" title="Termux简单入门">Termux简单入门</a></li><li><a href="https://leapsea.github.io/2021/08/13/Golang%E7%BC%96%E7%A0%81%E8%A7%84%E8%8C%83.html" title="Golang编码规范">Golang编码规范</a></li><li><a href="https://leapsea.github.io/2021/08/09/%E5%9F%BA%E4%BA%8EBacktrader-AKShare%E5%BF%AB%E9%80%9F%E6%90%AD%E5%BB%BA%E9%87%8F%E5%8C%96%E5%9B%9E%E6%B5%8B%E5%B9%B3%E5%8F%B0.html" title="基于Backtrader&#43;AKShare快速搭建量化回测平台">基于Backtrader&#43;AKShare快速搭建量化回测平台</a></li><li><a href="https://leapsea.github.io/2021/08/06/idea%E5%BF%AB%E9%80%9F%E5%AE%9E%E7%8E%B0%E5%AE%A2%E6%88%B7%E7%AB%AFhttp%E8%B0%83%E7%94%A8.html" title="idea快速实现客户端http调用">idea快速实现客户端http调用</a></li><li><a href="https://leapsea.github.io/2021/07/31/Android%E7%B3%BB%E7%BB%9F%E7%9A%84%E6%95%B0%E6%8D%AE%E5%A4%87%E4%BB%BD%E4%B8%8E%E8%BF%98%E5%8E%9F.html" title="Android系统的数据备份与还原">Android系统的数据备份与还原</a></li><li><a href="https://leapsea.github.io/2021/07/29/Linux%E6%9C%8D%E5%8A%A1%E5%99%A8%E5%BC%80%E5%85%89.html" title="Linux服务器开光">Linux服务器开光</a></li></ul>
+  </section>
+  <section class="widget widget-links">
+    <h3 class="widget-title"><svg class="site-icon" viewBox="0 0 22 22" aria-hidden="true" focusable="false"><path d="M14 3h7v7h-2V6.4l-9.3 9.3-1.4-1.4L17.6 5H14zM5 5h6v2H7v10h10v-4h2v6H5z" /></svg>
+<span>友情链接</span></h3>
+    <ul class="recent-list"><li><a href="https://leapsea.github.io/">我的小站</a></li><li><a href="https://fictiony.github.io/">F大</a></li></ul>
+  </section>
+</aside>
+
+  </div>
+
+    </main><script defer src="https://leapsea.github.io/js/shiki.682f9fad917c5d871fb7f8af3908d8651586309049cd1d887d955c0aa05f35fe38046772a029c64eeee1fa012332b40c.js" integrity="sha384-aC&#43;frZF8XYcft/ivOQjYZRWGMJBJzR2IfZVcCqBfNf44BGdyoCnGTu7h&#43;gEjMrQM"></script>
+    <footer class="site-footer">
+  <div class="site-footer-inner">
+    <p>Copyright © 2026 <a href="https://leapsea.github.io/">我的小站</a> · Powered by <a href="https://gohugo.io/">Hugo</a></p>
+  </div>
+</footer>
+
+  </body>
+</html>

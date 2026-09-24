@@ -1,0 +1,1461 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="专注于IT互联网，包括但不限于Go语言(golang)、Java、Android、项目管理、软件架构等">
+<title>Android系统无故重启原因分析 · 我的小站</title>
+
+<link rel="stylesheet" href="https://leapsea.github.io/css/blog.css?v=5">
+<link rel="stylesheet" href="https://leapsea.github.io/css/recent-posts.css?v=2">
+<link rel="stylesheet" href="https://leapsea.github.io/css/code-highlighting.css">
+
+  </head>
+  <body class="">
+    <a class="skip-link" href="#main-content">跳到主要内容</a>
+    <header class="site-header">
+  <div class="header-inner">
+    <a class="brand" href="https://leapsea.github.io/" aria-label="我的小站 首页">
+      <span><strong>我的小站</strong><small>专注于Android、Kotlin、Go语言(golang)、移动互联网、项目管理、软件架构</small></span>
+    </a>
+    <nav class="site-nav" aria-label="主导航">
+      <a class="" href="https://leapsea.github.io/"><svg class="site-icon" viewBox="0 0 22 22" aria-hidden="true" focusable="false"><path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1z" /></svg>
+ 首页</a>
+      
+      
+        
+        
+        
+        
+        <a class="" href="https://leapsea.github.io/archives/"><svg class="site-icon" viewBox="0 0 22 22" aria-hidden="true" focusable="false"><path d="M3 4h18v4H3zm2 6h14v10H5zm4 3v2h6v-2z" /></svg>
+ 归档</a>
+      
+        
+        
+        
+        
+        <a class="" href="https://leapsea.github.io/tags/"><svg class="site-icon" viewBox="0 0 22 22" aria-hidden="true" focusable="false"><path d="M3 4h8l10 10-7 7L4 11zm5 3a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3" /></svg>
+ 标签</a>
+      
+        
+        
+        
+        
+        <a class="" href="https://leapsea.github.io/about/"><svg class="site-icon" viewBox="0 0 22 22" aria-hidden="true" focusable="false"><path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8m-8 9a8 8 0 0 1 16 0z" /></svg>
+ 关于</a>
+      
+        
+        
+        
+        
+        <a class="" href="https://leapsea.github.io/down/"><svg class="site-icon" viewBox="0 0 22 22" aria-hidden="true" focusable="false"><path d="M11 3h2v10l4-4 1.4 1.4L12 17l-6.4-6.6L7 9l4 4zm-6 16h14v2H5z" /></svg>
+ 下载</a>
+      
+        
+        
+        
+        
+        <a class="" href="https://leapsea.github.io/books/"><svg class="site-icon" viewBox="0 0 22 22" aria-hidden="true" focusable="false"><path d="M4 3h14a2 2 0 0 1 2 2v16H6a2 2 0 0 1-2-2zm3 3v2h10V6zm0 4v2h10v-2z" /></svg>
+ 电子书</a>
+      
+        
+        
+        
+        
+        
+      
+        
+        
+        
+        
+        
+      
+        
+        
+        
+        
+        
+      
+        
+        
+        
+        
+        
+      
+    </nav>
+  </div>
+</header>
+
+    <main id="main-content" class="site-shell">
+      
+  <div class="classic-layout article-grid">
+    <article class="article content-main">
+      <header class="article-header">
+        <div class="article-kicker">POSTS</div>
+        <h1>Android系统无故重启原因分析</h1>
+        <div class="post-meta">
+  <time datetime="2021-07-28">2021年07月28日</time>
+  <span class="meta-separator" aria-hidden="true">·</span><span>10 分钟阅读</span>
+  
+    
+    
+    <span class="meta-separator" aria-hidden="true">·</span><a href="https://leapsea.github.io/categories/Android/">Android</a>
+  
+</div>
+
+      </header>
+      
+        <aside class="article-toc" aria-label="文章目录">
+          <p class="toc-title">目录</p>
+          <nav id="TableOfContents">
+  <ul>
+    <li><a href="#尝试获取crash日志">尝试获取Crash日志</a>
+      <ul>
+        <li><a href="#系统日志">系统日志</a></li>
+        <li><a href="#logcat">Logcat</a></li>
+      </ul>
+    </li>
+    <li><a href="#问题定位">问题定位</a>
+      <ul>
+        <li><a href="#背景知识说明">背景知识说明</a></li>
+      </ul>
+    </li>
+    <li><a href="#寻找高人">寻找高人</a>
+      <ul>
+        <li><a href="#解决方案"><del>解决方案</del></a></li>
+      </ul>
+    </li>
+    <li><a href="#重新刷机后错误">重新刷机后错误</a>
+      <ul>
+        <li><a href="#复现一">复现一</a></li>
+        <li><a href="#复现二">复现二</a></li>
+        <li><a href="#复现三">复现三</a></li>
+        <li><a href="#复现四">复现四</a></li>
+      </ul>
+    </li>
+    <li><a href="#罪魁祸首">罪魁祸首</a></li>
+    <li><a href="#minote3资源下载">MiNote3资源下载</a></li>
+  </ul>
+</nav>
+        </aside>
+      
+      <div class="article-body"><p>手里的小米手机一直都是用的原生系统。最近升级了Android10（全新安装lineageos）。刷入了<strong>Magisk</strong>，
+安装了 <strong>Xposed</strong>、**AfWall+**及其他插件。调整了某些App的网络权限。可是发现在手机经常会无故自动重启。</p>
+<h2 id="尝试获取crash日志">尝试获取Crash日志</h2>
+<h3 id="系统日志">系统日志</h3>
+<p><strong>Android</strong>是基于<strong>Linux</strong>，理论上有与Linux相同的日志记录功能。但是鄙人才疏学浅，没找到日志位置。无法从这个地方问题</p>
+<h3 id="logcat">Logcat</h3>
+<p>那只能采用笨方法了，使用<strong>AndroidStudio</strong>的<strong>Logcat</strong>日志查看功能，捕捉崩溃时的日志。一番操作后，抓到了崩溃信息</p>
+<pre class="shiki-source" data-shiki-language="log" data-shiki-code="2021-07-28 15:37:29.100 27537-27537/? W/IptablesRestoreController: iptables-restore process 27546 terminated status=256
+2021-07-28 15:37:29.100 27537-27537/? E/IptablesRestoreController: iptables error:
+    ------- COMMAND -------
+    *filter
+    -D OUTPUT -o rmnet_data2 -m owner --uid-owner 10166 --jump REJECT
+    COMMIT
+    
+    -------  ERROR -------
+    iptables-restore: line 674 failed
+    ----------------------
+2021-07-28 15:37:29.104 27537-27537/? I/netd: bandwidthRemoveRestrictAppOnInterface(&#34;data&#34;, &#34;rmnet_data2&#34;, 10166) -&gt; ServiceSpecificException(1, &#34;Operation not permitted&#34;) &lt;15.89ms&gt;
+    
+    --------- beginning of crash
+2021-07-28 15:37:29.106 27815-27875/system_process E/AndroidRuntime: *** FATAL EXCEPTION IN SYSTEM PROCESS: android.fg
+    java.lang.IllegalStateException: android.os.ServiceSpecificException: Operation not permitted (code 1)
+        at com.android.server.NetworkManagementService.setAppOnInterfaceLocked(NetworkManagementService.java:1659)
+        at com.android.server.NetworkManagementService.updateAppOnInterfaceCallback(NetworkManagementService.java:1598)
+        at com.android.server.NetworkManagementService.access$500(NetworkManagementService.java:123)
+        at com.android.server.NetworkManagementService$1.lambda$onLinkPropertiesChanged$0$NetworkManagementService$1(NetworkManagementService.java:405)
+        at com.android.server.-$$Lambda$NetworkManagementService$1$cEe7AIGZabKkElb0YvNi_jszJbI.run(Unknown Source:6)
+        at android.os.Handler.handleCallback(Handler.java:883)
+        at android.os.Handler.dispatchMessage(Handler.java:100)
+        at android.os.Looper.loop(Looper.java:214)
+        at android.os.HandlerThread.run(HandlerThread.java:67)
+        at com.android.server.ServiceThread.run(ServiceThread.java:44)
+     Caused by: android.os.ServiceSpecificException: Operation not permitted (code 1)
+        at android.os.Parcel.createException(Parcel.java:2085)
+        at android.os.Parcel.readException(Parcel.java:2039)
+        at android.os.Parcel.readException(Parcel.java:1987)
+        at android.net.INetd$Stub$Proxy.bandwidthRemoveRestrictAppOnInterface(INetd.java:3558)
+        at com.android.server.NetworkManagementService.setAppOnInterfaceLocked(NetworkManagementService.java:1649)
+        at com.android.server.NetworkManagementService.updateAppOnInterfaceCallback(NetworkManagementService.java:1598) 
+        at com.android.server.NetworkManagementService.access$500(NetworkManagementService.java:123) 
+        at com.android.server.NetworkManagementService$1.lambda$onLinkPropertiesChanged$0$NetworkManagementService$1(NetworkManagementService.java:405) 
+        at com.android.server.-$$Lambda$NetworkManagementService$1$cEe7AIGZabKkElb0YvNi_jszJbI.run(Unknown Source:6) 
+        at android.os.Handler.handleCallback(Handler.java:883) 
+        at android.os.Handler.dispatchMessage(Handler.java:100) 
+        at android.os.Looper.loop(Looper.java:214) 
+        at android.os.HandlerThread.run(HandlerThread.java:67) 
+        at com.android.server.ServiceThread.run(ServiceThread.java:44) "><code>2021-07-28 15:37:29.100 27537-27537/? W/IptablesRestoreController: iptables-restore process 27546 terminated status=256
+2021-07-28 15:37:29.100 27537-27537/? E/IptablesRestoreController: iptables error:
+    ------- COMMAND -------
+    *filter
+    -D OUTPUT -o rmnet_data2 -m owner --uid-owner 10166 --jump REJECT
+    COMMIT
+    
+    -------  ERROR -------
+    iptables-restore: line 674 failed
+    ----------------------
+2021-07-28 15:37:29.104 27537-27537/? I/netd: bandwidthRemoveRestrictAppOnInterface(&#34;data&#34;, &#34;rmnet_data2&#34;, 10166) -&gt; ServiceSpecificException(1, &#34;Operation not permitted&#34;) &lt;15.89ms&gt;
+    
+    --------- beginning of crash
+2021-07-28 15:37:29.106 27815-27875/system_process E/AndroidRuntime: *** FATAL EXCEPTION IN SYSTEM PROCESS: android.fg
+    java.lang.IllegalStateException: android.os.ServiceSpecificException: Operation not permitted (code 1)
+        at com.android.server.NetworkManagementService.setAppOnInterfaceLocked(NetworkManagementService.java:1659)
+        at com.android.server.NetworkManagementService.updateAppOnInterfaceCallback(NetworkManagementService.java:1598)
+        at com.android.server.NetworkManagementService.access$500(NetworkManagementService.java:123)
+        at com.android.server.NetworkManagementService$1.lambda$onLinkPropertiesChanged$0$NetworkManagementService$1(NetworkManagementService.java:405)
+        at com.android.server.-$$Lambda$NetworkManagementService$1$cEe7AIGZabKkElb0YvNi_jszJbI.run(Unknown Source:6)
+        at android.os.Handler.handleCallback(Handler.java:883)
+        at android.os.Handler.dispatchMessage(Handler.java:100)
+        at android.os.Looper.loop(Looper.java:214)
+        at android.os.HandlerThread.run(HandlerThread.java:67)
+        at com.android.server.ServiceThread.run(ServiceThread.java:44)
+     Caused by: android.os.ServiceSpecificException: Operation not permitted (code 1)
+        at android.os.Parcel.createException(Parcel.java:2085)
+        at android.os.Parcel.readException(Parcel.java:2039)
+        at android.os.Parcel.readException(Parcel.java:1987)
+        at android.net.INetd$Stub$Proxy.bandwidthRemoveRestrictAppOnInterface(INetd.java:3558)
+        at com.android.server.NetworkManagementService.setAppOnInterfaceLocked(NetworkManagementService.java:1649)
+        at com.android.server.NetworkManagementService.updateAppOnInterfaceCallback(NetworkManagementService.java:1598) 
+        at com.android.server.NetworkManagementService.access$500(NetworkManagementService.java:123) 
+        at com.android.server.NetworkManagementService$1.lambda$onLinkPropertiesChanged$0$NetworkManagementService$1(NetworkManagementService.java:405) 
+        at com.android.server.-$$Lambda$NetworkManagementService$1$cEe7AIGZabKkElb0YvNi_jszJbI.run(Unknown Source:6) 
+        at android.os.Handler.handleCallback(Handler.java:883) 
+        at android.os.Handler.dispatchMessage(Handler.java:100) 
+        at android.os.Looper.loop(Looper.java:214) 
+        at android.os.HandlerThread.run(HandlerThread.java:67) 
+        at com.android.server.ServiceThread.run(ServiceThread.java:44) </code></pre>
+<h2 id="问题定位">问题定位</h2>
+<p>出现问题的原因是，在某项操作触发下（比如切换到<strong>流量上网模式</strong>），系统需要做出对应的动作，但是该进程没有权限。就导致了OOM。</p>
+<h3 id="背景知识说明">背景知识说明</h3>
+<h4 id="netd">Netd</h4>
+<p>Netd模块是Android中专门负责网络管理和控制的后台守护进程，其功能主要分为三个部分</p>
+<ol>
+<li>设置防火墙(Firewall) 、网络地址转换(NAT) 、带宽控制 、无线网卡软接入点控制(Soft Access Ponit)控制，网络设备绑定等等</li>
+<li>Android 系统中 DNS 信息的缓存和管理</li>
+<li>网络服务搜索功能(Net Service Discovery, 简称NSD)功能，包括服务注册(Service Registration) 、服务搜索(Service Browse)和服务名解析(Service Resolve)等</li>
+</ol>
+<p>如需详细了解，可拜读如下文章
+<a href="https://lixiaogang03.github.io/2019/09/26/Android-NetworkControl/" target="_blank" rel="noopener noreferrer">Android NetworkControl网速和防火墙管理</a>
+</p>
+<h2 id="寻找高人">寻找高人</h2>
+<p>通过关键词搜索得到如下两篇关键文章</p>
+<ul>
+<li>
+<p>热心网友提交给LineageOS的bug<a href="https://gitlab.com/LineageOS/issues/android/-/issues/2514" target="_blank" rel="noopener noreferrer">
+[SOLVED] Phone reboots everytime I turn on mobile data</a>
+</p>
+</li>
+<li>
+<p><a href="https://forum.xda-developers.com/t/rom-official-nightlies-lineageos-17-1.4109617/page-25#post-84172101" target="_blank" rel="noopener noreferrer">XDA上面的讨论</a>
+</p>
+</li>
+</ul>
+<pre class="shiki-source" data-shiki-language="text" data-shiki-code="Hi!
+
+
+I&#39;m use an older pixel Experience Mod (02/2020) at the moment. I want to change to Lineage and I’m very happy there is a stable Lineage ROM.
+
+THANKS TO EVERYBODY WHO MADE IT POSSIBLE!
+
+A few Questions before i start:
+
+Important for me is a full phone encryption. It comes with this ROM?
+
+Is it recommended to flash the latest MIUI ROM for all updates and change after it to this ROM? Because it is one year old, maybe it causes problems.
+
+At the moment i use orange fox. Or do you recommend this lineage recovery?
+
+My steps:
+
+1) Flash MIUI latest ROM for all updates
+2) Reinstall Orangefox
+3) Format data etc
+4)Install Lineage
+5) Install Google Apps
+
+
+Other Suggestions? Is there anything wrong? I want to avoid mistakes..."><code>Hi!
+
+
+I&#39;m use an older pixel Experience Mod (02/2020) at the moment. I want to change to Lineage and I’m very happy there is a stable Lineage ROM.
+
+THANKS TO EVERYBODY WHO MADE IT POSSIBLE!
+
+A few Questions before i start:
+
+Important for me is a full phone encryption. It comes with this ROM?
+
+Is it recommended to flash the latest MIUI ROM for all updates and change after it to this ROM? Because it is one year old, maybe it causes problems.
+
+At the moment i use orange fox. Or do you recommend this lineage recovery?
+
+My steps:
+
+1) Flash MIUI latest ROM for all updates
+2) Reinstall Orangefox
+3) Format data etc
+4)Install Lineage
+5) Install Google Apps
+
+
+Other Suggestions? Is there anything wrong? I want to avoid mistakes...</code></pre>
+<h3 id="解决方案"><del>解决方案</del></h3>
+<p>翻译过来就是：</p>
+<ol>
+<li>刷MIUI官方最新固件</li>
+<li><code>fastboot flash recovery recovery.img</code> 刷入Recovery（可跳过）</li>
+<li>格式化系统分区</li>
+<li>安装LineageOS</li>
+<li>根据个人喜好，安装其他软件</li>
+</ol>
+<p>看来需要刷机（升级底层固件）来解决这个问题，那么就要选一个良辰吉日来操作了。毕竟需要半天多的时间来折腾。</p>
+<p><strong>2021年8月5日更新</strong></p>
+<blockquote>
+<p><strong>该方案无效</strong></p>
+</blockquote>
+<h2 id="重新刷机后错误">重新刷机后错误</h2>
+<h3 id="复现一">复现一</h3>
+<pre class="shiki-source" data-shiki-language="log" data-shiki-code="2021-08-05 16:59:07.168 23192-23364/? D/ConnectivityService: NetReassign [18 : null → 102, 10 : null → 102, 23 : null → 102, 29 : null → 102, 26 : null → 102, 28 : null → 102, 1 : null → 102, 33 : null → 102, 31 : null → 102, 15 : null → 102, 35 : null → 102, 37 : null → 102, 39 : null → 102, 11 : null → 102, 16 : null → 102]
+2021-08-05 16:59:07.170 22869-22902/? E/NetlinkEvent: NetlinkEvent::FindParam(): Parameter &#39;INTERFACE&#39; not found
+2021-08-05 16:59:07.170 22869-22902/? E/NetlinkEvent: NetlinkEvent::FindParam(): Parameter &#39;STATE&#39; not found
+2021-08-05 16:59:07.170 22869-22902/? E/NetlinkEvent: NetlinkEvent::FindParam(): Parameter &#39;TIME_NS&#39; not found
+2021-08-05 16:59:07.170 22869-22902/? E/NetlinkEvent: NetlinkEvent::FindParam(): Parameter &#39;UID&#39; not found
+2021-08-05 16:59:07.173 23192-23364/? D/ConnectivityService: Switching to new default network: NetworkAgentInfo{ ni{[type: MOBILE[HSPA&#43;], state: CONNECTED/CONNECTED, reason: (unspecified), extra: 3gnet, failover: false, available: true, roaming: false]}  network{102}  nethandle{441492361229}  lp{{InterfaceName: rmnet_data1 LinkAddresses: [ 10.207.3.56/28 ] DnsAddresses: [ /112.65.184.255,/210.22.84.3 ] Domains: null MTU: 1436 TcpBufferSizes: 4094,87380,1220608,4096,16384,1220608 Routes: [ 0.0.0.0/0 -&gt; 10.207.3.57 rmnet_data1 mtu 1436,10.207.3.48/28 -&gt; 0.0.0.0 rmnet_data1 mtu 0 ]}}  nc{[ Transports: CELLULAR Capabilities: SUPL&amp;INTERNET&amp;NOT_RESTRICTED&amp;TRUSTED&amp;NOT_VPN&amp;NOT_ROAMING&amp;FOREGROUND&amp;NOT_CONGESTED&amp;NOT_SUSPENDED LinkUpBandwidth&gt;=3400Kbps LinkDnBandwidth&gt;=13000Kbps Specifier: &lt;TelephonyNetworkSpecifier [mSubId = 2]&gt; AdministratorUids: [] RequestorUid: -1 RequestorPackageName: null]}  Score{10}  everValidated{false}  lastValidated{false}  created{true} lingering{false} explicitlySelected{false} acceptUnvalidated{false} everCaptivePortalDetected{false} lastCaptivePortalDetected{false} partialConnectivity{false} acceptPartialConnectivity{false} clat{mBaseIface: null, mIface: null, mState: IDLE} }
+2021-08-05 16:59:07.193 23773-24961/? D/QCNEJ/DefaultNetworkInfoRelay: Default network available: 102
+2021-08-05 16:59:07.196 23192-23698/? D/NetworkTimeUpdateService: New default network 102; checking time.
+2021-08-05 16:59:07.202 23192-23364/? D/ConnectivityService: Sending CONNECTED broadcast for type 0 [102 CELLULAR] isDefaultNetwork=true
+2021-08-05 16:59:07.207 23192-23364/? D/ConnectivityService: [102 CELLULAR] EVENT_NETWORK_INFO_CHANGED, going from CONNECTED to CONNECTED
+2021-08-05 16:59:07.216 23773-24961/? D/QCNEJ/NativeHalConnector: -&gt; SND notifyDefaultNetworkChanged(0)
+2021-08-05 16:59:07.217 23773-24961/? D/QCNEJ/WwanInfoRelay: network available: 102
+2021-08-05 16:59:07.217 23773-24961/? I/QCNEJ/NativeHalConnector: -&gt; SND notifyWwanStatusChanged([WwanInfo]: signalStrength = 0 roaming = 0 mccMnc = [RatInfo]: networkType = 0 subType = 0 networkState = UNKNOWN netHdl = 441492361229 ipAddrV4 =  ipAddrV6 =  ifNameV4 =  ifNameV6 =  slotIdx = 0 isAndroidValidated = false) timeStamp = 2021-08-05 16:59:07.217
+2021-08-05 16:59:07.218 25002-25035/? I/System.out: true
+2021-08-05 16:59:07.218 25002-25072/? I/System.out: true
+2021-08-05 16:59:07.223 27896-28157/? E/libc: Access denied finding property &#34;net.dns1&#34;
+2021-08-05 16:59:07.224 24386-28324/? I/PinnedContentDownloader: Finished downloading pinned content.
+2021-08-05 16:59:07.229 27896-28157/? E/libc: Access denied finding property &#34;net.dns1&#34;
+2021-08-05 16:59:07.230 26827-26991/? E/libc: Access denied finding property &#34;net.dns1&#34;
+2021-08-05 16:59:07.230 26827-26991/? E/libc: Access denied finding property &#34;net.dns2&#34;
+2021-08-05 16:59:07.228 26827-26827/? W/mars::26991: type=1400 audit(0.0:22426): avc: denied { read } for name=&#34;route&#34; dev=&#34;proc&#34; ino=4026532115 scontext=u:r:untrusted_app_29:s0:c173,c256,c512,c768 tcontext=u:object_r:proc_net:s0 tclass=file permissive=0 app=com.tencent.mm
+2021-08-05 16:59:07.233 24077-26645/? I/NearbyDiscovery: FastPairHandler: Received action android.net.conn.CONNECTIVITY_CHANGE [CONTEXT service_id=49 ]
+2021-08-05 16:59:07.245 27896-28157/? E/libc: Access denied finding property &#34;net.dns1&#34;
+2021-08-05 16:59:07.252 22869-22907/? W/IptablesRestoreController: iptables-restore process 22878 terminated status=256
+2021-08-05 16:59:07.252 22869-22907/? E/IptablesRestoreController: iptables error:
+2021-08-05 16:59:07.252 22869-22907/? E/IptablesRestoreController: ------- COMMAND -------
+2021-08-05 16:59:07.252 22869-22907/? E/IptablesRestoreController: *filter
+    -D OUTPUT -o rmnet_data2 -m owner --uid-owner 10221 -j REJECT
+    COMMIT
+2021-08-05 16:59:07.252 22869-22907/? E/IptablesRestoreController: -------  ERROR -------
+2021-08-05 16:59:07.252 22869-22907/? E/IptablesRestoreController: iptables-restore: line 1078 failed
+2021-08-05 16:59:07.252 22869-22907/? E/IptablesRestoreController: ----------------------
+    
+    
+    --------- beginning of crash
+2021-08-05 16:59:07.255 23192-23213/? E/AndroidRuntime: *** FATAL EXCEPTION IN SYSTEM PROCESS: android.fg
+    java.lang.IllegalStateException: android.os.ServiceSpecificException: Operation not permitted (code 1)
+        at com.android.server.NetworkManagementService.setAppOnInterfaceLocked(NetworkManagementService.java:1604)
+        at com.android.server.NetworkManagementService.updateAppOnInterfaceCallback(NetworkManagementService.java:1543)
+        at com.android.server.NetworkManagementService.access$500(NetworkManagementService.java:125)
+        at com.android.server.NetworkManagementService$1.lambda$onLinkPropertiesChanged$0$NetworkManagementService$1(NetworkManagementService.java:405)
+        at com.android.server.-$$Lambda$NetworkManagementService$1$cEe7AIGZabKkElb0YvNi_jszJbI.run(Unknown Source:6)
+        at android.os.Handler.handleCallback(Handler.java:938)
+        at android.os.Handler.dispatchMessage(Handler.java:99)
+        at android.os.Looper.loop(Looper.java:223)
+        at android.os.HandlerThread.run(HandlerThread.java:67)
+        at com.android.server.ServiceThread.run(ServiceThread.java:44)
+     Caused by: android.os.ServiceSpecificException: Operation not permitted (code 1)
+        at android.os.Parcel.createExceptionOrNull(Parcel.java:2387)
+        at android.os.Parcel.createException(Parcel.java:2357)
+        at android.os.Parcel.readException(Parcel.java:2340)
+        at android.os.Parcel.readException(Parcel.java:2282)
+        at android.net.INetd$Stub$Proxy.bandwidthRemoveRestrictAppOnInterface(INetd.java:3991)
+        at com.android.server.NetworkManagementService.setAppOnInterfaceLocked(NetworkManagementService.java:1594)
+        at com.android.server.NetworkManagementService.updateAppOnInterfaceCallback(NetworkManagementService.java:1543) 
+        at com.android.server.NetworkManagementService.access$500(NetworkManagementService.java:125) 
+        at com.android.server.NetworkManagementService$1.lambda$onLinkPropertiesChanged$0$NetworkManagementService$1(NetworkManagementService.java:405) 
+        at com.android.server.-$$Lambda$NetworkManagementService$1$cEe7AIGZabKkElb0YvNi_jszJbI.run(Unknown Source:6) 
+        at android.os.Handler.handleCallback(Handler.java:938) 
+        at android.os.Handler.dispatchMessage(Handler.java:99) 
+        at android.os.Looper.loop(Looper.java:223) 
+        at android.os.HandlerThread.run(HandlerThread.java:67) 
+        at com.android.server.ServiceThread.run(ServiceThread.java:44) 
+2021-08-05 16:59:07.207 23192-23364/? D/ConnectivityService: [102 CELLULAR] EVENT_NETWORK_INFO_CHANGED, going from CONNECTED to CONNECTED
+2021-08-05 16:59:07.257 23192-23213/? I/DropBoxManagerService: add tag=system_server_crash isTagEnabled=true flags=0x2
+2021-08-05 16:59:07.269 24077-24171/? I/NetworkScheduler.Stats: Task com.google.android.gms/com.google.android.gms.tapandpay.gcmtask.TapAndPayGcmTaskService started execution. cause:8 exec_start_elapsed_seconds: 86135 [CONTEXT service_id=218 ]
+2021-08-05 16:59:07.294 23192-23213/? I/Process: Sending signal. PID: 23192 SIG: 9
+2021-08-05 16:59:06.742 0-0/? E/binder_alloc: 23192: binder_alloc_buf, no vma
+2021-08-05 16:59:07.374 23403-23403/? E/NotificationShadeWindowController: Failed to call setHasTopUi
+    android.os.DeadObjectException
+        at android.os.BinderProxy.transactNative(Native Method)
+        at android.os.BinderProxy.transact(BinderProxy.java:550)
+        at android.app.IActivityManager$Stub$Proxy.setHasTopUi(IActivityManager.java:9884)
+        at com.android.systemui.statusbar.phone.NotificationShadeWindowController.lambda$apply$1(NotificationShadeWindowController.java:413)
+        at com.android.systemui.statusbar.phone.NotificationShadeWindowController.lambda$apply$1$NotificationShadeWindowController(Unknown Source:0)
+        at com.android.systemui.statusbar.phone.-$$Lambda$NotificationShadeWindowController$cWnla7q4SPNKNSlx9hB8mcjvaHk.run(Unknown Source:2)
+        at com.android.systemui.DejankUtils.whitelistIpcs(DejankUtils.java:193)
+        at com.android.systemui.statusbar.phone.NotificationShadeWindowController.apply(NotificationShadeWindowController.java:411)
+        at com.android.systemui.statusbar.phone.NotificationShadeWindowController.setBackgroundBlurRadius(NotificationShadeWindowController.java:534)
+        at com.android.systemui.statusbar.NotificationShadeDepthController$updateBlurCallback$1.doFrame(NotificationShadeDepthController.kt:200)
+        at android.view.Choreographer$CallbackRecord.run(Choreographer.java:970)
+        at android.view.Choreographer.doCallbacks(Choreographer.java:796)
+        at android.view.Choreographer.doFrame(Choreographer.java:727)
+        at android.view.Choreographer$FrameDisplayEventReceiver.run(Choreographer.java:957)
+        at android.os.Handler.handleCallback(Handler.java:938)
+        at android.os.Handler.dispatchMessage(Handler.java:99)
+        at android.os.Looper.loop(Looper.java:223)
+        at android.app.ActivityThread.main(ActivityThread.java:7664)
+        at java.lang.reflect.Method.invoke(Native Method)
+        at com.android.internal.os.RuntimeInit$MethodAndArgsCaller.run(RuntimeInit.java:592)
+        at com.android.internal.os.ZygoteInit.main(ZygoteInit.java:947)
+2021-08-05 16:59:07.378 24147-24150/? I/adbd: adbd_auth: hit EOF on framework fd
+2021-08-05 16:59:07.379 24147-24150/? I/adbd: adbd_auth: received new framework fd -1 (current = 20)
+2021-08-05 16:59:06.745 0-0/? E/binder_alloc: 23192: binder_alloc_buf, no vma
+2021-08-05 16:59:06.754 0-0/? I/init: starting service &#39;bootanim&#39;...
+2021-08-05 16:59:06.757 0-0/? I/init: Control message: Processed ctl.start for &#39;bootanim&#39; from pid: 895 (/system/bin/surfaceflinger)
+2021-08-05 16:59:07.381 581-581/? I/lowmemorykiller: lmkd data connection dropped
+2021-08-05 16:59:07.381 581-581/? I/lowmemorykiller: closing lmkd data connection
+2021-08-05 16:59:07.381 833-833/? E/LocSvc_GnssInterface: serviceDied] service died. cookie: 0, who: 0x79001128f0
+2021-08-05 16:59:07.381 833-833/? E/GnssHal_GnssGeofencing: serviceDied] service died. cookie: 0, who: 0x7900116090
+2021-08-05 16:59:07.382 26827-26849/? W/Sensors: sensorservice died [0x7b25516fe0]
+2021-08-05 16:59:07.382 24077-26946/? W/Sensors: sensorservice died [0x7b25517c40]
+2021-08-05 16:59:07.382 24077-26946/? W/Sensors: sensorservice died [0x7b25517c40]
+2021-08-05 16:59:07.382 23718-23837/? W/Sensors: sensorservice died [0x7b2552fea0]
+2021-08-05 16:59:07.382 23403-23538/? W/Sensors: sensorservice died [0x7b2550be80]
+2021-08-05 16:59:07.382 23610-23666/? W/Sensors: sensorservice died [0x7b25520250]
+2021-08-05 16:59:07.382 25002-26401/? W/Sensors: sensorservice died [0x7b2551e990]
+2021-08-05 16:59:07.382 26898-28496/? W/Sensors: sensorservice died [0x7b256a95a0]
+2021-08-05 16:59:07.383 1199-1322/? I/rirud_java: Zygote is probably dead, delete existing /dev/riru folders...
+2021-08-05 16:59:07.383 22866-22866/? W/AudioFlinger: power manager service died !!!
+2021-08-05 16:59:07.383 22866-22866/? W/AudioFlinger: power manager service died !!!
+2021-08-05 16:59:07.383 895-895/? D/SurfaceFlinger: Setting power mode 2 on display 0
+2021-08-05 16:59:07.383 22866-22866/? W/AudioFlinger: power manager service died !!!
+2021-08-05 16:59:07.383 759-25133/? E/IPCThreadState: attemptIncStrongHandle(1): Not supported
+2021-08-05 16:59:07.383 22866-22892/? I/CaptureStateNotifier: Listener binder died
+2021-08-05 16:59:07.383 759-25133/? W/statsd: statscompanion service died
+2021-08-05 16:59:07.383 759-25133/? W/statsd: Reset statsd upon system server restarts.
+2021-08-05 16:59:07.383 759-2485/? E/IPCThreadState: attemptIncStrongHandle(2): Not supported
+2021-08-05 16:59:07.383 22869-23455/? E/libnetd_resolv: unlinkToDeath: removed reference to death recipient but unlink failed.
+2021-08-05 16:59:07.383 1199-1322/? I/rirud_java: Attempt to delete /dev/riru_jsDNmi5...
+2021-08-05 16:59:07.384 1199-1322/? I/rirud_java: Deleted /dev/riru_jsDNmi5
+2021-08-05 16:59:07.384 1199-1322/? I/rirud_java: Attempt to delete /dev/riru64_jsDNmi5...
+2021-08-05 16:59:07.384 22864-22864/? E/Zygote: Zygote failed to write to system_server FD: Connection refused
+2021-08-05 16:59:07.384 22864-22864/? I/Zygote: Process 23192 exited due to signal 9 (Killed)
+2021-08-05 16:59:07.384 22864-22864/? E/Zygote: Exit zygote because system server (pid 23192) has terminated
+2021-08-05 16:59:07.385 1199-1322/? I/rirud_java: Deleted /dev/riru64_jsDNmi5.
+2021-08-05 16:59:07.385 1199-1322/? I/rirud_java: Zygote is probably dead, reset native bridge to libriruloader.so...
+2021-08-05 16:59:07.388 759-27510/? E/IPCThreadState: attemptIncStrongHandle(3): Not supported
+2021-08-05 16:59:07.388 759-13336/? E/IPCThreadState: attemptIncStrongHandle(10): Not supported
+2021-08-05 16:59:07.388 759-2663/? E/IPCThreadState: attemptIncStrongHandle(27): Not supported
+2021-08-05 16:59:07.388 759-2663/? E/IPCThreadState: attemptIncStrongHandle(12): Not supported
+2021-08-05 16:59:07.388 759-13336/? E/IPCThreadState: attemptIncStrongHandle(65): Not supported
+2021-08-05 16:59:07.388 759-13336/? E/IPCThreadState: attemptIncStrongHandle(25): Not supported
+2021-08-05 16:59:07.388 759-13336/? E/IPCThreadState: attemptIncStrongHandle(6): Not supported
+2021-08-05 16:59:07.388 759-13336/? E/IPCThreadState: attemptIncStrongHandle(29): Not supported
+2021-08-05 16:59:07.388 759-13336/? E/IPCThreadState: attemptIncStrongHandle(5): Not supported
+2021-08-05 16:59:07.388 759-13336/? E/IPCThreadState: attemptIncStrongHandle(8): Not supported
+2021-08-05 16:59:07.388 759-13336/? E/IPCThreadState: attemptIncStrongHandle(24): Not supported
+2021-08-05 16:59:07.388 759-13336/? E/IPCThreadState: attemptIncStrongHandle(26): Not supported
+2021-08-05 16:59:07.388 759-13336/? E/IPCThreadState: attemptIncStrongHandle(11): Not supported
+2021-08-05 16:59:07.388 759-13336/? E/IPCThreadState: attemptIncStrongHandle(14): Not supported
+2021-08-05 16:59:07.389 759-2663/? E/IPCThreadState: attemptIncStrongHandle(48): Not supported
+2021-08-05 16:59:07.389 759-30778/? E/IPCThreadState: attemptIncStrongHandle(13): Not supported
+2021-08-05 16:59:07.389 759-773/? E/IPCThreadState: attemptIncStrongHandle(45): Not supported
+2021-08-05 16:59:07.389 759-2663/? E/IPCThreadState: attemptIncStrongHandle(9): Not supported
+2021-08-05 16:59:07.389 759-30778/? E/IPCThreadState: attemptIncStrongHandle(15): Not supported
+2021-08-05 16:59:07.389 759-773/? E/IPCThreadState: attemptIncStrongHandle(40): Not supported
+2021-08-05 16:59:07.389 759-2485/? E/IPCThreadState: attemptIncStrongHandle(49): Not supported
+2021-08-05 16:59:07.389 759-30778/? E/IPCThreadState: attemptIncStrongHandle(57): Not supported
+2021-08-05 16:59:07.389 759-773/? E/IPCThreadState: attemptIncStrongHandle(38): Not supported
+2021-08-05 16:59:07.389 759-2485/? E/IPCThreadState: attemptIncStrongHandle(21): Not supported
+2021-08-05 16:59:07.389 759-773/? E/IPCThreadState: attemptIncStrongHandle(37): Not supported
+2021-08-05 16:59:07.389 759-772/? E/IPCThreadState: attemptIncStrongHandle(43): Not supported
+2021-08-05 16:59:07.389 759-2485/? E/IPCThreadState: attemptIncStrongHandle(42): Not supported
+2021-08-05 16:59:07.389 759-13336/? E/IPCThreadState: attemptIncStrongHandle(7): Not supported
+2021-08-05 16:59:07.389 759-773/? E/IPCThreadState: attemptIncStrongHandle(31): Not supported
+2021-08-05 16:59:07.389 759-772/? E/IPCThreadState: attemptIncStrongHandle(33): Not supported
+2021-08-05 16:59:07.389 759-2485/? E/IPCThreadState: attemptIncStrongHandle(55): Not supported
+2021-08-05 16:59:07.389 759-772/? E/IPCThreadState: attemptIncStrongHandle(23): Not supported
+2021-08-05 16:59:07.389 759-13336/? E/IPCThreadState: attemptIncStrongHandle(60): Not supported
+2021-08-05 16:59:07.389 759-2485/? E/IPCThreadState: attemptIncStrongHandle(22): Not supported
+2021-08-05 16:59:07.389 759-773/? E/IPCThreadState: attemptIncStrongHandle(47): Not supported
+2021-08-05 16:59:07.389 759-772/? E/IPCThreadState: attemptIncStrongHandle(41): Not supported
+2021-08-05 16:59:07.389 759-13336/? E/IPCThreadState: attemptIncStrongHandle(66): Not supported
+2021-08-05 16:59:07.389 759-2485/? E/IPCThreadState: attemptIncStrongHandle(51): Not supported
+2021-08-05 16:59:07.389 759-772/? E/IPCThreadState: attemptIncStrongHandle(53): Not supported
+2021-08-05 16:59:07.389 759-13336/? E/IPCThreadState: attemptIncStrongHandle(50): Not supported
+2021-08-05 16:59:07.389 759-773/? E/IPCThreadState: attemptIncStrongHandle(20): Not supported
+2021-08-05 16:59:07.389 23403-23403/? D/AndroidRuntime: Shutting down VM
+2021-08-05 16:59:07.389 759-772/? E/IPCThreadState: attemptIncStrongHandle(39): Not supported
+2021-08-05 16:59:07.389 759-2663/? E/IPCThreadState: attemptIncStrongHandle(4): Not supported
+2021-08-05 16:59:07.389 759-13336/? E/IPCThreadState: attemptIncStrongHandle(44): Not supported
+2021-08-05 16:59:07.389 759-2663/? E/IPCThreadState: attemptIncStrongHandle(19): Not supported
+2021-08-05 16:59:07.389 759-773/? E/IPCThreadState: attemptIncStrongHandle(32): Not supported
+2021-08-05 16:59:07.389 759-25165/? E/IPCThreadState: attemptIncStrongHandle(28): Not supported
+2021-08-05 16:59:07.389 759-27508/? E/IPCThreadState: attemptIncStrongHandle(56): Not supported
+2021-08-05 16:59:07.389 759-30778/? E/IPCThreadState: attemptIncStrongHandle(36): Not supported
+2021-08-05 16:59:07.389 759-2485/? E/IPCThreadState: attemptIncStrongHandle(30): Not supported
+2021-08-05 16:59:07.389 759-772/? E/IPCThreadState: attemptIncStrongHandle(46): Not supported
+2021-08-05 16:59:07.390 759-772/? E/IPCThreadState: attemptIncStrongHandle(18): Not supported
+2021-08-05 16:59:07.390 759-27508/? E/IPCThreadState: attemptIncStrongHandle(16): Not supported
+2021-08-05 16:59:07.390 23403-23403/? E/AndroidRuntime: FATAL EXCEPTION: main
+    Process: com.android.systemui, PID: 23403
+    DeadSystemException: The system died; earlier logs will point to the root cause
+2021-08-05 16:59:07.390 759-773/? E/IPCThreadState: attemptIncStrongHandle(17): Not supported
+2021-08-05 16:59:07.390 759-30778/? E/IPCThreadState: attemptIncStrongHandle(35): Not supported
+2021-08-05 16:59:07.390 759-25165/? E/IPCThreadState: attemptIncStrongHandle(34): Not supported
+2021-08-05 16:59:07.390 759-772/? E/IPCThreadState: attemptIncStrongHandle(64): Not supported
+2021-08-05 16:59:07.390 759-27510/? E/IPCThreadState: attemptIncStrongHandle(54): Not supported
+2021-08-05 16:59:07.390 759-27510/? E/IPCThreadState: attemptIncStrongHandle(52): Not supported
+2021-08-05 16:59:07.390 759-27510/? E/IPCThreadState: attemptIncStrongHandle(63): Not supported
+2021-08-05 16:59:07.390 759-27510/? E/IPCThreadState: attemptIncStrongHandle(59): Not supported
+2021-08-05 16:59:07.390 23403-23403/? I/Process: Sending signal. PID: 23403 SIG: 9
+2021-08-05 16:59:07.390 759-27510/? E/IPCThreadState: attemptIncStrongHandle(61): Not supported
+2021-08-05 16:59:07.390 759-27510/? E/IPCThreadState: attemptIncStrongHandle(62): Not supported
+2021-08-05 16:59:07.390 759-27510/? E/IPCThreadState: attemptIncStrongHandle(58): Not supported
+2021-08-05 16:59:07.390 759-27510/? E/IPCThreadState: attemptIncStrongHandle(68): Not supported
+2021-08-05 16:59:07.391 759-27510/? E/IPCThreadState: attemptIncStrongHandle(69): Not supported
+2021-08-05 16:59:07.391 759-27510/? E/IPCThreadState: attemptIncStrongHandle(72): Not supported
+2021-08-05 16:59:07.391 759-27510/? E/IPCThreadState: attemptIncStrongHandle(70): Not supported
+2021-08-05 16:59:07.391 759-27510/? E/IPCThreadState: attemptIncStrongHandle(71): Not supported
+2021-08-05 16:59:07.391 759-27510/? E/IPCThreadState: attemptIncStrongHandle(73): Not supported
+2021-08-05 16:59:07.391 759-27510/? E/IPCThreadState: attemptIncStrongHandle(110): Not supported
+2021-08-05 16:59:07.396 759-25133/? W/statsd: No active metric for config (1000 1)
+2021-08-05 16:59:07.396 759-25133/? E/IPCThreadState: attemptIncStrongHandle(67): Not supported
+2021-08-05 16:59:07.401 1199-1322/? I/rirud_java: Exec resetprop exited with 0
+2021-08-05 16:59:07.401 1199-1322/? I/rirud_java: Zygote is probably dead, restart rirud socket...
+2021-08-05 16:59:06.784 0-0/? I/init: Service &#39;zygote&#39; (pid 22864) received signal 9
+2021-08-05 16:59:06.784 0-0/? I/init: Sending signal 9 to service &#39;zygote&#39; (pid 22864) process group...
+2021-08-05 16:59:06.803 0-0/? I/libprocessgroup: Successfully killed process cgroup uid 0 pid 22864 in 18ms
+2021-08-05 16:59:06.804 0-0/? I/init: starting service &#39;exec 44 (/system/bin/vdc volume abort_fuse)&#39;...
+2021-08-05 16:59:06.808 0-0/? I/init: Command &#39;write /sys/power/state on&#39; action=onrestart (&lt;Service &#39;zygote&#39; onrestart&gt;:2) took 1ms and failed: Unable to write to file &#39;/sys/power/state&#39;: Unable to write file contents: Invalid argument
+2021-08-05 16:59:06.808 0-0/? I/init: Sending signal 9 to service &#39;audioserver&#39; (pid 22866) process group...
+2021-08-05 16:59:07.462 585-26396/? D/vold: Aborting fuse connection entry /sys/fs/fuse/connections/61/abort
+2021-08-05 16:59:07.462 585-26396/? W/vold: Skip fsync /sys/fs/fuse/connections/61/abort on a file system does not support synchronization: Invalid argument
+2021-08-05 16:59:06.831 0-0/? D/vdc: Waited 0ms for vold
+2021-08-05 16:59:07.476 22863-22863/? I/r_submix: adev_close()
+2021-08-05 16:59:07.476 22863-23374/? D/audio_hw_primary: adev_close_output_stream: enter:stream_handle(low-latency-playback)
+2021-08-05 16:59:07.476 22863-23374/? D/audio_hw_primary: out_standby: enter: stream (0xf40464c0) usecase(1: low-latency-playback)
+2021-08-05 16:59:07.476 22863-23374/? D/audio_hw_primary: out_standby: exit
+2021-08-05 16:59:07.476 22863-23374/? D/audio_hw_primary: adev_close_output_stream: enter:stream_handle(deep-buffer-playback)
+2021-08-05 16:59:07.476 22863-23374/? D/audio_hw_primary: out_standby: enter: stream (0xf4040010) usecase(0: deep-buffer-playback)
+2021-08-05 16:59:07.476 22863-23374/? D/audio_hw_primary: out_standby: exit
+2021-08-05 16:59:07.476 22863-23374/? D/audio_hw_primary: adev_close_output_stream: enter:stream_handle(afe-proxy-playback)
+2021-08-05 16:59:07.476 22863-23374/? D/audio_hw_primary: out_standby: enter: stream (0xf4048650) usecase(51: afe-proxy-playback)
+2021-08-05 16:59:07.476 22863-23374/? D/audio_hw_primary: out_standby: exit
+2021-08-05 16:59:07.476 22863-23374/? D/audio_hw_spkr_prot: spkr_prot_deinit: Entering deinit cal_thrd_created :1
+2021-08-05 16:59:07.477 22863-23374/? I/soundtrigger: audio_extn_sound_trigger_deinit: Enter
+2021-08-05 16:59:06.846 0-0/? I/libprocessgroup: Successfully killed process cgroup uid 1041 pid 22866 in 37ms
+2021-08-05 16:59:06.848 0-0/? I/init: Sending signal 9 to service &#39;cameraserver&#39; (pid 22867) process group...
+2021-08-05 16:59:07.482 22863-23374/? D/ACDB-LOADER: ACDB -&gt; deallocate_ADIE
+2021-08-05 16:59:07.482 22863-23374/? D/android.hardware.audio.service: [ACPH]-&gt;ADIE RTC service Unregistered with ACPH
+2021-08-05 16:59:07.482 22863-23374/? D/ACDB-LOADER: ACDB -&gt; deallocate_ACDB
+2021-08-05 16:59:07.482 22863-23374/? D/android.hardware.audio.service: [ACPH]-&gt;DSP RTC service Unregistered with ACPH
+2021-08-05 16:59:07.482 22863-23374/? D/android.hardware.audio.service: [ACPH]-&gt;acph_deinit-&gt;is called
+2021-08-05 16:59:07.482 22863-23374/? D/android.hardware.audio.service: g_pCmdTbl is not NULL, g_pCmdTbl-&gt;pNodeHead is not NULL
+2021-08-05 16:59:07.482 22863-23374/? D/android.hardware.audio.service: Node1 is not empty, address[0xf463cdd0]
+2021-08-05 16:59:07.482 22863-23374/? D/android.hardware.audio.service: Node2 is not empty, address[0xf463d310]
+2021-08-05 16:59:07.482 22863-23374/? D/android.hardware.audio.service: Node3 is not empty, address[0xf463d230]
+2021-08-05 16:59:07.482 22863-23374/? D/android.hardware.audio.service: g_pCmdTbl-&gt;pNodeTail is not NULL, address[0xf463d230]
+2021-08-05 16:59:07.482 22863-23374/? D/android.hardware.audio.service: Free first node, pNodeHead[0xf463d310],pCur[0xf463cdd0],pNext[0xf463d310]
+2021-08-05 16:59:07.482 22863-23374/? D/android.hardware.audio.service: [ACPH]-&gt;Online service Unregistered with ACPH
+2021-08-05 16:59:06.854 0-0/? I/libprocessgroup: Successfully killed process cgroup uid 1047 pid 22867 in 5ms
+2021-08-05 16:59:06.854 0-0/? I/init: Sending signal 9 to service &#39;media&#39; (pid 22868) process group...
+2021-08-05 16:59:06.862 0-0/? I/libprocessgroup: Successfully killed process cgroup uid 1013 pid 22868 in 7ms
+2021-08-05 16:59:06.863 0-0/? I/init: Sending signal 9 to service &#39;netd&#39; (pid 22869) process group...
+2021-08-05 16:59:07.500 1138-2013/? E/QC-NETMGR-LIB: serviceDied(): Netd service died
+2021-08-05 16:59:06.870 0-0/? I/libprocessgroup: Successfully killed process cgroup uid 0 pid 22869 in 6ms
+2021-08-05 16:59:06.871 0-0/? I/init: Sending signal 9 to service &#39;wificond&#39; (pid 22870) process group...
+2021-08-05 16:59:07.509 28510-28510/? D/BootAnimation: BootAnimationStartTiming start time: 86135588ms
+2021-08-05 16:59:07.509 28510-28510/? D/BootAnimation: BootAnimationPreloadTiming start time: 86135588ms
+2021-08-05 16:59:06.876 0-0/? I/libprocessgroup: Successfully killed process cgroup uid 1010 pid 22870 in 5ms
+2021-08-05 16:59:06.878 0-0/? I/init: Service &#39;audioserver&#39; (pid 22866) received signal 9
+2021-08-05 16:59:06.878 0-0/? I/init: Sending signal 9 to service &#39;vendor.audio-hal&#39; (pid 22863) process group...
+2021-08-05 16:59:07.524 28510-28510/? D/BootAnimation: BootAnimationPreloadStopTiming start time: 86135603ms
+2021-08-05 16:59:06.895 0-0/? I/libprocessgroup: Successfully killed process cgroup uid 1041 pid 22863 in 16ms
+2021-08-05 16:59:06.895 0-0/? I/init: Command &#39;restart vendor.audio-hal-4-0-msd&#39; action=onrestart (&lt;Service &#39;audioserver&#39; onrestart&gt;:2) took 0ms and failed: service vendor.audio-hal-4-0-msd not found
+2021-08-05 16:59:06.895 0-0/? I/init: Command &#39;restart vendor.audio-hal-2-0&#39; action=onrestart (&lt;Service &#39;audioserver&#39; onrestart&gt;:3) took 0ms and failed: service vendor.audio-hal-2-0 not found
+2021-08-05 16:59:06.895 0-0/? I/init: Command &#39;restart audio-hal-2-0&#39; action=onrestart (&lt;Service &#39;audioserver&#39; onrestart&gt;:4) took 0ms and failed: service audio-hal-2-0 not found
+2021-08-05 16:59:07.527 22865-22865/? E/Zygote: Zygote failed to write to system_server FD: Connection refused
+2021-08-05 16:59:07.527 22865-22865/? I/Zygote: Process 23520 exited due to signal 9 (Killed)"><code>2021-08-05 16:59:07.168 23192-23364/? D/ConnectivityService: NetReassign [18 : null → 102, 10 : null → 102, 23 : null → 102, 29 : null → 102, 26 : null → 102, 28 : null → 102, 1 : null → 102, 33 : null → 102, 31 : null → 102, 15 : null → 102, 35 : null → 102, 37 : null → 102, 39 : null → 102, 11 : null → 102, 16 : null → 102]
+2021-08-05 16:59:07.170 22869-22902/? E/NetlinkEvent: NetlinkEvent::FindParam(): Parameter &#39;INTERFACE&#39; not found
+2021-08-05 16:59:07.170 22869-22902/? E/NetlinkEvent: NetlinkEvent::FindParam(): Parameter &#39;STATE&#39; not found
+2021-08-05 16:59:07.170 22869-22902/? E/NetlinkEvent: NetlinkEvent::FindParam(): Parameter &#39;TIME_NS&#39; not found
+2021-08-05 16:59:07.170 22869-22902/? E/NetlinkEvent: NetlinkEvent::FindParam(): Parameter &#39;UID&#39; not found
+2021-08-05 16:59:07.173 23192-23364/? D/ConnectivityService: Switching to new default network: NetworkAgentInfo{ ni{[type: MOBILE[HSPA&#43;], state: CONNECTED/CONNECTED, reason: (unspecified), extra: 3gnet, failover: false, available: true, roaming: false]}  network{102}  nethandle{441492361229}  lp{{InterfaceName: rmnet_data1 LinkAddresses: [ 10.207.3.56/28 ] DnsAddresses: [ /112.65.184.255,/210.22.84.3 ] Domains: null MTU: 1436 TcpBufferSizes: 4094,87380,1220608,4096,16384,1220608 Routes: [ 0.0.0.0/0 -&gt; 10.207.3.57 rmnet_data1 mtu 1436,10.207.3.48/28 -&gt; 0.0.0.0 rmnet_data1 mtu 0 ]}}  nc{[ Transports: CELLULAR Capabilities: SUPL&amp;INTERNET&amp;NOT_RESTRICTED&amp;TRUSTED&amp;NOT_VPN&amp;NOT_ROAMING&amp;FOREGROUND&amp;NOT_CONGESTED&amp;NOT_SUSPENDED LinkUpBandwidth&gt;=3400Kbps LinkDnBandwidth&gt;=13000Kbps Specifier: &lt;TelephonyNetworkSpecifier [mSubId = 2]&gt; AdministratorUids: [] RequestorUid: -1 RequestorPackageName: null]}  Score{10}  everValidated{false}  lastValidated{false}  created{true} lingering{false} explicitlySelected{false} acceptUnvalidated{false} everCaptivePortalDetected{false} lastCaptivePortalDetected{false} partialConnectivity{false} acceptPartialConnectivity{false} clat{mBaseIface: null, mIface: null, mState: IDLE} }
+2021-08-05 16:59:07.193 23773-24961/? D/QCNEJ/DefaultNetworkInfoRelay: Default network available: 102
+2021-08-05 16:59:07.196 23192-23698/? D/NetworkTimeUpdateService: New default network 102; checking time.
+2021-08-05 16:59:07.202 23192-23364/? D/ConnectivityService: Sending CONNECTED broadcast for type 0 [102 CELLULAR] isDefaultNetwork=true
+2021-08-05 16:59:07.207 23192-23364/? D/ConnectivityService: [102 CELLULAR] EVENT_NETWORK_INFO_CHANGED, going from CONNECTED to CONNECTED
+2021-08-05 16:59:07.216 23773-24961/? D/QCNEJ/NativeHalConnector: -&gt; SND notifyDefaultNetworkChanged(0)
+2021-08-05 16:59:07.217 23773-24961/? D/QCNEJ/WwanInfoRelay: network available: 102
+2021-08-05 16:59:07.217 23773-24961/? I/QCNEJ/NativeHalConnector: -&gt; SND notifyWwanStatusChanged([WwanInfo]: signalStrength = 0 roaming = 0 mccMnc = [RatInfo]: networkType = 0 subType = 0 networkState = UNKNOWN netHdl = 441492361229 ipAddrV4 =  ipAddrV6 =  ifNameV4 =  ifNameV6 =  slotIdx = 0 isAndroidValidated = false) timeStamp = 2021-08-05 16:59:07.217
+2021-08-05 16:59:07.218 25002-25035/? I/System.out: true
+2021-08-05 16:59:07.218 25002-25072/? I/System.out: true
+2021-08-05 16:59:07.223 27896-28157/? E/libc: Access denied finding property &#34;net.dns1&#34;
+2021-08-05 16:59:07.224 24386-28324/? I/PinnedContentDownloader: Finished downloading pinned content.
+2021-08-05 16:59:07.229 27896-28157/? E/libc: Access denied finding property &#34;net.dns1&#34;
+2021-08-05 16:59:07.230 26827-26991/? E/libc: Access denied finding property &#34;net.dns1&#34;
+2021-08-05 16:59:07.230 26827-26991/? E/libc: Access denied finding property &#34;net.dns2&#34;
+2021-08-05 16:59:07.228 26827-26827/? W/mars::26991: type=1400 audit(0.0:22426): avc: denied { read } for name=&#34;route&#34; dev=&#34;proc&#34; ino=4026532115 scontext=u:r:untrusted_app_29:s0:c173,c256,c512,c768 tcontext=u:object_r:proc_net:s0 tclass=file permissive=0 app=com.tencent.mm
+2021-08-05 16:59:07.233 24077-26645/? I/NearbyDiscovery: FastPairHandler: Received action android.net.conn.CONNECTIVITY_CHANGE [CONTEXT service_id=49 ]
+2021-08-05 16:59:07.245 27896-28157/? E/libc: Access denied finding property &#34;net.dns1&#34;
+2021-08-05 16:59:07.252 22869-22907/? W/IptablesRestoreController: iptables-restore process 22878 terminated status=256
+2021-08-05 16:59:07.252 22869-22907/? E/IptablesRestoreController: iptables error:
+2021-08-05 16:59:07.252 22869-22907/? E/IptablesRestoreController: ------- COMMAND -------
+2021-08-05 16:59:07.252 22869-22907/? E/IptablesRestoreController: *filter
+    -D OUTPUT -o rmnet_data2 -m owner --uid-owner 10221 -j REJECT
+    COMMIT
+2021-08-05 16:59:07.252 22869-22907/? E/IptablesRestoreController: -------  ERROR -------
+2021-08-05 16:59:07.252 22869-22907/? E/IptablesRestoreController: iptables-restore: line 1078 failed
+2021-08-05 16:59:07.252 22869-22907/? E/IptablesRestoreController: ----------------------
+    
+    
+    --------- beginning of crash
+2021-08-05 16:59:07.255 23192-23213/? E/AndroidRuntime: *** FATAL EXCEPTION IN SYSTEM PROCESS: android.fg
+    java.lang.IllegalStateException: android.os.ServiceSpecificException: Operation not permitted (code 1)
+        at com.android.server.NetworkManagementService.setAppOnInterfaceLocked(NetworkManagementService.java:1604)
+        at com.android.server.NetworkManagementService.updateAppOnInterfaceCallback(NetworkManagementService.java:1543)
+        at com.android.server.NetworkManagementService.access$500(NetworkManagementService.java:125)
+        at com.android.server.NetworkManagementService$1.lambda$onLinkPropertiesChanged$0$NetworkManagementService$1(NetworkManagementService.java:405)
+        at com.android.server.-$$Lambda$NetworkManagementService$1$cEe7AIGZabKkElb0YvNi_jszJbI.run(Unknown Source:6)
+        at android.os.Handler.handleCallback(Handler.java:938)
+        at android.os.Handler.dispatchMessage(Handler.java:99)
+        at android.os.Looper.loop(Looper.java:223)
+        at android.os.HandlerThread.run(HandlerThread.java:67)
+        at com.android.server.ServiceThread.run(ServiceThread.java:44)
+     Caused by: android.os.ServiceSpecificException: Operation not permitted (code 1)
+        at android.os.Parcel.createExceptionOrNull(Parcel.java:2387)
+        at android.os.Parcel.createException(Parcel.java:2357)
+        at android.os.Parcel.readException(Parcel.java:2340)
+        at android.os.Parcel.readException(Parcel.java:2282)
+        at android.net.INetd$Stub$Proxy.bandwidthRemoveRestrictAppOnInterface(INetd.java:3991)
+        at com.android.server.NetworkManagementService.setAppOnInterfaceLocked(NetworkManagementService.java:1594)
+        at com.android.server.NetworkManagementService.updateAppOnInterfaceCallback(NetworkManagementService.java:1543) 
+        at com.android.server.NetworkManagementService.access$500(NetworkManagementService.java:125) 
+        at com.android.server.NetworkManagementService$1.lambda$onLinkPropertiesChanged$0$NetworkManagementService$1(NetworkManagementService.java:405) 
+        at com.android.server.-$$Lambda$NetworkManagementService$1$cEe7AIGZabKkElb0YvNi_jszJbI.run(Unknown Source:6) 
+        at android.os.Handler.handleCallback(Handler.java:938) 
+        at android.os.Handler.dispatchMessage(Handler.java:99) 
+        at android.os.Looper.loop(Looper.java:223) 
+        at android.os.HandlerThread.run(HandlerThread.java:67) 
+        at com.android.server.ServiceThread.run(ServiceThread.java:44) 
+2021-08-05 16:59:07.207 23192-23364/? D/ConnectivityService: [102 CELLULAR] EVENT_NETWORK_INFO_CHANGED, going from CONNECTED to CONNECTED
+2021-08-05 16:59:07.257 23192-23213/? I/DropBoxManagerService: add tag=system_server_crash isTagEnabled=true flags=0x2
+2021-08-05 16:59:07.269 24077-24171/? I/NetworkScheduler.Stats: Task com.google.android.gms/com.google.android.gms.tapandpay.gcmtask.TapAndPayGcmTaskService started execution. cause:8 exec_start_elapsed_seconds: 86135 [CONTEXT service_id=218 ]
+2021-08-05 16:59:07.294 23192-23213/? I/Process: Sending signal. PID: 23192 SIG: 9
+2021-08-05 16:59:06.742 0-0/? E/binder_alloc: 23192: binder_alloc_buf, no vma
+2021-08-05 16:59:07.374 23403-23403/? E/NotificationShadeWindowController: Failed to call setHasTopUi
+    android.os.DeadObjectException
+        at android.os.BinderProxy.transactNative(Native Method)
+        at android.os.BinderProxy.transact(BinderProxy.java:550)
+        at android.app.IActivityManager$Stub$Proxy.setHasTopUi(IActivityManager.java:9884)
+        at com.android.systemui.statusbar.phone.NotificationShadeWindowController.lambda$apply$1(NotificationShadeWindowController.java:413)
+        at com.android.systemui.statusbar.phone.NotificationShadeWindowController.lambda$apply$1$NotificationShadeWindowController(Unknown Source:0)
+        at com.android.systemui.statusbar.phone.-$$Lambda$NotificationShadeWindowController$cWnla7q4SPNKNSlx9hB8mcjvaHk.run(Unknown Source:2)
+        at com.android.systemui.DejankUtils.whitelistIpcs(DejankUtils.java:193)
+        at com.android.systemui.statusbar.phone.NotificationShadeWindowController.apply(NotificationShadeWindowController.java:411)
+        at com.android.systemui.statusbar.phone.NotificationShadeWindowController.setBackgroundBlurRadius(NotificationShadeWindowController.java:534)
+        at com.android.systemui.statusbar.NotificationShadeDepthController$updateBlurCallback$1.doFrame(NotificationShadeDepthController.kt:200)
+        at android.view.Choreographer$CallbackRecord.run(Choreographer.java:970)
+        at android.view.Choreographer.doCallbacks(Choreographer.java:796)
+        at android.view.Choreographer.doFrame(Choreographer.java:727)
+        at android.view.Choreographer$FrameDisplayEventReceiver.run(Choreographer.java:957)
+        at android.os.Handler.handleCallback(Handler.java:938)
+        at android.os.Handler.dispatchMessage(Handler.java:99)
+        at android.os.Looper.loop(Looper.java:223)
+        at android.app.ActivityThread.main(ActivityThread.java:7664)
+        at java.lang.reflect.Method.invoke(Native Method)
+        at com.android.internal.os.RuntimeInit$MethodAndArgsCaller.run(RuntimeInit.java:592)
+        at com.android.internal.os.ZygoteInit.main(ZygoteInit.java:947)
+2021-08-05 16:59:07.378 24147-24150/? I/adbd: adbd_auth: hit EOF on framework fd
+2021-08-05 16:59:07.379 24147-24150/? I/adbd: adbd_auth: received new framework fd -1 (current = 20)
+2021-08-05 16:59:06.745 0-0/? E/binder_alloc: 23192: binder_alloc_buf, no vma
+2021-08-05 16:59:06.754 0-0/? I/init: starting service &#39;bootanim&#39;...
+2021-08-05 16:59:06.757 0-0/? I/init: Control message: Processed ctl.start for &#39;bootanim&#39; from pid: 895 (/system/bin/surfaceflinger)
+2021-08-05 16:59:07.381 581-581/? I/lowmemorykiller: lmkd data connection dropped
+2021-08-05 16:59:07.381 581-581/? I/lowmemorykiller: closing lmkd data connection
+2021-08-05 16:59:07.381 833-833/? E/LocSvc_GnssInterface: serviceDied] service died. cookie: 0, who: 0x79001128f0
+2021-08-05 16:59:07.381 833-833/? E/GnssHal_GnssGeofencing: serviceDied] service died. cookie: 0, who: 0x7900116090
+2021-08-05 16:59:07.382 26827-26849/? W/Sensors: sensorservice died [0x7b25516fe0]
+2021-08-05 16:59:07.382 24077-26946/? W/Sensors: sensorservice died [0x7b25517c40]
+2021-08-05 16:59:07.382 24077-26946/? W/Sensors: sensorservice died [0x7b25517c40]
+2021-08-05 16:59:07.382 23718-23837/? W/Sensors: sensorservice died [0x7b2552fea0]
+2021-08-05 16:59:07.382 23403-23538/? W/Sensors: sensorservice died [0x7b2550be80]
+2021-08-05 16:59:07.382 23610-23666/? W/Sensors: sensorservice died [0x7b25520250]
+2021-08-05 16:59:07.382 25002-26401/? W/Sensors: sensorservice died [0x7b2551e990]
+2021-08-05 16:59:07.382 26898-28496/? W/Sensors: sensorservice died [0x7b256a95a0]
+2021-08-05 16:59:07.383 1199-1322/? I/rirud_java: Zygote is probably dead, delete existing /dev/riru folders...
+2021-08-05 16:59:07.383 22866-22866/? W/AudioFlinger: power manager service died !!!
+2021-08-05 16:59:07.383 22866-22866/? W/AudioFlinger: power manager service died !!!
+2021-08-05 16:59:07.383 895-895/? D/SurfaceFlinger: Setting power mode 2 on display 0
+2021-08-05 16:59:07.383 22866-22866/? W/AudioFlinger: power manager service died !!!
+2021-08-05 16:59:07.383 759-25133/? E/IPCThreadState: attemptIncStrongHandle(1): Not supported
+2021-08-05 16:59:07.383 22866-22892/? I/CaptureStateNotifier: Listener binder died
+2021-08-05 16:59:07.383 759-25133/? W/statsd: statscompanion service died
+2021-08-05 16:59:07.383 759-25133/? W/statsd: Reset statsd upon system server restarts.
+2021-08-05 16:59:07.383 759-2485/? E/IPCThreadState: attemptIncStrongHandle(2): Not supported
+2021-08-05 16:59:07.383 22869-23455/? E/libnetd_resolv: unlinkToDeath: removed reference to death recipient but unlink failed.
+2021-08-05 16:59:07.383 1199-1322/? I/rirud_java: Attempt to delete /dev/riru_jsDNmi5...
+2021-08-05 16:59:07.384 1199-1322/? I/rirud_java: Deleted /dev/riru_jsDNmi5
+2021-08-05 16:59:07.384 1199-1322/? I/rirud_java: Attempt to delete /dev/riru64_jsDNmi5...
+2021-08-05 16:59:07.384 22864-22864/? E/Zygote: Zygote failed to write to system_server FD: Connection refused
+2021-08-05 16:59:07.384 22864-22864/? I/Zygote: Process 23192 exited due to signal 9 (Killed)
+2021-08-05 16:59:07.384 22864-22864/? E/Zygote: Exit zygote because system server (pid 23192) has terminated
+2021-08-05 16:59:07.385 1199-1322/? I/rirud_java: Deleted /dev/riru64_jsDNmi5.
+2021-08-05 16:59:07.385 1199-1322/? I/rirud_java: Zygote is probably dead, reset native bridge to libriruloader.so...
+2021-08-05 16:59:07.388 759-27510/? E/IPCThreadState: attemptIncStrongHandle(3): Not supported
+2021-08-05 16:59:07.388 759-13336/? E/IPCThreadState: attemptIncStrongHandle(10): Not supported
+2021-08-05 16:59:07.388 759-2663/? E/IPCThreadState: attemptIncStrongHandle(27): Not supported
+2021-08-05 16:59:07.388 759-2663/? E/IPCThreadState: attemptIncStrongHandle(12): Not supported
+2021-08-05 16:59:07.388 759-13336/? E/IPCThreadState: attemptIncStrongHandle(65): Not supported
+2021-08-05 16:59:07.388 759-13336/? E/IPCThreadState: attemptIncStrongHandle(25): Not supported
+2021-08-05 16:59:07.388 759-13336/? E/IPCThreadState: attemptIncStrongHandle(6): Not supported
+2021-08-05 16:59:07.388 759-13336/? E/IPCThreadState: attemptIncStrongHandle(29): Not supported
+2021-08-05 16:59:07.388 759-13336/? E/IPCThreadState: attemptIncStrongHandle(5): Not supported
+2021-08-05 16:59:07.388 759-13336/? E/IPCThreadState: attemptIncStrongHandle(8): Not supported
+2021-08-05 16:59:07.388 759-13336/? E/IPCThreadState: attemptIncStrongHandle(24): Not supported
+2021-08-05 16:59:07.388 759-13336/? E/IPCThreadState: attemptIncStrongHandle(26): Not supported
+2021-08-05 16:59:07.388 759-13336/? E/IPCThreadState: attemptIncStrongHandle(11): Not supported
+2021-08-05 16:59:07.388 759-13336/? E/IPCThreadState: attemptIncStrongHandle(14): Not supported
+2021-08-05 16:59:07.389 759-2663/? E/IPCThreadState: attemptIncStrongHandle(48): Not supported
+2021-08-05 16:59:07.389 759-30778/? E/IPCThreadState: attemptIncStrongHandle(13): Not supported
+2021-08-05 16:59:07.389 759-773/? E/IPCThreadState: attemptIncStrongHandle(45): Not supported
+2021-08-05 16:59:07.389 759-2663/? E/IPCThreadState: attemptIncStrongHandle(9): Not supported
+2021-08-05 16:59:07.389 759-30778/? E/IPCThreadState: attemptIncStrongHandle(15): Not supported
+2021-08-05 16:59:07.389 759-773/? E/IPCThreadState: attemptIncStrongHandle(40): Not supported
+2021-08-05 16:59:07.389 759-2485/? E/IPCThreadState: attemptIncStrongHandle(49): Not supported
+2021-08-05 16:59:07.389 759-30778/? E/IPCThreadState: attemptIncStrongHandle(57): Not supported
+2021-08-05 16:59:07.389 759-773/? E/IPCThreadState: attemptIncStrongHandle(38): Not supported
+2021-08-05 16:59:07.389 759-2485/? E/IPCThreadState: attemptIncStrongHandle(21): Not supported
+2021-08-05 16:59:07.389 759-773/? E/IPCThreadState: attemptIncStrongHandle(37): Not supported
+2021-08-05 16:59:07.389 759-772/? E/IPCThreadState: attemptIncStrongHandle(43): Not supported
+2021-08-05 16:59:07.389 759-2485/? E/IPCThreadState: attemptIncStrongHandle(42): Not supported
+2021-08-05 16:59:07.389 759-13336/? E/IPCThreadState: attemptIncStrongHandle(7): Not supported
+2021-08-05 16:59:07.389 759-773/? E/IPCThreadState: attemptIncStrongHandle(31): Not supported
+2021-08-05 16:59:07.389 759-772/? E/IPCThreadState: attemptIncStrongHandle(33): Not supported
+2021-08-05 16:59:07.389 759-2485/? E/IPCThreadState: attemptIncStrongHandle(55): Not supported
+2021-08-05 16:59:07.389 759-772/? E/IPCThreadState: attemptIncStrongHandle(23): Not supported
+2021-08-05 16:59:07.389 759-13336/? E/IPCThreadState: attemptIncStrongHandle(60): Not supported
+2021-08-05 16:59:07.389 759-2485/? E/IPCThreadState: attemptIncStrongHandle(22): Not supported
+2021-08-05 16:59:07.389 759-773/? E/IPCThreadState: attemptIncStrongHandle(47): Not supported
+2021-08-05 16:59:07.389 759-772/? E/IPCThreadState: attemptIncStrongHandle(41): Not supported
+2021-08-05 16:59:07.389 759-13336/? E/IPCThreadState: attemptIncStrongHandle(66): Not supported
+2021-08-05 16:59:07.389 759-2485/? E/IPCThreadState: attemptIncStrongHandle(51): Not supported
+2021-08-05 16:59:07.389 759-772/? E/IPCThreadState: attemptIncStrongHandle(53): Not supported
+2021-08-05 16:59:07.389 759-13336/? E/IPCThreadState: attemptIncStrongHandle(50): Not supported
+2021-08-05 16:59:07.389 759-773/? E/IPCThreadState: attemptIncStrongHandle(20): Not supported
+2021-08-05 16:59:07.389 23403-23403/? D/AndroidRuntime: Shutting down VM
+2021-08-05 16:59:07.389 759-772/? E/IPCThreadState: attemptIncStrongHandle(39): Not supported
+2021-08-05 16:59:07.389 759-2663/? E/IPCThreadState: attemptIncStrongHandle(4): Not supported
+2021-08-05 16:59:07.389 759-13336/? E/IPCThreadState: attemptIncStrongHandle(44): Not supported
+2021-08-05 16:59:07.389 759-2663/? E/IPCThreadState: attemptIncStrongHandle(19): Not supported
+2021-08-05 16:59:07.389 759-773/? E/IPCThreadState: attemptIncStrongHandle(32): Not supported
+2021-08-05 16:59:07.389 759-25165/? E/IPCThreadState: attemptIncStrongHandle(28): Not supported
+2021-08-05 16:59:07.389 759-27508/? E/IPCThreadState: attemptIncStrongHandle(56): Not supported
+2021-08-05 16:59:07.389 759-30778/? E/IPCThreadState: attemptIncStrongHandle(36): Not supported
+2021-08-05 16:59:07.389 759-2485/? E/IPCThreadState: attemptIncStrongHandle(30): Not supported
+2021-08-05 16:59:07.389 759-772/? E/IPCThreadState: attemptIncStrongHandle(46): Not supported
+2021-08-05 16:59:07.390 759-772/? E/IPCThreadState: attemptIncStrongHandle(18): Not supported
+2021-08-05 16:59:07.390 759-27508/? E/IPCThreadState: attemptIncStrongHandle(16): Not supported
+2021-08-05 16:59:07.390 23403-23403/? E/AndroidRuntime: FATAL EXCEPTION: main
+    Process: com.android.systemui, PID: 23403
+    DeadSystemException: The system died; earlier logs will point to the root cause
+2021-08-05 16:59:07.390 759-773/? E/IPCThreadState: attemptIncStrongHandle(17): Not supported
+2021-08-05 16:59:07.390 759-30778/? E/IPCThreadState: attemptIncStrongHandle(35): Not supported
+2021-08-05 16:59:07.390 759-25165/? E/IPCThreadState: attemptIncStrongHandle(34): Not supported
+2021-08-05 16:59:07.390 759-772/? E/IPCThreadState: attemptIncStrongHandle(64): Not supported
+2021-08-05 16:59:07.390 759-27510/? E/IPCThreadState: attemptIncStrongHandle(54): Not supported
+2021-08-05 16:59:07.390 759-27510/? E/IPCThreadState: attemptIncStrongHandle(52): Not supported
+2021-08-05 16:59:07.390 759-27510/? E/IPCThreadState: attemptIncStrongHandle(63): Not supported
+2021-08-05 16:59:07.390 759-27510/? E/IPCThreadState: attemptIncStrongHandle(59): Not supported
+2021-08-05 16:59:07.390 23403-23403/? I/Process: Sending signal. PID: 23403 SIG: 9
+2021-08-05 16:59:07.390 759-27510/? E/IPCThreadState: attemptIncStrongHandle(61): Not supported
+2021-08-05 16:59:07.390 759-27510/? E/IPCThreadState: attemptIncStrongHandle(62): Not supported
+2021-08-05 16:59:07.390 759-27510/? E/IPCThreadState: attemptIncStrongHandle(58): Not supported
+2021-08-05 16:59:07.390 759-27510/? E/IPCThreadState: attemptIncStrongHandle(68): Not supported
+2021-08-05 16:59:07.391 759-27510/? E/IPCThreadState: attemptIncStrongHandle(69): Not supported
+2021-08-05 16:59:07.391 759-27510/? E/IPCThreadState: attemptIncStrongHandle(72): Not supported
+2021-08-05 16:59:07.391 759-27510/? E/IPCThreadState: attemptIncStrongHandle(70): Not supported
+2021-08-05 16:59:07.391 759-27510/? E/IPCThreadState: attemptIncStrongHandle(71): Not supported
+2021-08-05 16:59:07.391 759-27510/? E/IPCThreadState: attemptIncStrongHandle(73): Not supported
+2021-08-05 16:59:07.391 759-27510/? E/IPCThreadState: attemptIncStrongHandle(110): Not supported
+2021-08-05 16:59:07.396 759-25133/? W/statsd: No active metric for config (1000 1)
+2021-08-05 16:59:07.396 759-25133/? E/IPCThreadState: attemptIncStrongHandle(67): Not supported
+2021-08-05 16:59:07.401 1199-1322/? I/rirud_java: Exec resetprop exited with 0
+2021-08-05 16:59:07.401 1199-1322/? I/rirud_java: Zygote is probably dead, restart rirud socket...
+2021-08-05 16:59:06.784 0-0/? I/init: Service &#39;zygote&#39; (pid 22864) received signal 9
+2021-08-05 16:59:06.784 0-0/? I/init: Sending signal 9 to service &#39;zygote&#39; (pid 22864) process group...
+2021-08-05 16:59:06.803 0-0/? I/libprocessgroup: Successfully killed process cgroup uid 0 pid 22864 in 18ms
+2021-08-05 16:59:06.804 0-0/? I/init: starting service &#39;exec 44 (/system/bin/vdc volume abort_fuse)&#39;...
+2021-08-05 16:59:06.808 0-0/? I/init: Command &#39;write /sys/power/state on&#39; action=onrestart (&lt;Service &#39;zygote&#39; onrestart&gt;:2) took 1ms and failed: Unable to write to file &#39;/sys/power/state&#39;: Unable to write file contents: Invalid argument
+2021-08-05 16:59:06.808 0-0/? I/init: Sending signal 9 to service &#39;audioserver&#39; (pid 22866) process group...
+2021-08-05 16:59:07.462 585-26396/? D/vold: Aborting fuse connection entry /sys/fs/fuse/connections/61/abort
+2021-08-05 16:59:07.462 585-26396/? W/vold: Skip fsync /sys/fs/fuse/connections/61/abort on a file system does not support synchronization: Invalid argument
+2021-08-05 16:59:06.831 0-0/? D/vdc: Waited 0ms for vold
+2021-08-05 16:59:07.476 22863-22863/? I/r_submix: adev_close()
+2021-08-05 16:59:07.476 22863-23374/? D/audio_hw_primary: adev_close_output_stream: enter:stream_handle(low-latency-playback)
+2021-08-05 16:59:07.476 22863-23374/? D/audio_hw_primary: out_standby: enter: stream (0xf40464c0) usecase(1: low-latency-playback)
+2021-08-05 16:59:07.476 22863-23374/? D/audio_hw_primary: out_standby: exit
+2021-08-05 16:59:07.476 22863-23374/? D/audio_hw_primary: adev_close_output_stream: enter:stream_handle(deep-buffer-playback)
+2021-08-05 16:59:07.476 22863-23374/? D/audio_hw_primary: out_standby: enter: stream (0xf4040010) usecase(0: deep-buffer-playback)
+2021-08-05 16:59:07.476 22863-23374/? D/audio_hw_primary: out_standby: exit
+2021-08-05 16:59:07.476 22863-23374/? D/audio_hw_primary: adev_close_output_stream: enter:stream_handle(afe-proxy-playback)
+2021-08-05 16:59:07.476 22863-23374/? D/audio_hw_primary: out_standby: enter: stream (0xf4048650) usecase(51: afe-proxy-playback)
+2021-08-05 16:59:07.476 22863-23374/? D/audio_hw_primary: out_standby: exit
+2021-08-05 16:59:07.476 22863-23374/? D/audio_hw_spkr_prot: spkr_prot_deinit: Entering deinit cal_thrd_created :1
+2021-08-05 16:59:07.477 22863-23374/? I/soundtrigger: audio_extn_sound_trigger_deinit: Enter
+2021-08-05 16:59:06.846 0-0/? I/libprocessgroup: Successfully killed process cgroup uid 1041 pid 22866 in 37ms
+2021-08-05 16:59:06.848 0-0/? I/init: Sending signal 9 to service &#39;cameraserver&#39; (pid 22867) process group...
+2021-08-05 16:59:07.482 22863-23374/? D/ACDB-LOADER: ACDB -&gt; deallocate_ADIE
+2021-08-05 16:59:07.482 22863-23374/? D/android.hardware.audio.service: [ACPH]-&gt;ADIE RTC service Unregistered with ACPH
+2021-08-05 16:59:07.482 22863-23374/? D/ACDB-LOADER: ACDB -&gt; deallocate_ACDB
+2021-08-05 16:59:07.482 22863-23374/? D/android.hardware.audio.service: [ACPH]-&gt;DSP RTC service Unregistered with ACPH
+2021-08-05 16:59:07.482 22863-23374/? D/android.hardware.audio.service: [ACPH]-&gt;acph_deinit-&gt;is called
+2021-08-05 16:59:07.482 22863-23374/? D/android.hardware.audio.service: g_pCmdTbl is not NULL, g_pCmdTbl-&gt;pNodeHead is not NULL
+2021-08-05 16:59:07.482 22863-23374/? D/android.hardware.audio.service: Node1 is not empty, address[0xf463cdd0]
+2021-08-05 16:59:07.482 22863-23374/? D/android.hardware.audio.service: Node2 is not empty, address[0xf463d310]
+2021-08-05 16:59:07.482 22863-23374/? D/android.hardware.audio.service: Node3 is not empty, address[0xf463d230]
+2021-08-05 16:59:07.482 22863-23374/? D/android.hardware.audio.service: g_pCmdTbl-&gt;pNodeTail is not NULL, address[0xf463d230]
+2021-08-05 16:59:07.482 22863-23374/? D/android.hardware.audio.service: Free first node, pNodeHead[0xf463d310],pCur[0xf463cdd0],pNext[0xf463d310]
+2021-08-05 16:59:07.482 22863-23374/? D/android.hardware.audio.service: [ACPH]-&gt;Online service Unregistered with ACPH
+2021-08-05 16:59:06.854 0-0/? I/libprocessgroup: Successfully killed process cgroup uid 1047 pid 22867 in 5ms
+2021-08-05 16:59:06.854 0-0/? I/init: Sending signal 9 to service &#39;media&#39; (pid 22868) process group...
+2021-08-05 16:59:06.862 0-0/? I/libprocessgroup: Successfully killed process cgroup uid 1013 pid 22868 in 7ms
+2021-08-05 16:59:06.863 0-0/? I/init: Sending signal 9 to service &#39;netd&#39; (pid 22869) process group...
+2021-08-05 16:59:07.500 1138-2013/? E/QC-NETMGR-LIB: serviceDied(): Netd service died
+2021-08-05 16:59:06.870 0-0/? I/libprocessgroup: Successfully killed process cgroup uid 0 pid 22869 in 6ms
+2021-08-05 16:59:06.871 0-0/? I/init: Sending signal 9 to service &#39;wificond&#39; (pid 22870) process group...
+2021-08-05 16:59:07.509 28510-28510/? D/BootAnimation: BootAnimationStartTiming start time: 86135588ms
+2021-08-05 16:59:07.509 28510-28510/? D/BootAnimation: BootAnimationPreloadTiming start time: 86135588ms
+2021-08-05 16:59:06.876 0-0/? I/libprocessgroup: Successfully killed process cgroup uid 1010 pid 22870 in 5ms
+2021-08-05 16:59:06.878 0-0/? I/init: Service &#39;audioserver&#39; (pid 22866) received signal 9
+2021-08-05 16:59:06.878 0-0/? I/init: Sending signal 9 to service &#39;vendor.audio-hal&#39; (pid 22863) process group...
+2021-08-05 16:59:07.524 28510-28510/? D/BootAnimation: BootAnimationPreloadStopTiming start time: 86135603ms
+2021-08-05 16:59:06.895 0-0/? I/libprocessgroup: Successfully killed process cgroup uid 1041 pid 22863 in 16ms
+2021-08-05 16:59:06.895 0-0/? I/init: Command &#39;restart vendor.audio-hal-4-0-msd&#39; action=onrestart (&lt;Service &#39;audioserver&#39; onrestart&gt;:2) took 0ms and failed: service vendor.audio-hal-4-0-msd not found
+2021-08-05 16:59:06.895 0-0/? I/init: Command &#39;restart vendor.audio-hal-2-0&#39; action=onrestart (&lt;Service &#39;audioserver&#39; onrestart&gt;:3) took 0ms and failed: service vendor.audio-hal-2-0 not found
+2021-08-05 16:59:06.895 0-0/? I/init: Command &#39;restart audio-hal-2-0&#39; action=onrestart (&lt;Service &#39;audioserver&#39; onrestart&gt;:4) took 0ms and failed: service audio-hal-2-0 not found
+2021-08-05 16:59:07.527 22865-22865/? E/Zygote: Zygote failed to write to system_server FD: Connection refused
+2021-08-05 16:59:07.527 22865-22865/? I/Zygote: Process 23520 exited due to signal 9 (Killed)</code></pre>
+<h3 id="复现二">复现二</h3>
+<pre class="shiki-source" data-shiki-language="log" data-shiki-code="2021-08-05 17:34:45.809 2466-2466/? E/com.tencent.component.network.module.common.NetworkState: NetworkStateReceiver ====== android.net.conn.CONNECTIVITY_CHANGE
+2021-08-05 17:34:45.845 28538-28576/? E/IptablesRestoreController: iptables error:
+2021-08-05 17:34:45.845 28538-28576/? E/IptablesRestoreController: ------- COMMAND -------
+2021-08-05 17:34:45.845 28538-28576/? E/IptablesRestoreController: *filter
+    -D OUTPUT -o rmnet_data2 -m owner --uid-owner 10164 -j REJECT
+    COMMIT
+2021-08-05 17:34:45.845 28538-28576/? E/IptablesRestoreController: -------  ERROR -------
+2021-08-05 17:34:45.845 28538-28576/? E/IptablesRestoreController: iptables-restore: line 1569 failed
+2021-08-05 17:34:45.845 28538-28576/? E/IptablesRestoreController: ----------------------
+    
+    
+    --------- beginning of crash
+2021-08-05 17:34:45.849 28848-28881/? E/AndroidRuntime: *** FATAL EXCEPTION IN SYSTEM PROCESS: android.fg
+    java.lang.IllegalStateException: android.os.ServiceSpecificException: Operation not permitted (code 1)
+        at com.android.server.NetworkManagementService.setAppOnInterfaceLocked(NetworkManagementService.java:1604)
+        at com.android.server.NetworkManagementService.updateAppOnInterfaceCallback(NetworkManagementService.java:1543)
+        at com.android.server.NetworkManagementService.access$500(NetworkManagementService.java:125)
+        at com.android.server.NetworkManagementService$1.lambda$onLinkPropertiesChanged$0$NetworkManagementService$1(NetworkManagementService.java:405)
+        at com.android.server.-$$Lambda$NetworkManagementService$1$cEe7AIGZabKkElb0YvNi_jszJbI.run(Unknown Source:6)
+        at android.os.Handler.handleCallback(Handler.java:938)
+        at android.os.Handler.dispatchMessage(Handler.java:99)
+        at android.os.Looper.loop(Looper.java:223)
+        at android.os.HandlerThread.run(HandlerThread.java:67)
+        at com.android.server.ServiceThread.run(ServiceThread.java:44)
+     Caused by: android.os.ServiceSpecificException: Operation not permitted (code 1)
+        at android.os.Parcel.createExceptionOrNull(Parcel.java:2387)
+        at android.os.Parcel.createException(Parcel.java:2357)
+        at android.os.Parcel.readException(Parcel.java:2340)
+        at android.os.Parcel.readException(Parcel.java:2282)
+        at android.net.INetd$Stub$Proxy.bandwidthRemoveRestrictAppOnInterface(INetd.java:3991)
+        at com.android.server.NetworkManagementService.setAppOnInterfaceLocked(NetworkManagementService.java:1594)
+        at com.android.server.NetworkManagementService.updateAppOnInterfaceCallback(NetworkManagementService.java:1543) 
+        at com.android.server.NetworkManagementService.access$500(NetworkManagementService.java:125) 
+        at com.android.server.NetworkManagementService$1.lambda$onLinkPropertiesChanged$0$NetworkManagementService$1(NetworkManagementService.java:405) 
+        at com.android.server.-$$Lambda$NetworkManagementService$1$cEe7AIGZabKkElb0YvNi_jszJbI.run(Unknown Source:6) 
+        at android.os.Handler.handleCallback(Handler.java:938) 
+        at android.os.Handler.dispatchMessage(Handler.java:99) 
+        at android.os.Looper.loop(Looper.java:223) 
+        at android.os.HandlerThread.run(HandlerThread.java:67) 
+        at com.android.server.ServiceThread.run(ServiceThread.java:44) 
+2021-08-05 17:34:46.117 5175-5175/? E/AndroidRuntime: FATAL EXCEPTION: main
+    Process: com.tencent.mm:toolsmp, PID: 5175
+    DeadSystemException: The system died; earlier logs will point to the root cause"><code>2021-08-05 17:34:45.809 2466-2466/? E/com.tencent.component.network.module.common.NetworkState: NetworkStateReceiver ====== android.net.conn.CONNECTIVITY_CHANGE
+2021-08-05 17:34:45.845 28538-28576/? E/IptablesRestoreController: iptables error:
+2021-08-05 17:34:45.845 28538-28576/? E/IptablesRestoreController: ------- COMMAND -------
+2021-08-05 17:34:45.845 28538-28576/? E/IptablesRestoreController: *filter
+    -D OUTPUT -o rmnet_data2 -m owner --uid-owner 10164 -j REJECT
+    COMMIT
+2021-08-05 17:34:45.845 28538-28576/? E/IptablesRestoreController: -------  ERROR -------
+2021-08-05 17:34:45.845 28538-28576/? E/IptablesRestoreController: iptables-restore: line 1569 failed
+2021-08-05 17:34:45.845 28538-28576/? E/IptablesRestoreController: ----------------------
+    
+    
+    --------- beginning of crash
+2021-08-05 17:34:45.849 28848-28881/? E/AndroidRuntime: *** FATAL EXCEPTION IN SYSTEM PROCESS: android.fg
+    java.lang.IllegalStateException: android.os.ServiceSpecificException: Operation not permitted (code 1)
+        at com.android.server.NetworkManagementService.setAppOnInterfaceLocked(NetworkManagementService.java:1604)
+        at com.android.server.NetworkManagementService.updateAppOnInterfaceCallback(NetworkManagementService.java:1543)
+        at com.android.server.NetworkManagementService.access$500(NetworkManagementService.java:125)
+        at com.android.server.NetworkManagementService$1.lambda$onLinkPropertiesChanged$0$NetworkManagementService$1(NetworkManagementService.java:405)
+        at com.android.server.-$$Lambda$NetworkManagementService$1$cEe7AIGZabKkElb0YvNi_jszJbI.run(Unknown Source:6)
+        at android.os.Handler.handleCallback(Handler.java:938)
+        at android.os.Handler.dispatchMessage(Handler.java:99)
+        at android.os.Looper.loop(Looper.java:223)
+        at android.os.HandlerThread.run(HandlerThread.java:67)
+        at com.android.server.ServiceThread.run(ServiceThread.java:44)
+     Caused by: android.os.ServiceSpecificException: Operation not permitted (code 1)
+        at android.os.Parcel.createExceptionOrNull(Parcel.java:2387)
+        at android.os.Parcel.createException(Parcel.java:2357)
+        at android.os.Parcel.readException(Parcel.java:2340)
+        at android.os.Parcel.readException(Parcel.java:2282)
+        at android.net.INetd$Stub$Proxy.bandwidthRemoveRestrictAppOnInterface(INetd.java:3991)
+        at com.android.server.NetworkManagementService.setAppOnInterfaceLocked(NetworkManagementService.java:1594)
+        at com.android.server.NetworkManagementService.updateAppOnInterfaceCallback(NetworkManagementService.java:1543) 
+        at com.android.server.NetworkManagementService.access$500(NetworkManagementService.java:125) 
+        at com.android.server.NetworkManagementService$1.lambda$onLinkPropertiesChanged$0$NetworkManagementService$1(NetworkManagementService.java:405) 
+        at com.android.server.-$$Lambda$NetworkManagementService$1$cEe7AIGZabKkElb0YvNi_jszJbI.run(Unknown Source:6) 
+        at android.os.Handler.handleCallback(Handler.java:938) 
+        at android.os.Handler.dispatchMessage(Handler.java:99) 
+        at android.os.Looper.loop(Looper.java:223) 
+        at android.os.HandlerThread.run(HandlerThread.java:67) 
+        at com.android.server.ServiceThread.run(ServiceThread.java:44) 
+2021-08-05 17:34:46.117 5175-5175/? E/AndroidRuntime: FATAL EXCEPTION: main
+    Process: com.tencent.mm:toolsmp, PID: 5175
+    DeadSystemException: The system died; earlier logs will point to the root cause</code></pre>
+<h3 id="复现三">复现三</h3>
+<pre class="shiki-source" data-shiki-language="log" data-shiki-code="2021-08-05 17:44:44.980 0-0/? E/audit: rate limit exceeded
+2021-08-05 17:44:45.571 11281-11738/? E/libc: Access denied finding property &#34;net.dns1&#34;
+2021-08-05 17:44:45.596 14670-14816/? E/libc: Access denied finding property &#34;net.dns1&#34;
+2021-08-05 17:44:45.596 14670-14816/? E/libc: Access denied finding property &#34;net.dns2&#34;
+2021-08-05 17:44:45.605 11962-11962/? E/com.tencent.component.network.module.common.NetworkState: NetworkStateReceiver ====== android.net.conn.CONNECTIVITY_CHANGE
+    --------- beginning of crash
+2021-08-05 17:44:45.616 6011-6070/? E/AndroidRuntime: *** FATAL EXCEPTION IN SYSTEM PROCESS: android.fg
+    java.lang.IllegalStateException: android.os.ServiceSpecificException: Operation not permitted (code 1)
+        at com.android.server.NetworkManagementService.setAppOnInterfaceLocked(NetworkManagementService.java:1604)
+        at com.android.server.NetworkManagementService.updateAppOnInterfaceCallback(NetworkManagementService.java:1543)
+        at com.android.server.NetworkManagementService.access$500(NetworkManagementService.java:125)
+        at com.android.server.NetworkManagementService$1.lambda$onLinkPropertiesChanged$0$NetworkManagementService$1(NetworkManagementService.java:405)
+        at com.android.server.-$$Lambda$NetworkManagementService$1$cEe7AIGZabKkElb0YvNi_jszJbI.run(Unknown Source:6)
+        at android.os.Handler.handleCallback(Handler.java:938)
+        at android.os.Handler.dispatchMessage(Handler.java:99)
+        at android.os.Looper.loop(Looper.java:223)
+        at android.os.HandlerThread.run(HandlerThread.java:67)
+        at com.android.server.ServiceThread.run(ServiceThread.java:44)
+     Caused by: android.os.ServiceSpecificException: Operation not permitted (code 1)
+        at android.os.Parcel.createExceptionOrNull(Parcel.java:2387)
+        at android.os.Parcel.createException(Parcel.java:2357)
+        at android.os.Parcel.readException(Parcel.java:2340)
+        at android.os.Parcel.readException(Parcel.java:2282)
+        at android.net.INetd$Stub$Proxy.bandwidthRemoveRestrictAppOnInterface(INetd.java:3991)
+        at com.android.server.NetworkManagementService.setAppOnInterfaceLocked(NetworkManagementService.java:1594)
+        at com.android.server.NetworkManagementService.updateAppOnInterfaceCallback(NetworkManagementService.java:1543) 
+        at com.android.server.NetworkManagementService.access$500(NetworkManagementService.java:125) 
+        at com.android.server.NetworkManagementService$1.lambda$onLinkPropertiesChanged$0$NetworkManagementService$1(NetworkManagementService.java:405) 
+        at com.android.server.-$$Lambda$NetworkManagementService$1$cEe7AIGZabKkElb0YvNi_jszJbI.run(Unknown Source:6) 
+        at android.os.Handler.handleCallback(Handler.java:938) 
+        at android.os.Handler.dispatchMessage(Handler.java:99) 
+        at android.os.Looper.loop(Looper.java:223) 
+        at android.os.HandlerThread.run(HandlerThread.java:67) 
+        at com.android.server.ServiceThread.run(ServiceThread.java:44) "><code>2021-08-05 17:44:44.980 0-0/? E/audit: rate limit exceeded
+2021-08-05 17:44:45.571 11281-11738/? E/libc: Access denied finding property &#34;net.dns1&#34;
+2021-08-05 17:44:45.596 14670-14816/? E/libc: Access denied finding property &#34;net.dns1&#34;
+2021-08-05 17:44:45.596 14670-14816/? E/libc: Access denied finding property &#34;net.dns2&#34;
+2021-08-05 17:44:45.605 11962-11962/? E/com.tencent.component.network.module.common.NetworkState: NetworkStateReceiver ====== android.net.conn.CONNECTIVITY_CHANGE
+    --------- beginning of crash
+2021-08-05 17:44:45.616 6011-6070/? E/AndroidRuntime: *** FATAL EXCEPTION IN SYSTEM PROCESS: android.fg
+    java.lang.IllegalStateException: android.os.ServiceSpecificException: Operation not permitted (code 1)
+        at com.android.server.NetworkManagementService.setAppOnInterfaceLocked(NetworkManagementService.java:1604)
+        at com.android.server.NetworkManagementService.updateAppOnInterfaceCallback(NetworkManagementService.java:1543)
+        at com.android.server.NetworkManagementService.access$500(NetworkManagementService.java:125)
+        at com.android.server.NetworkManagementService$1.lambda$onLinkPropertiesChanged$0$NetworkManagementService$1(NetworkManagementService.java:405)
+        at com.android.server.-$$Lambda$NetworkManagementService$1$cEe7AIGZabKkElb0YvNi_jszJbI.run(Unknown Source:6)
+        at android.os.Handler.handleCallback(Handler.java:938)
+        at android.os.Handler.dispatchMessage(Handler.java:99)
+        at android.os.Looper.loop(Looper.java:223)
+        at android.os.HandlerThread.run(HandlerThread.java:67)
+        at com.android.server.ServiceThread.run(ServiceThread.java:44)
+     Caused by: android.os.ServiceSpecificException: Operation not permitted (code 1)
+        at android.os.Parcel.createExceptionOrNull(Parcel.java:2387)
+        at android.os.Parcel.createException(Parcel.java:2357)
+        at android.os.Parcel.readException(Parcel.java:2340)
+        at android.os.Parcel.readException(Parcel.java:2282)
+        at android.net.INetd$Stub$Proxy.bandwidthRemoveRestrictAppOnInterface(INetd.java:3991)
+        at com.android.server.NetworkManagementService.setAppOnInterfaceLocked(NetworkManagementService.java:1594)
+        at com.android.server.NetworkManagementService.updateAppOnInterfaceCallback(NetworkManagementService.java:1543) 
+        at com.android.server.NetworkManagementService.access$500(NetworkManagementService.java:125) 
+        at com.android.server.NetworkManagementService$1.lambda$onLinkPropertiesChanged$0$NetworkManagementService$1(NetworkManagementService.java:405) 
+        at com.android.server.-$$Lambda$NetworkManagementService$1$cEe7AIGZabKkElb0YvNi_jszJbI.run(Unknown Source:6) 
+        at android.os.Handler.handleCallback(Handler.java:938) 
+        at android.os.Handler.dispatchMessage(Handler.java:99) 
+        at android.os.Looper.loop(Looper.java:223) 
+        at android.os.HandlerThread.run(HandlerThread.java:67) 
+        at com.android.server.ServiceThread.run(ServiceThread.java:44) </code></pre>
+<h3 id="复现四">复现四</h3>
+<pre class="shiki-source" data-shiki-language="log" data-shiki-code="2021-08-05 17:51:40.666 15338-15391/? I/EthernetTracker: interfaceLinkStateChanged, iface: wlan0, up: false
+2021-08-05 17:51:40.673 15879-20663/? E/ApfFilter: Read error
+    android.system.ErrnoException: read failed: ENETDOWN (Network is down)
+        at libcore.io.Linux.readBytes(Native Method)
+        at libcore.io.Linux.read(Linux.java:189)
+        at libcore.io.ForwardingOs.read(ForwardingOs.java:176)
+        at libcore.io.BlockGuardOs.read(BlockGuardOs.java:305)
+        at libcore.io.ForwardingOs.read(ForwardingOs.java:176)
+        at android.system.Os.read(Os.java:470)
+        at android.net.apf.ApfFilter$ReceiveThread.run(ApfFilter.java:220)
+2021-08-05 17:51:40.674 15879-20654/? E/ConnectivityPacketTracker.wlan0: readPacket error: 
+    android.system.ErrnoException: read failed: ENETDOWN (Network is down)
+        at libcore.io.Linux.readBytes(Native Method)
+        at libcore.io.Linux.read(Linux.java:189)
+        at libcore.io.ForwardingOs.read(ForwardingOs.java:176)
+        at libcore.io.BlockGuardOs.read(BlockGuardOs.java:305)
+        at libcore.io.ForwardingOs.read(ForwardingOs.java:176)
+        at android.system.Os.read(Os.java:470)
+        at android.net.util.PacketReader.readPacket(PacketReader.java:57)
+        at android.net.util.PacketReader.readPacket(PacketReader.java:32)
+        at android.net.util.FdEventsReader.handleInput(FdEventsReader.java:223)
+        at android.net.util.FdEventsReader.lambda$createAndRegisterFd$0(FdEventsReader.java:203)
+        at android.net.util.FdEventsReader.lambda$createAndRegisterFd$0$FdEventsReader(Unknown Source:0)
+        at android.net.util.-$$Lambda$FdEventsReader$t47DgB7XhHMFh6zjMyOAmdKEeDo.onFileDescriptorEvents(Unknown Source:2)
+        at android.os.MessageQueue.dispatchEvents(MessageQueue.java:293)
+        at android.os.MessageQueue.nativePollOnce(Native Method)
+        at android.os.MessageQueue.next(MessageQueue.java:335)
+        at android.os.Looper.loop(Looper.java:183)
+        at android.os.HandlerThread.run(HandlerThread.java:67)
+2021-08-05 17:51:40.675 15338-15464/? I/SupplicantStaIfaceHal: Terminating supplicant using HIDL
+2021-08-05 17:51:40.676 15879-20654/? E/DhcpClient: readPacket error: 
+    android.system.ErrnoException: read failed: ENETDOWN (Network is down)
+        at libcore.io.Linux.readBytes(Native Method)
+        at libcore.io.Linux.read(Linux.java:189)
+        at libcore.io.ForwardingOs.read(ForwardingOs.java:176)
+        at libcore.io.BlockGuardOs.read(BlockGuardOs.java:305)
+        at libcore.io.ForwardingOs.read(ForwardingOs.java:176)
+        at android.system.Os.read(Os.java:470)
+        at android.net.dhcp.DhcpClient$DhcpPacketHandler.readPacket(DhcpClient.java:660)
+        at android.net.dhcp.DhcpClient$DhcpPacketHandler.readPacket(DhcpClient.java:608)
+        at android.net.util.FdEventsReader.handleInput(FdEventsReader.java:223)
+        at android.net.util.FdEventsReader.lambda$createAndRegisterFd$0(FdEventsReader.java:203)
+        at android.net.util.FdEventsReader.lambda$createAndRegisterFd$0$FdEventsReader(Unknown Source:0)
+        at android.net.util.-$$Lambda$FdEventsReader$t47DgB7XhHMFh6zjMyOAmdKEeDo.onFileDescriptorEvents(Unknown Source:2)
+        at android.os.MessageQueue.dispatchEvents(MessageQueue.java:293)
+        at android.os.MessageQueue.nativePollOnce(Native Method)
+        at android.os.MessageQueue.next(MessageQueue.java:335)
+        at android.os.Looper.loop(Looper.java:183)
+        at android.os.HandlerThread.run(HandlerThread.java:67)
+2021-08-05 17:51:40.695 851-20650/? E/WifiHAL: wlan_service_update_sys_param: unable to open /proc/sys/net/ipv4/tcp_limit_output_bytes
+2021-08-05 17:51:40.696 851-20650/? E/WifiHAL: wlan_service_update_sys_param: unable to open /proc/sys/net/ipv4/tcp_use_userconfig
+2021-08-05 17:51:40.696 851-20650/? E/WifiHAL: wlan_service_update_sys_param: unable to open /proc/sys/net/ipv4/tcp_adv_win_scale
+2021-08-05 17:51:40.699 15338-15464/? E/SupplicantStaIfaceHal: Can&#39;t call setPowerSave, ISupplicantStaIface is null
+2021-08-05 17:51:40.699 15338-15464/? E/SupplicantStaIfaceHal: Can&#39;t call setBtCoexistenceMode, ISupplicantStaIface is null
+2021-08-05 17:51:45.918 15055-20791/? W/resolv: Validating DnsTlsServer on netId 102
+2021-08-05 17:51:45.918 15055-20790/? W/resolv: Validating DnsTlsServer on netId 102
+2021-08-05 17:51:45.938 15338-15470/? D/ConnectivityService: NetReassign [10 : null → 102, 18 : null → 102, 26 : null → 102, 15 : null → 102, 41 : null → 102, 11 : null → 102, 16 : null → 102, 23 : null → 102, 1 : null → 102]
+2021-08-05 17:51:45.940 15055-15116/? E/NetlinkEvent: NetlinkEvent::FindParam(): Parameter &#39;INTERFACE&#39; not found
+2021-08-05 17:51:45.940 15055-15116/? E/NetlinkEvent: NetlinkEvent::FindParam(): Parameter &#39;STATE&#39; not found
+2021-08-05 17:51:45.940 15055-15116/? E/NetlinkEvent: NetlinkEvent::FindParam(): Parameter &#39;TIME_NS&#39; not found
+2021-08-05 17:51:45.940 15055-15116/? E/NetlinkEvent: NetlinkEvent::FindParam(): Parameter &#39;UID&#39; not found
+2021-08-05 17:51:46.028 15055-15123/? W/IptablesRestoreController: iptables-restore process 15064 terminated status=256
+2021-08-05 17:51:46.029 15055-15123/? E/IptablesRestoreController: iptables error:
+2021-08-05 17:51:46.029 15055-15123/? E/IptablesRestoreController: ------- COMMAND -------
+2021-08-05 17:51:46.029 15055-15123/? E/IptablesRestoreController: *filter
+    -D OUTPUT -o rmnet_data2 -m owner --uid-owner 10164 -j REJECT
+    COMMIT
+2021-08-05 17:51:46.029 15055-15123/? E/IptablesRestoreController: -------  ERROR -------
+2021-08-05 17:51:46.029 15055-15123/? E/IptablesRestoreController: iptables-restore: line 888 failed
+2021-08-05 17:51:46.029 15055-15123/? E/IptablesRestoreController: ----------------------
+    
+    
+    --------- beginning of crash
+2021-08-05 17:51:46.033 15338-15391/? E/AndroidRuntime: *** FATAL EXCEPTION IN SYSTEM PROCESS: android.fg
+    java.lang.IllegalStateException: android.os.ServiceSpecificException: Operation not permitted (code 1)
+        at com.android.server.NetworkManagementService.setAppOnInterfaceLocked(NetworkManagementService.java:1604)
+        at com.android.server.NetworkManagementService.updateAppOnInterfaceCallback(NetworkManagementService.java:1543)
+        at com.android.server.NetworkManagementService.access$500(NetworkManagementService.java:125)
+        at com.android.server.NetworkManagementService$1.lambda$onLinkPropertiesChanged$0$NetworkManagementService$1(NetworkManagementService.java:405)
+        at com.android.server.-$$Lambda$NetworkManagementService$1$cEe7AIGZabKkElb0YvNi_jszJbI.run(Unknown Source:6)
+        at android.os.Handler.handleCallback(Handler.java:938)
+        at android.os.Handler.dispatchMessage(Handler.java:99)
+        at android.os.Looper.loop(Looper.java:223)
+        at android.os.HandlerThread.run(HandlerThread.java:67)
+        at com.android.server.ServiceThread.run(ServiceThread.java:44)
+     Caused by: android.os.ServiceSpecificException: Operation not permitted (code 1)
+        at android.os.Parcel.createExceptionOrNull(Parcel.java:2387)
+        at android.os.Parcel.createException(Parcel.java:2357)
+        at android.os.Parcel.readException(Parcel.java:2340)
+        at android.os.Parcel.readException(Parcel.java:2282)
+        at android.net.INetd$Stub$Proxy.bandwidthRemoveRestrictAppOnInterface(INetd.java:3991)
+        at com.android.server.NetworkManagementService.setAppOnInterfaceLocked(NetworkManagementService.java:1594)
+        at com.android.server.NetworkManagementService.updateAppOnInterfaceCallback(NetworkManagementService.java:1543) 
+        at com.android.server.NetworkManagementService.access$500(NetworkManagementService.java:125) 
+        at com.android.server.NetworkManagementService$1.lambda$onLinkPropertiesChanged$0$NetworkManagementService$1(NetworkManagementService.java:405) 
+        at com.android.server.-$$Lambda$NetworkManagementService$1$cEe7AIGZabKkElb0YvNi_jszJbI.run(Unknown Source:6) 
+        at android.os.Handler.handleCallback(Handler.java:938) 
+        at android.os.Handler.dispatchMessage(Handler.java:99) 
+        at android.os.Looper.loop(Looper.java:223) 
+        at android.os.HandlerThread.run(HandlerThread.java:67) 
+        at com.android.server.ServiceThread.run(ServiceThread.java:44) 
+2021-08-05 17:51:46.035 16519-19803/? I/PinnedContentDownloader: Finished downloading pinned content.
+2021-08-05 17:51:45.985 15338-15470/? D/ConnectivityService: [102 CELLULAR] EVENT_NETWORK_INFO_CHANGED, going from CONNECTED to CONNECTED
+2021-08-05 17:51:46.037 15338-15391/? I/DropBoxManagerService: add tag=system_server_crash isTagEnabled=true flags=0x2
+2021-08-05 17:51:46.055 15338-15391/? I/Process: Sending signal. PID: 15338 SIG: 9
+2021-08-05 17:51:46.298 16273-16278/? I/adbd: adbd_auth: hit EOF on framework fd
+2021-08-05 17:51:46.298 16273-16278/? I/adbd: adbd_auth: received new framework fd -1 (current = 20)
+2021-08-05 17:51:46.302 581-581/? I/lowmemorykiller: lmkd data connection dropped
+2021-08-05 17:51:46.302 581-581/? I/lowmemorykiller: closing lmkd data connection
+2021-08-05 17:51:46.305 833-833/? E/GnssHal_GnssGeofencing: serviceDied] service died. cookie: 0, who: 0x7900117300
+2021-08-05 17:51:46.305 833-833/? E/LocSvc_GnssInterface: serviceDied] service died. cookie: 0, who: 0x79001128f0
+2021-08-05 17:51:46.452 1138-2013/? E/QC-NETMGR-LIB: serviceDied(): Netd service died"><code>2021-08-05 17:51:40.666 15338-15391/? I/EthernetTracker: interfaceLinkStateChanged, iface: wlan0, up: false
+2021-08-05 17:51:40.673 15879-20663/? E/ApfFilter: Read error
+    android.system.ErrnoException: read failed: ENETDOWN (Network is down)
+        at libcore.io.Linux.readBytes(Native Method)
+        at libcore.io.Linux.read(Linux.java:189)
+        at libcore.io.ForwardingOs.read(ForwardingOs.java:176)
+        at libcore.io.BlockGuardOs.read(BlockGuardOs.java:305)
+        at libcore.io.ForwardingOs.read(ForwardingOs.java:176)
+        at android.system.Os.read(Os.java:470)
+        at android.net.apf.ApfFilter$ReceiveThread.run(ApfFilter.java:220)
+2021-08-05 17:51:40.674 15879-20654/? E/ConnectivityPacketTracker.wlan0: readPacket error: 
+    android.system.ErrnoException: read failed: ENETDOWN (Network is down)
+        at libcore.io.Linux.readBytes(Native Method)
+        at libcore.io.Linux.read(Linux.java:189)
+        at libcore.io.ForwardingOs.read(ForwardingOs.java:176)
+        at libcore.io.BlockGuardOs.read(BlockGuardOs.java:305)
+        at libcore.io.ForwardingOs.read(ForwardingOs.java:176)
+        at android.system.Os.read(Os.java:470)
+        at android.net.util.PacketReader.readPacket(PacketReader.java:57)
+        at android.net.util.PacketReader.readPacket(PacketReader.java:32)
+        at android.net.util.FdEventsReader.handleInput(FdEventsReader.java:223)
+        at android.net.util.FdEventsReader.lambda$createAndRegisterFd$0(FdEventsReader.java:203)
+        at android.net.util.FdEventsReader.lambda$createAndRegisterFd$0$FdEventsReader(Unknown Source:0)
+        at android.net.util.-$$Lambda$FdEventsReader$t47DgB7XhHMFh6zjMyOAmdKEeDo.onFileDescriptorEvents(Unknown Source:2)
+        at android.os.MessageQueue.dispatchEvents(MessageQueue.java:293)
+        at android.os.MessageQueue.nativePollOnce(Native Method)
+        at android.os.MessageQueue.next(MessageQueue.java:335)
+        at android.os.Looper.loop(Looper.java:183)
+        at android.os.HandlerThread.run(HandlerThread.java:67)
+2021-08-05 17:51:40.675 15338-15464/? I/SupplicantStaIfaceHal: Terminating supplicant using HIDL
+2021-08-05 17:51:40.676 15879-20654/? E/DhcpClient: readPacket error: 
+    android.system.ErrnoException: read failed: ENETDOWN (Network is down)
+        at libcore.io.Linux.readBytes(Native Method)
+        at libcore.io.Linux.read(Linux.java:189)
+        at libcore.io.ForwardingOs.read(ForwardingOs.java:176)
+        at libcore.io.BlockGuardOs.read(BlockGuardOs.java:305)
+        at libcore.io.ForwardingOs.read(ForwardingOs.java:176)
+        at android.system.Os.read(Os.java:470)
+        at android.net.dhcp.DhcpClient$DhcpPacketHandler.readPacket(DhcpClient.java:660)
+        at android.net.dhcp.DhcpClient$DhcpPacketHandler.readPacket(DhcpClient.java:608)
+        at android.net.util.FdEventsReader.handleInput(FdEventsReader.java:223)
+        at android.net.util.FdEventsReader.lambda$createAndRegisterFd$0(FdEventsReader.java:203)
+        at android.net.util.FdEventsReader.lambda$createAndRegisterFd$0$FdEventsReader(Unknown Source:0)
+        at android.net.util.-$$Lambda$FdEventsReader$t47DgB7XhHMFh6zjMyOAmdKEeDo.onFileDescriptorEvents(Unknown Source:2)
+        at android.os.MessageQueue.dispatchEvents(MessageQueue.java:293)
+        at android.os.MessageQueue.nativePollOnce(Native Method)
+        at android.os.MessageQueue.next(MessageQueue.java:335)
+        at android.os.Looper.loop(Looper.java:183)
+        at android.os.HandlerThread.run(HandlerThread.java:67)
+2021-08-05 17:51:40.695 851-20650/? E/WifiHAL: wlan_service_update_sys_param: unable to open /proc/sys/net/ipv4/tcp_limit_output_bytes
+2021-08-05 17:51:40.696 851-20650/? E/WifiHAL: wlan_service_update_sys_param: unable to open /proc/sys/net/ipv4/tcp_use_userconfig
+2021-08-05 17:51:40.696 851-20650/? E/WifiHAL: wlan_service_update_sys_param: unable to open /proc/sys/net/ipv4/tcp_adv_win_scale
+2021-08-05 17:51:40.699 15338-15464/? E/SupplicantStaIfaceHal: Can&#39;t call setPowerSave, ISupplicantStaIface is null
+2021-08-05 17:51:40.699 15338-15464/? E/SupplicantStaIfaceHal: Can&#39;t call setBtCoexistenceMode, ISupplicantStaIface is null
+2021-08-05 17:51:45.918 15055-20791/? W/resolv: Validating DnsTlsServer on netId 102
+2021-08-05 17:51:45.918 15055-20790/? W/resolv: Validating DnsTlsServer on netId 102
+2021-08-05 17:51:45.938 15338-15470/? D/ConnectivityService: NetReassign [10 : null → 102, 18 : null → 102, 26 : null → 102, 15 : null → 102, 41 : null → 102, 11 : null → 102, 16 : null → 102, 23 : null → 102, 1 : null → 102]
+2021-08-05 17:51:45.940 15055-15116/? E/NetlinkEvent: NetlinkEvent::FindParam(): Parameter &#39;INTERFACE&#39; not found
+2021-08-05 17:51:45.940 15055-15116/? E/NetlinkEvent: NetlinkEvent::FindParam(): Parameter &#39;STATE&#39; not found
+2021-08-05 17:51:45.940 15055-15116/? E/NetlinkEvent: NetlinkEvent::FindParam(): Parameter &#39;TIME_NS&#39; not found
+2021-08-05 17:51:45.940 15055-15116/? E/NetlinkEvent: NetlinkEvent::FindParam(): Parameter &#39;UID&#39; not found
+2021-08-05 17:51:46.028 15055-15123/? W/IptablesRestoreController: iptables-restore process 15064 terminated status=256
+2021-08-05 17:51:46.029 15055-15123/? E/IptablesRestoreController: iptables error:
+2021-08-05 17:51:46.029 15055-15123/? E/IptablesRestoreController: ------- COMMAND -------
+2021-08-05 17:51:46.029 15055-15123/? E/IptablesRestoreController: *filter
+    -D OUTPUT -o rmnet_data2 -m owner --uid-owner 10164 -j REJECT
+    COMMIT
+2021-08-05 17:51:46.029 15055-15123/? E/IptablesRestoreController: -------  ERROR -------
+2021-08-05 17:51:46.029 15055-15123/? E/IptablesRestoreController: iptables-restore: line 888 failed
+2021-08-05 17:51:46.029 15055-15123/? E/IptablesRestoreController: ----------------------
+    
+    
+    --------- beginning of crash
+2021-08-05 17:51:46.033 15338-15391/? E/AndroidRuntime: *** FATAL EXCEPTION IN SYSTEM PROCESS: android.fg
+    java.lang.IllegalStateException: android.os.ServiceSpecificException: Operation not permitted (code 1)
+        at com.android.server.NetworkManagementService.setAppOnInterfaceLocked(NetworkManagementService.java:1604)
+        at com.android.server.NetworkManagementService.updateAppOnInterfaceCallback(NetworkManagementService.java:1543)
+        at com.android.server.NetworkManagementService.access$500(NetworkManagementService.java:125)
+        at com.android.server.NetworkManagementService$1.lambda$onLinkPropertiesChanged$0$NetworkManagementService$1(NetworkManagementService.java:405)
+        at com.android.server.-$$Lambda$NetworkManagementService$1$cEe7AIGZabKkElb0YvNi_jszJbI.run(Unknown Source:6)
+        at android.os.Handler.handleCallback(Handler.java:938)
+        at android.os.Handler.dispatchMessage(Handler.java:99)
+        at android.os.Looper.loop(Looper.java:223)
+        at android.os.HandlerThread.run(HandlerThread.java:67)
+        at com.android.server.ServiceThread.run(ServiceThread.java:44)
+     Caused by: android.os.ServiceSpecificException: Operation not permitted (code 1)
+        at android.os.Parcel.createExceptionOrNull(Parcel.java:2387)
+        at android.os.Parcel.createException(Parcel.java:2357)
+        at android.os.Parcel.readException(Parcel.java:2340)
+        at android.os.Parcel.readException(Parcel.java:2282)
+        at android.net.INetd$Stub$Proxy.bandwidthRemoveRestrictAppOnInterface(INetd.java:3991)
+        at com.android.server.NetworkManagementService.setAppOnInterfaceLocked(NetworkManagementService.java:1594)
+        at com.android.server.NetworkManagementService.updateAppOnInterfaceCallback(NetworkManagementService.java:1543) 
+        at com.android.server.NetworkManagementService.access$500(NetworkManagementService.java:125) 
+        at com.android.server.NetworkManagementService$1.lambda$onLinkPropertiesChanged$0$NetworkManagementService$1(NetworkManagementService.java:405) 
+        at com.android.server.-$$Lambda$NetworkManagementService$1$cEe7AIGZabKkElb0YvNi_jszJbI.run(Unknown Source:6) 
+        at android.os.Handler.handleCallback(Handler.java:938) 
+        at android.os.Handler.dispatchMessage(Handler.java:99) 
+        at android.os.Looper.loop(Looper.java:223) 
+        at android.os.HandlerThread.run(HandlerThread.java:67) 
+        at com.android.server.ServiceThread.run(ServiceThread.java:44) 
+2021-08-05 17:51:46.035 16519-19803/? I/PinnedContentDownloader: Finished downloading pinned content.
+2021-08-05 17:51:45.985 15338-15470/? D/ConnectivityService: [102 CELLULAR] EVENT_NETWORK_INFO_CHANGED, going from CONNECTED to CONNECTED
+2021-08-05 17:51:46.037 15338-15391/? I/DropBoxManagerService: add tag=system_server_crash isTagEnabled=true flags=0x2
+2021-08-05 17:51:46.055 15338-15391/? I/Process: Sending signal. PID: 15338 SIG: 9
+2021-08-05 17:51:46.298 16273-16278/? I/adbd: adbd_auth: hit EOF on framework fd
+2021-08-05 17:51:46.298 16273-16278/? I/adbd: adbd_auth: received new framework fd -1 (current = 20)
+2021-08-05 17:51:46.302 581-581/? I/lowmemorykiller: lmkd data connection dropped
+2021-08-05 17:51:46.302 581-581/? I/lowmemorykiller: closing lmkd data connection
+2021-08-05 17:51:46.305 833-833/? E/GnssHal_GnssGeofencing: serviceDied] service died. cookie: 0, who: 0x7900117300
+2021-08-05 17:51:46.305 833-833/? E/LocSvc_GnssInterface: serviceDied] service died. cookie: 0, who: 0x79001128f0
+2021-08-05 17:51:46.452 1138-2013/? E/QC-NETMGR-LIB: serviceDied(): Netd service died</code></pre>
+<p>可以看出，出错是由于
+<code>at android.net.INetd$Stub$Proxy.bandwidthRemoveRestrictAppOnInterface(INetd.java:3991)</code>
+这里产生的。</p>
+<h2 id="罪魁祸首">罪魁祸首</h2>
+<p>手机上安装的是Play版本的<code>万能钥匙</code>，不能在国内使用。遂卸载之。
+奇迹发生了。无论怎么开关<code>WIFI/移动网络</code>都不会诱发重启。</p>
+<p>安装了<code>XposedEdge</code>后，问题复现</p>
+<pre class="shiki-source" data-shiki-language="log" data-shiki-code="2021-08-09 18:52:49.634 17146-17360/? E/[cmshow][MemePlayer]MemeBornPlayerManager: currentActionState
+     canRecycle:true
+2021-08-09 18:52:50.080 15248-15303/? E/NetlinkEvent: NetlinkEvent::FindParam(): Parameter &#39;INTERFACE&#39; not found
+2021-08-09 18:52:50.080 15248-15303/? E/NetlinkEvent: NetlinkEvent::FindParam(): Parameter &#39;STATE&#39; not found
+2021-08-09 18:52:50.080 15248-15303/? E/NetlinkEvent: NetlinkEvent::FindParam(): Parameter &#39;TIME_NS&#39; not found
+2021-08-09 18:52:50.080 15248-15303/? E/NetlinkEvent: NetlinkEvent::FindParam(): Parameter &#39;UID&#39; not found
+2021-08-09 18:52:50.159 17146-17146/? E/com.tencent.component.network.module.common.NetworkState: NetworkStateReceiver ====== android.net.conn.CONNECTIVITY_CHANGE
+2021-08-09 18:52:50.160 15541-15740/? D/ConnectivityService: [102 CELLULAR] EVENT_NETWORK_INFO_CHANGED, going from CONNECTED to CONNECTED
+2021-08-09 18:52:50.161 17146-20924/? I/DnsService: DNSService reset. Key:3gnet currKey:3gnet
+2021-08-09 18:52:50.161 17146-20924/? I/DnsService: add query:m.qpic.cn
+2021-08-09 18:52:50.164 17146-20809/? E/libc: Access denied finding property &#34;net.dns1&#34;
+2021-08-09 18:52:50.165 17146-17146/? E/TcSdkManager: not mobile operator On Request
+2021-08-09 18:52:49.274 0-0/? W/audit: audit_lost=31399 audit_rate_limit=5 audit_backlog_limit=64
+2021-08-09 18:52:49.274 0-0/? E/audit: rate limit exceeded
+2021-08-09 18:52:50.166 17146-21554/? I/chromium: [0809/185250.166924:INFO:tspdy_quic_client_session_factory.cc(22)] OnNetworkConnected network:441492361229
+2021-08-09 18:52:50.167 17146-21554/? I/chromium: [0809/185250.167119:INFO:tspdy_quic_client_session_factory.cc(37)] OnNetworkMadeDefault network:441492361229
+2021-08-09 18:52:50.168 21868-21868/? E/com.tencent.component.network.module.common.NetworkState: NetworkStateReceiver ====== android.net.conn.CONNECTIVITY_CHANGE
+2021-08-09 18:52:50.171 21868-22317/? I/TPNetworkChangeMonitor: onReceive broadcast action and update net status,onReceive broadcast in work thread.
+2021-08-09 18:52:50.171 20327-20327/? I/MSF.D.NetworkProvider: refresh currentAPN:3gnet. received networkInfo: CONNECTED :NetworkInfo: type: MOBILE[HSPA&#43;], state: CONNECTED/CONNECTED, reason: (unspecified), extra: 3g, roaming: false, failover: false, isAvailable: true, isConnectedToProvisioningNetwork: true. ExtraNetInfo: NetworkInfo: type: MOBILE[HSPA&#43;], state: CONNECTED/CONNECTED, reason: (unspecified), extra: 3g, roaming: false, failover: false, isAvailable: true, isConnectedToProvisioningNetwork: true
+2021-08-09 18:52:50.171 20327-20327/? D/MSF.D.NetworkProvider: netchange NONE to MOBILE
+2021-08-09 18:52:50.173 17146-20809/? E/libc: Access denied finding property &#34;net.dns1&#34;
+2021-08-09 18:52:50.174 17146-20326/? D/MSF.D.AppNetInfoNewImpl: onReceive com.tencent.mobileqq.msf.bd.netchange
+2021-08-09 18:52:50.175 22135-22364/? D/MSF.D.AppNetInfoNewImpl: onReceive com.tencent.mobileqq.msf.bd.netchange
+2021-08-09 18:52:50.175 21516-21838/? D/MSF.D.AppNetInfoNewImpl: onReceive com.tencent.mobileqq.msf.bd.netchange
+2021-08-09 18:52:50.175 22135-22364/? I/MSF.D.NetworkProvider: refresh currentAPN:null. received networkInfo: CONNECTED :NetworkInfo: type: MOBILE[HSPA&#43;], state: CONNECTED/CONNECTED, reason: (unspecified), extra: 3g, roaming: false, failover: false, isAvailable: true, isConnectedToProvisioningNetwork: true. ExtraNetInfo: NetworkInfo: type: MOBILE[HSPA&#43;], state: CONNECTED/CONNECTED, reason: (unspecified), extra: 3g, roaming: false, failover: false, isAvailable: true, isConnectedToProvisioningNetwork: true
+2021-08-09 18:52:50.175 21516-21838/? I/MSF.D.NetworkProvider: refresh currentAPN:null. received networkInfo: CONNECTED :NetworkInfo: type: MOBILE[HSPA&#43;], state: CONNECTED/CONNECTED, reason: (unspecified), extra: 3g, roaming: false, failover: false, isAvailable: true, isConnectedToProvisioningNetwork: true. ExtraNetInfo: NetworkInfo: type: MOBILE[HSPA&#43;], state: CONNECTED/CONNECTED, reason: (unspecified), extra: 3g, roaming: false, failover: false, isAvailable: true, isConnectedToProvisioningNetwork: true
+2021-08-09 18:52:50.175 17146-20326/? I/MSF.D.NetworkProvider: refresh currentAPN:null. received networkInfo: CONNECTED :NetworkInfo: type: MOBILE[HSPA&#43;], state: CONNECTED/CONNECTED, reason: (unspecified), extra: 3g, roaming: false, failover: false, isAvailable: true, isConnectedToProvisioningNetwork: true. ExtraNetInfo: NetworkInfo: type: MOBILE[HSPA&#43;], state: CONNECTED/CONNECTED, reason: (unspecified), extra: 3g, roaming: false, failover: false, isAvailable: true, isConnectedToProvisioningNetwork: true
+2021-08-09 18:52:50.176 21516-21838/? D/MSF.C.NetworkType5GWrapper: some param are still null, per = false
+2021-08-09 18:52:50.176 22135-22364/? D/MSF.C.NetworkType5GWrapper: some param are still null, per = false
+2021-08-09 18:52:50.176 17146-20326/? D/MSF.C.NetworkType5GWrapper: some param are still null, per = false
+2021-08-09 18:52:50.176 21516-21838/? D/MSF.D.NetworkProvider: netchange NONE to MOBILE
+2021-08-09 18:52:50.176 17146-20326/? D/MSF.D.NetworkProvider: netchange NONE to MOBILE
+2021-08-09 18:52:50.176 22135-22364/? D/MSF.D.NetworkProvider: netchange NONE to MOBILE
+2021-08-09 18:52:50.178 21868-22073/? D/MSF.D.AppNetInfoNewImpl: onReceive com.tencent.mobileqq.msf.bd.netchange
+2021-08-09 18:52:50.180 21868-23004/? E/libc: Access denied finding property &#34;net.dns1&#34;
+2021-08-09 18:52:50.181 20327-20693/? D/MsfNetUtil: Mobile Type:2
+2021-08-09 18:52:50.181 21868-22073/? I/MSF.D.NetworkProvider: refresh currentAPN:null. received networkInfo: CONNECTED :NetworkInfo: type: MOBILE[HSPA&#43;], state: CONNECTED/CONNECTED, reason: (unspecified), extra: 3g, roaming: false, failover: false, isAvailable: true, isConnectedToProvisioningNetwork: true. ExtraNetInfo: NetworkInfo: type: MOBILE[HSPA&#43;], state: CONNECTED/CONNECTED, reason: (unspecified), extra: 3g, roaming: false, failover: false, isAvailable: true, isConnectedToProvisioningNetwork: true
+2021-08-09 18:52:50.181 21868-22073/? D/MSF.C.NetworkType5GWrapper: some param are still null, per = false
+2021-08-09 18:52:50.181 21868-22073/? D/MSF.D.NetworkProvider: netchange NONE to MOBILE
+2021-08-09 18:52:50.182 15248-15309/? W/IptablesRestoreController: iptables-restore process 15258 terminated status=256
+2021-08-09 18:52:50.182 15248-15309/? E/IptablesRestoreController: iptables error:
+2021-08-09 18:52:50.182 15248-15309/? E/IptablesRestoreController: ------- COMMAND -------
+2021-08-09 18:52:50.182 15248-15309/? E/IptablesRestoreController: *filter
+    -D OUTPUT -o rmnet_data1 -m owner --uid-owner 10164 -j REJECT
+    COMMIT
+2021-08-09 18:52:50.182 15248-15309/? E/IptablesRestoreController: -------  ERROR -------
+2021-08-09 18:52:50.182 15248-15309/? E/IptablesRestoreController: iptables-restore: line 930 failed
+2021-08-09 18:52:50.182 15248-15309/? E/IptablesRestoreController: ----------------------
+2021-08-09 18:52:50.182 20327-20693/? D/StandbyModeManager: onMobileOn
+2021-08-09 18:52:50.182 20327-20693/? D/StandbyModeManager: stop try start standby by screenOn ON when mobileOn
+2021-08-09 18:52:50.184 15248-15309/? W/IptablesRestoreController: iptables-restore process 15259 terminated status=256
+2021-08-09 18:52:50.184 15248-15309/? E/IptablesRestoreController: iptables error:
+2021-08-09 18:52:50.184 15248-15309/? E/IptablesRestoreController: ------- COMMAND -------
+2021-08-09 18:52:50.184 15248-15309/? E/IptablesRestoreController: *filter
+    -D OUTPUT -o rmnet_data1 -m owner --uid-owner 10164 -j REJECT
+    COMMIT
+2021-08-09 18:52:50.184 15248-15309/? E/IptablesRestoreController: -------  ERROR -------
+2021-08-09 18:52:50.184 15248-15309/? E/IptablesRestoreController: ip6tables-restore: line 915 failed
+2021-08-09 18:52:50.184 15248-15309/? E/IptablesRestoreController: ----------------------
+2021-08-09 18:52:50.185 21162-21665/? E/libc: Access denied finding property &#34;net.dns1&#34;
+    
+    --------- beginning of crash
+2021-08-09 18:52:50.185 15541-15586/? E/AndroidRuntime: *** FATAL EXCEPTION IN SYSTEM PROCESS: android.fg
+    java.lang.IllegalStateException: android.os.ServiceSpecificException: Operation not permitted (code 1)
+        at com.android.server.NetworkManagementService.setAppOnInterfaceLocked(NetworkManagementService.java:1604)
+        at com.android.server.NetworkManagementService.updateAppOnInterfaceCallback(NetworkManagementService.java:1543)
+        at com.android.server.NetworkManagementService.access$500(NetworkManagementService.java:125)
+        at com.android.server.NetworkManagementService$1.lambda$onLinkPropertiesChanged$0$NetworkManagementService$1(NetworkManagementService.java:405)
+        at com.android.server.-$$Lambda$NetworkManagementService$1$cEe7AIGZabKkElb0YvNi_jszJbI.run(Unknown Source:6)
+        at android.os.Handler.handleCallback(Handler.java:938)
+        at android.os.Handler.dispatchMessage(Handler.java:99)
+        at android.os.Looper.loop(Looper.java:223)
+        at android.os.HandlerThread.run(HandlerThread.java:67)
+        at com.android.server.ServiceThread.run(ServiceThread.java:44)
+     Caused by: android.os.ServiceSpecificException: Operation not permitted (code 1)
+        at android.os.Parcel.createExceptionOrNull(Parcel.java:2387)
+        at android.os.Parcel.createException(Parcel.java:2357)
+        at android.os.Parcel.readException(Parcel.java:2340)
+        at android.os.Parcel.readException(Parcel.java:2282)
+        at android.net.INetd$Stub$Proxy.bandwidthRemoveRestrictAppOnInterface(INetd.java:3991)
+        at com.android.server.NetworkManagementService.setAppOnInterfaceLocked(NetworkManagementService.java:1594)
+        at com.android.server.NetworkManagementService.updateAppOnInterfaceCallback(NetworkManagementService.java:1543) 
+        at com.android.server.NetworkManagementService.access$500(NetworkManagementService.java:125) 
+        at com.android.server.NetworkManagementService$1.lambda$onLinkPropertiesChanged$0$NetworkManagementService$1(NetworkManagementService.java:405) 
+        at com.android.server.-$$Lambda$NetworkManagementService$1$cEe7AIGZabKkElb0YvNi_jszJbI.run(Unknown Source:6) 
+        at android.os.Handler.handleCallback(Handler.java:938) 
+        at android.os.Handler.dispatchMessage(Handler.java:99) 
+        at android.os.Looper.loop(Looper.java:223) 
+        at android.os.HandlerThread.run(HandlerThread.java:67) 
+        at com.android.server.ServiceThread.run(ServiceThread.java:44) "><code>2021-08-09 18:52:49.634 17146-17360/? E/[cmshow][MemePlayer]MemeBornPlayerManager: currentActionState
+     canRecycle:true
+2021-08-09 18:52:50.080 15248-15303/? E/NetlinkEvent: NetlinkEvent::FindParam(): Parameter &#39;INTERFACE&#39; not found
+2021-08-09 18:52:50.080 15248-15303/? E/NetlinkEvent: NetlinkEvent::FindParam(): Parameter &#39;STATE&#39; not found
+2021-08-09 18:52:50.080 15248-15303/? E/NetlinkEvent: NetlinkEvent::FindParam(): Parameter &#39;TIME_NS&#39; not found
+2021-08-09 18:52:50.080 15248-15303/? E/NetlinkEvent: NetlinkEvent::FindParam(): Parameter &#39;UID&#39; not found
+2021-08-09 18:52:50.159 17146-17146/? E/com.tencent.component.network.module.common.NetworkState: NetworkStateReceiver ====== android.net.conn.CONNECTIVITY_CHANGE
+2021-08-09 18:52:50.160 15541-15740/? D/ConnectivityService: [102 CELLULAR] EVENT_NETWORK_INFO_CHANGED, going from CONNECTED to CONNECTED
+2021-08-09 18:52:50.161 17146-20924/? I/DnsService: DNSService reset. Key:3gnet currKey:3gnet
+2021-08-09 18:52:50.161 17146-20924/? I/DnsService: add query:m.qpic.cn
+2021-08-09 18:52:50.164 17146-20809/? E/libc: Access denied finding property &#34;net.dns1&#34;
+2021-08-09 18:52:50.165 17146-17146/? E/TcSdkManager: not mobile operator On Request
+2021-08-09 18:52:49.274 0-0/? W/audit: audit_lost=31399 audit_rate_limit=5 audit_backlog_limit=64
+2021-08-09 18:52:49.274 0-0/? E/audit: rate limit exceeded
+2021-08-09 18:52:50.166 17146-21554/? I/chromium: [0809/185250.166924:INFO:tspdy_quic_client_session_factory.cc(22)] OnNetworkConnected network:441492361229
+2021-08-09 18:52:50.167 17146-21554/? I/chromium: [0809/185250.167119:INFO:tspdy_quic_client_session_factory.cc(37)] OnNetworkMadeDefault network:441492361229
+2021-08-09 18:52:50.168 21868-21868/? E/com.tencent.component.network.module.common.NetworkState: NetworkStateReceiver ====== android.net.conn.CONNECTIVITY_CHANGE
+2021-08-09 18:52:50.171 21868-22317/? I/TPNetworkChangeMonitor: onReceive broadcast action and update net status,onReceive broadcast in work thread.
+2021-08-09 18:52:50.171 20327-20327/? I/MSF.D.NetworkProvider: refresh currentAPN:3gnet. received networkInfo: CONNECTED :NetworkInfo: type: MOBILE[HSPA&#43;], state: CONNECTED/CONNECTED, reason: (unspecified), extra: 3g, roaming: false, failover: false, isAvailable: true, isConnectedToProvisioningNetwork: true. ExtraNetInfo: NetworkInfo: type: MOBILE[HSPA&#43;], state: CONNECTED/CONNECTED, reason: (unspecified), extra: 3g, roaming: false, failover: false, isAvailable: true, isConnectedToProvisioningNetwork: true
+2021-08-09 18:52:50.171 20327-20327/? D/MSF.D.NetworkProvider: netchange NONE to MOBILE
+2021-08-09 18:52:50.173 17146-20809/? E/libc: Access denied finding property &#34;net.dns1&#34;
+2021-08-09 18:52:50.174 17146-20326/? D/MSF.D.AppNetInfoNewImpl: onReceive com.tencent.mobileqq.msf.bd.netchange
+2021-08-09 18:52:50.175 22135-22364/? D/MSF.D.AppNetInfoNewImpl: onReceive com.tencent.mobileqq.msf.bd.netchange
+2021-08-09 18:52:50.175 21516-21838/? D/MSF.D.AppNetInfoNewImpl: onReceive com.tencent.mobileqq.msf.bd.netchange
+2021-08-09 18:52:50.175 22135-22364/? I/MSF.D.NetworkProvider: refresh currentAPN:null. received networkInfo: CONNECTED :NetworkInfo: type: MOBILE[HSPA&#43;], state: CONNECTED/CONNECTED, reason: (unspecified), extra: 3g, roaming: false, failover: false, isAvailable: true, isConnectedToProvisioningNetwork: true. ExtraNetInfo: NetworkInfo: type: MOBILE[HSPA&#43;], state: CONNECTED/CONNECTED, reason: (unspecified), extra: 3g, roaming: false, failover: false, isAvailable: true, isConnectedToProvisioningNetwork: true
+2021-08-09 18:52:50.175 21516-21838/? I/MSF.D.NetworkProvider: refresh currentAPN:null. received networkInfo: CONNECTED :NetworkInfo: type: MOBILE[HSPA&#43;], state: CONNECTED/CONNECTED, reason: (unspecified), extra: 3g, roaming: false, failover: false, isAvailable: true, isConnectedToProvisioningNetwork: true. ExtraNetInfo: NetworkInfo: type: MOBILE[HSPA&#43;], state: CONNECTED/CONNECTED, reason: (unspecified), extra: 3g, roaming: false, failover: false, isAvailable: true, isConnectedToProvisioningNetwork: true
+2021-08-09 18:52:50.175 17146-20326/? I/MSF.D.NetworkProvider: refresh currentAPN:null. received networkInfo: CONNECTED :NetworkInfo: type: MOBILE[HSPA&#43;], state: CONNECTED/CONNECTED, reason: (unspecified), extra: 3g, roaming: false, failover: false, isAvailable: true, isConnectedToProvisioningNetwork: true. ExtraNetInfo: NetworkInfo: type: MOBILE[HSPA&#43;], state: CONNECTED/CONNECTED, reason: (unspecified), extra: 3g, roaming: false, failover: false, isAvailable: true, isConnectedToProvisioningNetwork: true
+2021-08-09 18:52:50.176 21516-21838/? D/MSF.C.NetworkType5GWrapper: some param are still null, per = false
+2021-08-09 18:52:50.176 22135-22364/? D/MSF.C.NetworkType5GWrapper: some param are still null, per = false
+2021-08-09 18:52:50.176 17146-20326/? D/MSF.C.NetworkType5GWrapper: some param are still null, per = false
+2021-08-09 18:52:50.176 21516-21838/? D/MSF.D.NetworkProvider: netchange NONE to MOBILE
+2021-08-09 18:52:50.176 17146-20326/? D/MSF.D.NetworkProvider: netchange NONE to MOBILE
+2021-08-09 18:52:50.176 22135-22364/? D/MSF.D.NetworkProvider: netchange NONE to MOBILE
+2021-08-09 18:52:50.178 21868-22073/? D/MSF.D.AppNetInfoNewImpl: onReceive com.tencent.mobileqq.msf.bd.netchange
+2021-08-09 18:52:50.180 21868-23004/? E/libc: Access denied finding property &#34;net.dns1&#34;
+2021-08-09 18:52:50.181 20327-20693/? D/MsfNetUtil: Mobile Type:2
+2021-08-09 18:52:50.181 21868-22073/? I/MSF.D.NetworkProvider: refresh currentAPN:null. received networkInfo: CONNECTED :NetworkInfo: type: MOBILE[HSPA&#43;], state: CONNECTED/CONNECTED, reason: (unspecified), extra: 3g, roaming: false, failover: false, isAvailable: true, isConnectedToProvisioningNetwork: true. ExtraNetInfo: NetworkInfo: type: MOBILE[HSPA&#43;], state: CONNECTED/CONNECTED, reason: (unspecified), extra: 3g, roaming: false, failover: false, isAvailable: true, isConnectedToProvisioningNetwork: true
+2021-08-09 18:52:50.181 21868-22073/? D/MSF.C.NetworkType5GWrapper: some param are still null, per = false
+2021-08-09 18:52:50.181 21868-22073/? D/MSF.D.NetworkProvider: netchange NONE to MOBILE
+2021-08-09 18:52:50.182 15248-15309/? W/IptablesRestoreController: iptables-restore process 15258 terminated status=256
+2021-08-09 18:52:50.182 15248-15309/? E/IptablesRestoreController: iptables error:
+2021-08-09 18:52:50.182 15248-15309/? E/IptablesRestoreController: ------- COMMAND -------
+2021-08-09 18:52:50.182 15248-15309/? E/IptablesRestoreController: *filter
+    -D OUTPUT -o rmnet_data1 -m owner --uid-owner 10164 -j REJECT
+    COMMIT
+2021-08-09 18:52:50.182 15248-15309/? E/IptablesRestoreController: -------  ERROR -------
+2021-08-09 18:52:50.182 15248-15309/? E/IptablesRestoreController: iptables-restore: line 930 failed
+2021-08-09 18:52:50.182 15248-15309/? E/IptablesRestoreController: ----------------------
+2021-08-09 18:52:50.182 20327-20693/? D/StandbyModeManager: onMobileOn
+2021-08-09 18:52:50.182 20327-20693/? D/StandbyModeManager: stop try start standby by screenOn ON when mobileOn
+2021-08-09 18:52:50.184 15248-15309/? W/IptablesRestoreController: iptables-restore process 15259 terminated status=256
+2021-08-09 18:52:50.184 15248-15309/? E/IptablesRestoreController: iptables error:
+2021-08-09 18:52:50.184 15248-15309/? E/IptablesRestoreController: ------- COMMAND -------
+2021-08-09 18:52:50.184 15248-15309/? E/IptablesRestoreController: *filter
+    -D OUTPUT -o rmnet_data1 -m owner --uid-owner 10164 -j REJECT
+    COMMIT
+2021-08-09 18:52:50.184 15248-15309/? E/IptablesRestoreController: -------  ERROR -------
+2021-08-09 18:52:50.184 15248-15309/? E/IptablesRestoreController: ip6tables-restore: line 915 failed
+2021-08-09 18:52:50.184 15248-15309/? E/IptablesRestoreController: ----------------------
+2021-08-09 18:52:50.185 21162-21665/? E/libc: Access denied finding property &#34;net.dns1&#34;
+    
+    --------- beginning of crash
+2021-08-09 18:52:50.185 15541-15586/? E/AndroidRuntime: *** FATAL EXCEPTION IN SYSTEM PROCESS: android.fg
+    java.lang.IllegalStateException: android.os.ServiceSpecificException: Operation not permitted (code 1)
+        at com.android.server.NetworkManagementService.setAppOnInterfaceLocked(NetworkManagementService.java:1604)
+        at com.android.server.NetworkManagementService.updateAppOnInterfaceCallback(NetworkManagementService.java:1543)
+        at com.android.server.NetworkManagementService.access$500(NetworkManagementService.java:125)
+        at com.android.server.NetworkManagementService$1.lambda$onLinkPropertiesChanged$0$NetworkManagementService$1(NetworkManagementService.java:405)
+        at com.android.server.-$$Lambda$NetworkManagementService$1$cEe7AIGZabKkElb0YvNi_jszJbI.run(Unknown Source:6)
+        at android.os.Handler.handleCallback(Handler.java:938)
+        at android.os.Handler.dispatchMessage(Handler.java:99)
+        at android.os.Looper.loop(Looper.java:223)
+        at android.os.HandlerThread.run(HandlerThread.java:67)
+        at com.android.server.ServiceThread.run(ServiceThread.java:44)
+     Caused by: android.os.ServiceSpecificException: Operation not permitted (code 1)
+        at android.os.Parcel.createExceptionOrNull(Parcel.java:2387)
+        at android.os.Parcel.createException(Parcel.java:2357)
+        at android.os.Parcel.readException(Parcel.java:2340)
+        at android.os.Parcel.readException(Parcel.java:2282)
+        at android.net.INetd$Stub$Proxy.bandwidthRemoveRestrictAppOnInterface(INetd.java:3991)
+        at com.android.server.NetworkManagementService.setAppOnInterfaceLocked(NetworkManagementService.java:1594)
+        at com.android.server.NetworkManagementService.updateAppOnInterfaceCallback(NetworkManagementService.java:1543) 
+        at com.android.server.NetworkManagementService.access$500(NetworkManagementService.java:125) 
+        at com.android.server.NetworkManagementService$1.lambda$onLinkPropertiesChanged$0$NetworkManagementService$1(NetworkManagementService.java:405) 
+        at com.android.server.-$$Lambda$NetworkManagementService$1$cEe7AIGZabKkElb0YvNi_jszJbI.run(Unknown Source:6) 
+        at android.os.Handler.handleCallback(Handler.java:938) 
+        at android.os.Handler.dispatchMessage(Handler.java:99) 
+        at android.os.Looper.loop(Looper.java:223) 
+        at android.os.HandlerThread.run(HandlerThread.java:67) 
+        at com.android.server.ServiceThread.run(ServiceThread.java:44) </code></pre>
+<h2 id="minote3资源下载">MiNote3资源下载</h2>
+<p>附固件下载地址：<br>
+<a href="https://c.mi.com/oc/miuidownload/detail?device=1700336" target="_blank" rel="noopener noreferrer">Note3 MIUI国际版</a>
+<br>
+<a href="https://www.miui.com/download-336.html" target="_blank" rel="noopener noreferrer">Note3 MIUI国内版</a>
+<br>
+<a href="https://download.lineageos.org/jason" target="_blank" rel="noopener noreferrer">Note3 LineageOS</a>
+<br>
+<a href="https://download.mokeedev.com/?device=jason" target="_blank" rel="noopener noreferrer">Note3 Mokee</a>
+</p>
+</div>
+      <div class="article-tags"><a href="https://leapsea.github.io/tags/Android/">#Android</a></div>
+
+      <footer class="article-footer">
+        <a href="https://leapsea.github.io/2021/07/27/%E9%87%8F%E5%8C%96%E4%BA%A4%E6%98%93%E5%B7%A5%E5%85%B7-%E6%A1%86%E6%9E%B6.html">← 量化交易工具/框架</a>
+        <a class="next" href="https://leapsea.github.io/2021/07/29/Linux%E6%9C%8D%E5%8A%A1%E5%99%A8%E5%BC%80%E5%85%89.html">Linux服务器开光 →</a>
+      </footer>
+    </article>
+    <aside class="sidebar">
+  <form class="site-search" role="search" action="https://leapsea.github.io/search/" method="get">
+    <label class="sr-only" for="site-search-input">搜索</label>
+    <input id="site-search-input" type="search" name="q" placeholder="Search" aria-label="搜索">
+    <button type="submit" aria-label="提交搜索"><svg class="site-icon" viewBox="0 0 22 22" aria-hidden="true" focusable="false"><path d="M10 3a7 7 0 1 0 4.4 12.4l5.3 5.3 1.4-1.4-5.3-5.3A7 7 0 0 0 10 3m0 2a5 5 0 1 1 0 10 5 5 0 0 1 0-10" /></svg>
+</button>
+  </form>
+  <section class="widget widget-category">
+    <h3 class="widget-title"><svg class="site-icon" viewBox="0 0 22 22" aria-hidden="true" focusable="false"><path d="M3 5h7l2 2h9v12H3zm2 4v8h14V9z" /></svg>
+<span>分类</span></h3>
+    <ul class="widget-list"><li><a href="https://leapsea.github.io/categories/Golang/">Golang</a><span>(5)</span></li><li><a href="https://leapsea.github.io/categories/Android/">Android</a><span>(3)</span></li><li><a href="https://leapsea.github.io/categories/Docker/">Docker</a><span>(3)</span></li><li><a href="https://leapsea.github.io/categories/%E5%94%A0%E5%8F%A8/">唠叨</a><span>(3)</span></li><li><a href="https://leapsea.github.io/categories/%E6%8A%98%E8%85%BE/">折腾</a><span>(3)</span></li><li><a href="https://leapsea.github.io/categories/Kubernetes/">Kubernetes</a><span>(2)</span></li><li><a href="https://leapsea.github.io/categories/Linux/">Linux</a><span>(2)</span></li><li><a href="https://leapsea.github.io/categories/%E5%B7%A5%E5%85%B7/">工具</a><span>(2)</span></li><li><a href="https://leapsea.github.io/categories/%E9%87%8F%E5%8C%96%E4%BA%A4%E6%98%93/">量化交易</a><span>(2)</span></li><li><a href="https://leapsea.github.io/categories/Flutter/">Flutter</a><span>(1)</span></li><li><a href="https://leapsea.github.io/categories/Google/">Google</a><span>(1)</span></li><li><a href="https://leapsea.github.io/categories/%E5%85%A5%E4%BE%B5%E6%A3%80%E6%B5%8B/">入侵检测</a><span>(1)</span></li><li><a href="https://leapsea.github.io/categories/%E5%85%BB%E7%94%9F/">养生</a><span>(1)</span></li><li><a href="https://leapsea.github.io/categories/%E5%AD%A6%E4%B9%A0%E8%B5%84%E6%96%99/">学习资料</a><span>(1)</span></li><li><a href="https://leapsea.github.io/categories/%E6%84%8F%E5%A4%96%E6%94%B6%E8%8E%B7/">意外收获</a><span>(1)</span></li><li><a href="https://leapsea.github.io/categories/%E6%95%88%E7%8E%87/">效率</a><span>(1)</span></li><li><a href="https://leapsea.github.io/categories/%E7%96%AB%E6%83%85/">疫情</a><span>(1)</span></li><li><a href="https://leapsea.github.io/categories/%E7%B3%BB%E7%BB%9F/">系统</a><span>(1)</span></li><li><a href="https://leapsea.github.io/categories/%E8%96%85%E7%BE%8A%E6%AF%9B/">薅羊毛</a><span>(1)</span></li><li><a href="https://leapsea.github.io/categories/%E8%96%9B%E5%AE%9A%E8%B0%94%E7%9A%84bug/">薛定谔的bug</a><span>(1)</span></li></ul>
+  </section>
+  <section class="widget">
+    <h3 class="widget-title"><svg class="site-icon" viewBox="0 0 22 22" aria-hidden="true" focusable="false"><path d="m12 2 3 6 7 .9-5 4.8 1.2 6.8L12 17l-6.2 3.5L7 13.7 2 8.9 9 8z" /></svg>
+ 标签</h3>
+    <div class="tag-list"><a href="https://leapsea.github.io/tags/Golang/">Golang(7)</a><a href="https://leapsea.github.io/tags/Android/">Android(6)</a><a href="https://leapsea.github.io/tags/Docker/">Docker(4)</a><a href="https://leapsea.github.io/tags/Linux/">Linux(4)</a><a href="https://leapsea.github.io/tags/HTTP/">HTTP(3)</a><a href="https://leapsea.github.io/tags/Windows/">Windows(3)</a><a href="https://leapsea.github.io/tags/%E8%99%9A%E6%8B%9F%E6%9C%BA/">虚拟机(3)</a><a href="https://leapsea.github.io/tags/Kafka/">Kafka(2)</a><a href="https://leapsea.github.io/tags/Kubernetes/">Kubernetes(2)</a><a href="https://leapsea.github.io/tags/Termux/">Termux(2)</a><a href="https://leapsea.github.io/tags/%E4%BF%A1%E6%81%AF%E5%AE%89%E5%85%A8/">信息安全(2)</a><a href="https://leapsea.github.io/tags/%E5%8D%9A%E5%AE%A2/">博客(2)</a><a href="https://leapsea.github.io/tags/%E5%BC%80%E5%8F%91%E5%B7%A5%E5%85%B7/">开发工具(2)</a><a href="https://leapsea.github.io/tags/%E7%BD%91%E7%BB%9C/">网络(2)</a><a href="https://leapsea.github.io/tags/%E9%87%8F%E5%8C%96%E4%BA%A4%E6%98%93/">量化交易(2)</a><a href="https://leapsea.github.io/tags/Flutter/">Flutter(1)</a><a href="https://leapsea.github.io/tags/SSH/">SSH(1)</a><a href="https://leapsea.github.io/tags/%E5%81%A5%E5%BA%B7/">健康(1)</a><a href="https://leapsea.github.io/tags/%E5%9B%BE%E5%BA%8A/">图床(1)</a><a href="https://leapsea.github.io/tags/%E5%BE%AE%E6%9C%8D%E5%8A%A1/">微服务(1)</a><a href="https://leapsea.github.io/tags/%E6%95%B0%E6%8D%AE%E5%88%86%E6%9E%90/">数据分析(1)</a><a href="https://leapsea.github.io/tags/%E6%95%B0%E6%8D%AE%E5%BA%93/">数据库(1)</a><a href="https://leapsea.github.io/tags/%E6%96%B0%E5%86%A0/">新冠(1)</a><a href="https://leapsea.github.io/tags/%E7%A1%AC%E4%BB%B6/">硬件(1)</a><a href="https://leapsea.github.io/tags/%E8%87%AA%E5%8A%A8%E5%8C%96/">自动化(1)</a></div>
+  </section>
+  <section class="widget widget-recent-posts">
+    <h3 class="widget-title"><svg class="site-icon" viewBox="0 0 22 22" aria-hidden="true" focusable="false"><path d="M5 2h9l5 5v15H5zm8 2v5h5M8 13h8v2H8zm0 4h8v2H8z" /></svg>
+ 最近文章</h3>
+    <ul class="recent-list recent-posts"><li><a href="https://leapsea.github.io/2026/09/23/%E4%BB%8E-Hexo-%E5%88%B0-Hugo%E4%B8%BB%E9%A2%98%E6%A0%B7%E5%BC%8F%E4%B8%8E%E4%BB%A3%E7%A0%81%E9%AB%98%E4%BA%AE.html" title="从 Hexo 到 Hugo：主题、样式与代码高亮">从 Hexo 到 Hugo：主题、样式与代码高亮</a></li><li><a href="https://leapsea.github.io/2022/03/30/http%E9%87%8D%E5%AE%9A%E5%90%91.html" title="http重定向">http重定向</a></li><li><a href="https://leapsea.github.io/2022/02/06/%E6%96%B0%E5%8A%A0%E5%9D%A1%E7%96%AB%E6%83%85%E5%8F%AF%E8%A7%86%E5%8C%96%E7%BB%9F%E8%AE%A1.html" title="新加坡疫情可视化统计">新加坡疫情可视化统计</a></li><li><a href="https://leapsea.github.io/2021/11/13/%E4%BA%AC%E8%B1%86%E8%84%9A%E6%9C%AC.html" title="京豆脚本">京豆脚本</a></li><li><a href="https://leapsea.github.io/2021/10/24/Termux%E7%AE%80%E5%8D%95%E5%85%A5%E9%97%A8.html" title="Termux简单入门">Termux简单入门</a></li><li><a href="https://leapsea.github.io/2021/08/13/Golang%E7%BC%96%E7%A0%81%E8%A7%84%E8%8C%83.html" title="Golang编码规范">Golang编码规范</a></li><li><a href="https://leapsea.github.io/2021/08/09/%E5%9F%BA%E4%BA%8EBacktrader-AKShare%E5%BF%AB%E9%80%9F%E6%90%AD%E5%BB%BA%E9%87%8F%E5%8C%96%E5%9B%9E%E6%B5%8B%E5%B9%B3%E5%8F%B0.html" title="基于Backtrader&#43;AKShare快速搭建量化回测平台">基于Backtrader&#43;AKShare快速搭建量化回测平台</a></li><li><a href="https://leapsea.github.io/2021/08/06/idea%E5%BF%AB%E9%80%9F%E5%AE%9E%E7%8E%B0%E5%AE%A2%E6%88%B7%E7%AB%AFhttp%E8%B0%83%E7%94%A8.html" title="idea快速实现客户端http调用">idea快速实现客户端http调用</a></li><li><a href="https://leapsea.github.io/2021/07/31/Android%E7%B3%BB%E7%BB%9F%E7%9A%84%E6%95%B0%E6%8D%AE%E5%A4%87%E4%BB%BD%E4%B8%8E%E8%BF%98%E5%8E%9F.html" title="Android系统的数据备份与还原">Android系统的数据备份与还原</a></li><li><a href="https://leapsea.github.io/2021/07/29/Linux%E6%9C%8D%E5%8A%A1%E5%99%A8%E5%BC%80%E5%85%89.html" title="Linux服务器开光">Linux服务器开光</a></li></ul>
+  </section>
+  <section class="widget widget-links">
+    <h3 class="widget-title"><svg class="site-icon" viewBox="0 0 22 22" aria-hidden="true" focusable="false"><path d="M14 3h7v7h-2V6.4l-9.3 9.3-1.4-1.4L17.6 5H14zM5 5h6v2H7v10h10v-4h2v6H5z" /></svg>
+<span>友情链接</span></h3>
+    <ul class="recent-list"><li><a href="https://leapsea.github.io/">我的小站</a></li><li><a href="https://fictiony.github.io/">F大</a></li></ul>
+  </section>
+</aside>
+
+  </div>
+
+    </main><script defer src="https://leapsea.github.io/js/shiki.682f9fad917c5d871fb7f8af3908d8651586309049cd1d887d955c0aa05f35fe38046772a029c64eeee1fa012332b40c.js" integrity="sha384-aC&#43;frZF8XYcft/ivOQjYZRWGMJBJzR2IfZVcCqBfNf44BGdyoCnGTu7h&#43;gEjMrQM"></script>
+    <footer class="site-footer">
+  <div class="site-footer-inner">
+    <p>Copyright © 2026 <a href="https://leapsea.github.io/">我的小站</a> · Powered by <a href="https://gohugo.io/">Hugo</a></p>
+  </div>
+</footer>
+
+  </body>
+</html>

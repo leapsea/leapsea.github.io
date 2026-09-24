@@ -1,0 +1,43 @@
+.widget-recent-posts .widget-title {
+  margin-bottom: 0;
+}
+
+.recent-posts li {
+  position: relative;
+  border-bottom: 1px solid #f2f2f2;
+}
+
+.recent-posts li:last-child {
+  border-bottom: 0;
+}
+
+.recent-posts a {
+  display: block;
+  overflow: hidden;
+  padding: 3px 8px 3px 18px;
+  border-radius: 3px;
+  line-height: 1.6;
+  text-overflow: ellipsis;
+  transition: background-color .15s ease, color .15s ease;
+  white-space: nowrap;
+}
+
+.recent-posts a::before {
+  position: absolute;
+  top: 50%;
+  left: 8px;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: #ccc;
+  content: "";
+  transform: translateY(-50%);
+}
+
+.recent-posts a:hover {
+  background: #f7f7f7;
+}
+
+.recent-posts a:hover::before {
+  background: #b54b42;
+}
