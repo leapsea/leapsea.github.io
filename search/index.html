@@ -4,7 +4,7 @@
     <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="description" content="专注于IT互联网，包括但不限于Go语言(golang)、Java、Android、项目管理、软件架构等">
-<title>电子书 · 我的小站</title>
+<title>搜索 · 我的小站</title>
 
 <link rel="stylesheet" href="https://leapsea.github.io/css/blog.css?v=5">
 <link rel="stylesheet" href="https://leapsea.github.io/css/recent-posts.css?v=2">
@@ -55,7 +55,7 @@
         
         
         
-        <a class="active" href="https://leapsea.github.io/books/"><svg class="site-icon" viewBox="0 0 22 22" aria-hidden="true" focusable="false"><path d="M4 3h14a2 2 0 0 1 2 2v16H6a2 2 0 0 1-2-2zm3 3v2h10V6zm0 4v2h10v-2z" /></svg>
+        <a class="" href="https://leapsea.github.io/books/"><svg class="site-icon" viewBox="0 0 22 22" aria-hidden="true" focusable="false"><path d="M4 3h14a2 2 0 0 1 2 2v16H6a2 2 0 0 1-2-2zm3 3v2h10V6zm0 4v2h10v-2z" /></svg>
  电子书</a>
       
         
@@ -88,31 +88,19 @@
 
     <main id="main-content" class="site-shell">
       
-  <div class="classic-layout article-grid">
-    <article class="article content-main">
-      <header class="article-header">
-        <div class="article-kicker"></div>
-        <h1>电子书</h1>
-        
-      </header>
-      
-      <div class="article-body"><h2 id="阅读清单">阅读清单</h2>
-<p>这里用于收录电子书、技术文档和长期阅读资料。</p>
-<ul>
-<li><a href="https://gohugo.io/documentation/" target="_blank" rel="noopener noreferrer">Hugo 官方文档</a>
-</li>
-<li><a href="https://go.dev/doc/" target="_blank" rel="noopener noreferrer">Go 官方文档</a>
-</li>
-</ul>
-<p>后续可以直接编辑本页面，继续添加新的阅读资源。</p>
-</div>
-      
-
-      <footer class="article-footer">
-        <a href="https://leapsea.github.io/search/">← 搜索</a>
-        <a class="next" href="https://leapsea.github.io/down/">资源下载 →</a>
-      </footer>
-    </article>
+  <link rel="stylesheet" href="https://leapsea.github.io/css/search.css">
+  <div class="classic-layout">
+    <section class="content-main search-page" data-search-index="/search.json">
+      <h1>搜索</h1>
+      <form class="search-form" role="search" action="https://leapsea.github.io/search/" method="get">
+        <label class="sr-only" for="search-query">搜索文章</label>
+        <input id="search-query" type="search" name="q" placeholder="输入标题、标签或正文关键词" autocomplete="off">
+        <button type="submit">搜索</button>
+      </form>
+      <p id="search-status" role="status" aria-live="polite">请输入关键词搜索文章。</p>
+      <div id="search-results" aria-busy="false"></div>
+      <noscript><p>请启用 JavaScript 后使用站内搜索，也可以浏览<a href="https://leapsea.github.io/archives/">文章归档</a>。</p></noscript>
+    </section>
     <aside class="sidebar">
   <form class="site-search" role="search" action="https://leapsea.github.io/search/" method="get">
     <label class="sr-only" for="site-search-input">搜索</label>
@@ -143,6 +131,8 @@
 </aside>
 
   </div>
+  
+  <script defer src="https://leapsea.github.io/js/search.min.4c0155f898822a761941f5255903077ed1e30954b8ca68806bbe52231436f0c7.js" integrity="sha256-TAFV&#43;JiCKnYZQfUlWQMHftHjCVS4ymiAa75SIxQ28Mc="></script>
 
     </main>
     <footer class="site-footer">
