@@ -1,0 +1,476 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script>
+    <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="使用 Docker Compose 部署 Media Harbor，下载 YouTube 和 Instagram 内容，并配置定时任务、Cookie 与自动归档。">
+<title>家庭NAS环境搭建 -- 部署media-harbor用于下载YouTube视频 · 我的小站</title>
+
+<link rel="stylesheet" href="http://localhost:1313/css/blog.css?v=7">
+<link rel="stylesheet" href="http://localhost:1313/css/recent-posts.css?v=2">
+<link rel="stylesheet" href="http://localhost:1313/css/code-highlighting.css">
+
+<link rel="stylesheet" href="http://localhost:1313/css/collection.css?v=1">
+
+
+  </head>
+  <body class="">
+    <a class="skip-link" href="#main-content">跳到主要内容</a>
+    <header class="site-header">
+  <div class="header-inner">
+    <a class="brand" href="http://localhost:1313/" aria-label="我的小站 首页">
+      <span><strong>我的小站</strong><small>专注于Android、Kotlin、Go语言(golang)、移动互联网、项目管理、软件架构</small></span>
+    </a>
+    <nav class="site-nav" aria-label="主导航">
+      <a class="" href="http://localhost:1313/"><svg class="site-icon" viewBox="0 0 22 22" aria-hidden="true" focusable="false"><path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1z" /></svg>
+ 首页</a>
+      
+      
+        
+        
+        
+        
+        
+        
+        <a class="active" href="http://localhost:1313/collections/"><svg class="site-icon" viewBox="0 0 22 22" aria-hidden="true" focusable="false"><path d="M4 3h14a2 2 0 0 1 2 2v16H6a2 2 0 0 1-2-2zm3 3v2h10V6zm0 4v2h10v-2z" /></svg>
+ 合集</a>
+      
+        
+        
+        
+        
+        
+        
+        <a class="" href="http://localhost:1313/archives/"><svg class="site-icon" viewBox="0 0 22 22" aria-hidden="true" focusable="false"><path d="M3 4h18v4H3zm2 6h14v10H5zm4 3v2h6v-2z" /></svg>
+ 归档</a>
+      
+        
+        
+        
+        
+        
+        
+        <a class="" href="http://localhost:1313/tags/"><svg class="site-icon" viewBox="0 0 22 22" aria-hidden="true" focusable="false"><path d="M3 4h8l10 10-7 7L4 11zm5 3a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3" /></svg>
+ 标签</a>
+      
+        
+        
+        
+        
+        
+        
+        <a class="" href="http://localhost:1313/about/"><svg class="site-icon" viewBox="0 0 22 22" aria-hidden="true" focusable="false"><path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8m-8 9a8 8 0 0 1 16 0z" /></svg>
+ 关于</a>
+      
+        
+        
+        
+        
+        
+        
+        <a class="" href="http://localhost:1313/down/"><svg class="site-icon" viewBox="0 0 22 22" aria-hidden="true" focusable="false"><path d="M11 3h2v10l4-4 1.4 1.4L12 17l-6.4-6.6L7 9l4 4zm-6 16h14v2H5z" /></svg>
+ 下载</a>
+      
+        
+        
+        
+        
+        
+        
+        <a class="" href="http://localhost:1313/books/"><svg class="site-icon" viewBox="0 0 22 22" aria-hidden="true" focusable="false"><path d="M4 3h14a2 2 0 0 1 2 2v16H6a2 2 0 0 1-2-2zm3 3v2h10V6zm0 4v2h10v-2z" /></svg>
+ 电子书</a>
+      
+        
+        
+        
+        
+        
+        
+        
+      
+        
+        
+        
+        
+        
+        
+        
+      
+        
+        
+        
+        
+        
+        
+        
+      
+        
+        
+        
+        
+        
+        
+        
+      
+    </nav>
+  </div>
+</header>
+
+    <main id="main-content" class="site-shell">
+      
+  <div class="classic-layout article-grid">
+    <article class="article content-main">
+      
+
+
+  
+  <nav class="collection-directory" aria-label="合集目录">
+    <p class="collection-label">文章合集 · 8 篇</p>
+    <h2><a href="http://localhost:1313/nas/">家庭NAS环境搭建</a></h2>
+    <ol>
+      
+        <li><a href="http://localhost:1313/2026/10/06/%E7%B3%BB%E7%BB%9F%E9%80%89%E5%9E%8B/">系统选型</a></li>
+      
+        <li><a href="http://localhost:1313/2026/10/06/Docker%E5%AE%89%E8%A3%85/">Docker安装</a></li>
+      
+        <li><a href="http://localhost:1313/2026/10/07/%E5%86%85%E7%BD%91%E7%A9%BF%E9%80%8F/">内网穿透</a></li>
+      
+        <li><a href="http://localhost:1313/2026/10/07/%E9%83%A8%E7%BD%B2KodCloud/">部署KodCloud</a></li>
+      
+        <li><a href="http://localhost:1313/2026/10/09/%E9%83%A8%E7%BD%B2%E4%B8%8B%E8%BD%BD%E5%99%A8/">部署下载器</a></li>
+      
+        <li><a href="http://localhost:1313/2026/10/12/%E9%83%A8%E7%BD%B2media-harbor%E7%94%A8%E4%BA%8E%E4%B8%8B%E8%BD%BDYouTube%E8%A7%86%E9%A2%91/" class="is-current" aria-current="page">部署media-harbor用于下载YouTube视频<span>当前文章</span></a></li>
+      
+        <li><a href="http://localhost:1313/2026/10/14/%E9%83%A8%E7%BD%B2mDNS-Gateway%E7%BB%9F%E4%B8%80%E5%86%85%E7%BD%91%E6%9C%8D%E5%8A%A1%E5%85%A5%E5%8F%A3/">部署mDNS Gateway统一内网服务入口</a></li>
+      
+        <li><a href="http://localhost:1313/nas/gitlab-deployment/">GitLab部署</a></li>
+      
+    </ol>
+  </nav>
+
+
+      <header class="article-header">
+        <div class="article-kicker">POSTS</div>
+        <h1>家庭NAS环境搭建 -- 部署media-harbor用于下载YouTube视频</h1>
+        <div class="post-meta">
+  <time datetime="2026-10-12">2026年10月12日</time>
+  <span class="meta-separator" aria-hidden="true">·</span><span>预计 4 分钟阅读</span>
+  
+    
+    
+    <span class="meta-separator" aria-hidden="true">·</span><a href="http://localhost:1313/categories/NAS/">NAS</a>
+  
+</div>
+
+        <div class="article-tags"><a href="http://localhost:1313/tags/Docker/">#Docker</a><a href="http://localhost:1313/tags/%E4%B8%8B%E8%BD%BD%E5%99%A8/">#下载器</a><a href="http://localhost:1313/tags/Instagram/">#Instagram</a><a href="http://localhost:1313/tags/YouTube/">#YouTube</a></div>
+
+      </header>
+      
+        <aside class="article-toc" aria-label="文章目录">
+          <p class="toc-title">目录</p>
+          <nav id="TableOfContents">
+  <ul>
+    <li><a href="#功能说明">功能说明</a></li>
+    <li><a href="#准备目录">准备目录</a></li>
+    <li><a href="#创建配置文件">创建配置文件</a>
+      <ul>
+        <li><a href="#compose-配置">Compose 配置</a></li>
+        <li><a href="#环境变量">环境变量</a></li>
+      </ul>
+    </li>
+    <li><a href="#启动服务">启动服务</a></li>
+    <li><a href="#创建下载任务">创建下载任务</a>
+      <ul>
+        <li><a href="#下载单个视频或帖子">下载单个视频或帖子</a></li>
+        <li><a href="#持续下载博主主页">持续下载博主主页</a></li>
+      </ul>
+    </li>
+    <li><a href="#常用设置">常用设置</a>
+      <ul>
+        <li><a href="#cookie">Cookie</a></li>
+        <li><a href="#下载内容与并发">下载内容与并发</a></li>
+        <li><a href="#目录规则与归档">目录规则与归档</a></li>
+        <li><a href="#存储与调试">存储与调试</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+        </aside>
+      
+      <div class="article-body"><p>通过 <a href="https://github.com/leapsea/media-harbor" target="_blank" rel="noopener noreferrer"><strong>Media Harbor</strong></a>
+ 下载 <strong>YouTube</strong> 视频和 <strong>Instagram</strong> 内容。除了单个视频或帖子，也可以创建博主主页任务，定期检查新内容，并按博主和日期整理文件。</p>
+<p>本次继续使用前面配置好的 Docker 环境：服务数据与下载暂存目录放在 SSD 上，归档文件放到 NAS 的共享目录。Instagram 的 Cookie 在“系统设置”中配置。</p>
+<h2 id="功能说明">功能说明</h2>
+<ul>
+<li>下载单个视频、帖子，或持续获取博主主页的新内容。</li>
+<li>YouTube 默认下载最高画质 MP4 和额外的 m4a 音频，也可选择字幕、评论、缩略图与元数据。</li>
+<li>跳过已下载内容，支持补全下载、取消、重试，以及重启后继续执行。</li>
+<li>在界面中查看任务进度、日志与下载历史，并按目录规则自动归档。</li>
+</ul>
+<h2 id="准备目录">准备目录</h2>
+<p>拉取镜像，创建部署配置与数据目录：</p>
+<pre class="shiki-source" data-shiki-language="bash" data-shiki-code="docker pull ghcr.io/leapsea/media-harbor:latest
+
+mkdir -p /mnt/ssd/docker/compose/media-harbor
+mkdir -p /mnt/ssd/docker/data/media-harbor/{data,downloads}
+mkdir -p /mnt/ssd/docker/logs/media-harbor
+mkdir -p /mnt/hdd/nas/share/media-harbor
+
+sudo chown -R 1000:2000 /mnt/ssd/docker/data/media-harbor
+sudo chown -R 1000:2000 /mnt/ssd/docker/logs/media-harbor
+sudo chown -R 1000:2000 /mnt/hdd/nas/share/media-harbor"><code>docker pull ghcr.io/leapsea/media-harbor:latest
+
+mkdir -p /mnt/ssd/docker/compose/media-harbor
+mkdir -p /mnt/ssd/docker/data/media-harbor/{data,downloads}
+mkdir -p /mnt/ssd/docker/logs/media-harbor
+mkdir -p /mnt/hdd/nas/share/media-harbor
+
+sudo chown -R 1000:2000 /mnt/ssd/docker/data/media-harbor
+sudo chown -R 1000:2000 /mnt/ssd/docker/logs/media-harbor
+sudo chown -R 1000:2000 /mnt/hdd/nas/share/media-harbor</code></pre>
+<p>本例使用 UID <code>1000</code>、GID <code>2000</code> 运行容器，与前文的 <code>docker-nas</code> 共享组对应。如果使用其他用户或用户组，需要同步调整目录所有者和下文的 <code>PUID</code>、<code>PGID</code>。</p>
+<table>
+	<thead>
+			<tr>
+					<th>容器目录</th>
+					<th>宿主机目录</th>
+					<th>用途</th>
+			</tr>
+	</thead>
+	<tbody>
+			<tr>
+					<td><code>/data</code></td>
+					<td><code>/mnt/ssd/docker/data/media-harbor/data</code></td>
+					<td>保存任务、设置、Cookie 与下载索引</td>
+			</tr>
+			<tr>
+					<td><code>/downloads</code></td>
+					<td><code>/mnt/ssd/docker/data/media-harbor/downloads</code></td>
+					<td>保存下载文件，作为归档前的暂存目录</td>
+			</tr>
+			<tr>
+					<td><code>/archive</code></td>
+					<td><code>/mnt/hdd/nas/share/media-harbor</code></td>
+					<td>保存归档文件</td>
+			</tr>
+			<tr>
+					<td><code>/logs</code></td>
+					<td><code>/mnt/ssd/docker/logs/media-harbor</code></td>
+					<td>保存任务日志</td>
+			</tr>
+	</tbody>
+</table>
+<p>挂载后，重建容器也可以保留这些数据。不使用自动归档时，可以去掉 <code>/archive</code> 的挂载；启用归档则需要挂载该目录，并保证容器有写入权限。</p>
+<h2 id="创建配置文件">创建配置文件</h2>
+<h3 id="compose-配置">Compose 配置</h3>
+<p>创建 <code>/mnt/ssd/docker/compose/media-harbor/compose.yaml</code>：</p>
+<pre class="shiki-source" data-shiki-language="yaml" data-shiki-code="services:
+  media-harbor:
+    image: ${IMAGE:-ghcr.io/leapsea/media-harbor:latest}
+    restart: unless-stopped
+    user: &#34;${PUID:-1000}:${PGID:-2000}&#34;
+    ports:
+      - &#34;${PORT:-8080}:8080&#34;
+    volumes:
+      - ${DATA_PATH:-./data}:/data
+      - ${DOWNLOAD_PATH:-./downloads}:/downloads
+      - ${ARCHIVE_PATH:-./archive}:/archive
+      - ${LOG_PATH:-./logs}:/logs
+    environment:
+      LOG_DIR: /logs
+      YTDLP_MAX_CONCURRENT: ${YTDLP_MAX_CONCURRENT:-5}
+      GALLERY_DL_MAX_CONCURRENT: ${GALLERY_DL_MAX_CONCURRENT:-20}
+      INSTAGRAM_USER_AGENT: ${INSTAGRAM_USER_AGENT:-}
+      TZ: ${TZ:-Asia/Singapore}"><code>services:
+  media-harbor:
+    image: ${IMAGE:-ghcr.io/leapsea/media-harbor:latest}
+    restart: unless-stopped
+    user: &#34;${PUID:-1000}:${PGID:-2000}&#34;
+    ports:
+      - &#34;${PORT:-8080}:8080&#34;
+    volumes:
+      - ${DATA_PATH:-./data}:/data
+      - ${DOWNLOAD_PATH:-./downloads}:/downloads
+      - ${ARCHIVE_PATH:-./archive}:/archive
+      - ${LOG_PATH:-./logs}:/logs
+    environment:
+      LOG_DIR: /logs
+      YTDLP_MAX_CONCURRENT: ${YTDLP_MAX_CONCURRENT:-5}
+      GALLERY_DL_MAX_CONCURRENT: ${GALLERY_DL_MAX_CONCURRENT:-20}
+      INSTAGRAM_USER_AGENT: ${INSTAGRAM_USER_AGENT:-}
+      TZ: ${TZ:-Asia/Singapore}</code></pre>
+<h3 id="环境变量">环境变量</h3>
+<p>在同目录下创建 <code>.env</code>：</p>
+<pre class="shiki-source" data-shiki-language="bash" data-shiki-code="PORT=2050
+PUID=1000
+PGID=2000
+IMAGE=ghcr.io/leapsea/media-harbor:latest
+
+DATA_PATH=/mnt/ssd/docker/data/media-harbor/data
+LOG_PATH=/mnt/ssd/docker/logs/media-harbor
+DOWNLOAD_PATH=/mnt/ssd/docker/data/media-harbor/downloads
+ARCHIVE_PATH=/mnt/hdd/nas/share/media-harbor
+
+YTDLP_MAX_CONCURRENT=2
+GALLERY_DL_MAX_CONCURRENT=10
+TZ=Asia/Singapore
+
+# 可选：按登录浏览器覆盖 Instagram 的 User-Agent。
+INSTAGRAM_USER_AGENT=Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/154.0.0.0 Safari/537.36"><code>PORT=2050
+PUID=1000
+PGID=2000
+IMAGE=ghcr.io/leapsea/media-harbor:latest
+
+DATA_PATH=/mnt/ssd/docker/data/media-harbor/data
+LOG_PATH=/mnt/ssd/docker/logs/media-harbor
+DOWNLOAD_PATH=/mnt/ssd/docker/data/media-harbor/downloads
+ARCHIVE_PATH=/mnt/hdd/nas/share/media-harbor
+
+YTDLP_MAX_CONCURRENT=2
+GALLERY_DL_MAX_CONCURRENT=10
+TZ=Asia/Singapore
+
+# 可选：按登录浏览器覆盖 Instagram 的 User-Agent。
+INSTAGRAM_USER_AGENT=Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/154.0.0.0 Safari/537.36</code></pre>
+<p>按需修改访问端口、挂载路径和运行身份。镜像默认使用 <code>1000:1000</code>，这里通过 Compose 的 <code>user</code> 改为 <code>1000:2000</code>。</p>
+<p>本例直接使用发布镜像，不需要配置 <code>GALLERY_DL_VERSION</code>、<code>YTDLP_VERSION</code> 或 <code>FFMPEG_VERSION</code> 等构建参数。测试时限制处理条目的功能，可直接在界面的“系统设置 → 调试”中开启。</p>
+<h2 id="启动服务">启动服务</h2>
+<p>进入配置目录并启动：</p>
+<pre class="shiki-source" data-shiki-language="bash" data-shiki-code="cd /mnt/ssd/docker/compose/media-harbor
+docker compose up -d
+docker compose logs --tail=100 media-harbor"><code>cd /mnt/ssd/docker/compose/media-harbor
+docker compose up -d
+docker compose logs --tail=100 media-harbor</code></pre>
+<p>打开浏览器，访问 <code>http://服务器IP:2050</code>，进入管理界面。</p>
+<h2 id="创建下载任务">创建下载任务</h2>
+<h3 id="下载单个视频或帖子">下载单个视频或帖子</h3>
+<ol>
+<li>打开“任务管理”，点击“新增任务”。</li>
+<li>选择 YouTube 或 Instagram，粘贴视频或帖子地址，确认自动解析的目录名称。</li>
+<li>按需选择下载内容并保存，详情地址会立即执行一次。</li>
+<li>在任务列表查看进度，完成后到“下载历史”查看产物，也可以复制文件夹路径。</li>
+</ol>
+<h3 id="持续下载博主主页">持续下载博主主页</h3>
+<ol>
+<li>新增任务时粘贴博主主页地址，设置目录名称与执行间隔，保存任务。</li>
+<li>点击“全量初始化”，下载当前可获取的内容。创建主页任务只保存配置，不会自动开始下载。</li>
+<li>首次手动执行后启动周期，后续扫描只排队新增内容；可以暂停或恢复定时执行。</li>
+</ol>
+<table>
+	<thead>
+			<tr>
+					<th>操作</th>
+					<th>使用场景</th>
+			</tr>
+	</thead>
+	<tbody>
+			<tr>
+					<td>全量初始化</td>
+					<td>首次获取主页内容</td>
+			</tr>
+			<tr>
+					<td>增量扫描</td>
+					<td>手动检查新增内容；未初始化时也可以用于首次下载</td>
+			</tr>
+			<tr>
+					<td>补全下载</td>
+					<td>复用已有文件、补齐缺失产物，并刷新所选评论与元数据</td>
+			</tr>
+			<tr>
+					<td>重试</td>
+					<td>重新执行失败任务</td>
+			</tr>
+	</tbody>
+</table>
+<p>“下载历史”按实际文件展示视频、音频、字幕等标签。评论保存在元数据 JSON 中，与元数据对应同一个文件。清空历史记录只会清除展示记录，下载文件和索引仍然保留，后续扫描也会继续跳过已下载内容。</p>
+<h2 id="常用设置">常用设置</h2>
+<p>大部分配置都在“系统设置”中调整，修改后点击“保存设置”。</p>
+<h3 id="cookie">Cookie</h3>
+<p>使用 Instagram 时，在 Cookie 设置中粘贴浏览器 Cookie 并保存，后续扫描与下载会自动使用。平台访问失败时，先查看任务日志，再检查网络和 Cookie 状态。</p>
+<h3 id="下载内容与并发">下载内容与并发</h3>
+<p>在下载设置中调整平台并发与 YouTube 默认下载内容。单个任务也可以覆盖默认下载选项。</p>
+<h3 id="目录规则与归档">目录规则与归档</h3>
+<p>默认目录规则为：</p>
+<pre class="shiki-source" data-shiki-language="text" data-shiki-code="{platform}/{directory_name}/{year}/{month}{day}/{filename}"><code>{platform}/{directory_name}/{year}/{month}{day}/{filename}</code></pre>
+<p>日期默认使用网站上传或发布时间，缺失时使用任务创建日期，并按本地时区计算。</p>
+<p>需要将下载结果保存到 NAS 共享目录时，在目录规则设置中配置自动归档。本例已挂载 <code>/archive</code>，对应 <code>/mnt/hdd/nas/share/media-harbor</code>。</p>
+<h3 id="存储与调试">存储与调试</h3>
+<p>存储设置可以查看占用、清空日志，以及清理已完成和无关联任务的缓存。首次试用时，可以在调试设置中开启条目限制，先处理少量内容；确认流程正常后，再关闭限制。</p>
+</div>
+      
+        
+
+
+
+<nav class="collection-pagination" aria-label="合集章节导航">
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      <div class="collection-neighbors">
+        
+          <a href="http://localhost:1313/2026/10/09/%E9%83%A8%E7%BD%B2%E4%B8%8B%E8%BD%BD%E5%99%A8/"><span>← 上一篇</span>部署下载器</a>
+        
+        
+          <a class="next" href="http://localhost:1313/2026/10/14/%E9%83%A8%E7%BD%B2mDNS-Gateway%E7%BB%9F%E4%B8%80%E5%86%85%E7%BD%91%E6%9C%8D%E5%8A%A1%E5%85%A5%E5%8F%A3/"><span>下一篇 →</span>部署mDNS Gateway统一内网服务入口</a>
+        
+      </div>
+    
+  
+    
+  
+    
+  
+  <a class="collection-overview-link" href="http://localhost:1313/nas/">查看完整合集：家庭NAS环境搭建 →</a>
+</nav>
+
+      
+    </article>
+    <aside class="sidebar">
+  <form class="site-search" role="search" action="http://localhost:1313/search/" method="get">
+    <label class="sr-only" for="site-search-input">搜索</label>
+    <input id="site-search-input" type="search" name="q" placeholder="Search" aria-label="搜索">
+    <button type="submit" aria-label="提交搜索"><svg class="site-icon" viewBox="0 0 22 22" aria-hidden="true" focusable="false"><path d="M10 3a7 7 0 1 0 4.4 12.4l5.3 5.3 1.4-1.4-5.3-5.3A7 7 0 0 0 10 3m0 2a5 5 0 1 1 0 10 5 5 0 0 1 0-10" /></svg>
+</button>
+  </form>
+  <section class="widget widget-category">
+    <h3 class="widget-title"><svg class="site-icon" viewBox="0 0 22 22" aria-hidden="true" focusable="false"><path d="M3 5h7l2 2h9v12H3zm2 4v8h14V9z" /></svg>
+<span>分类</span></h3>
+    <ul class="widget-list"><li><a href="http://localhost:1313/categories/NAS/">NAS</a><span>(7)</span></li><li><a href="http://localhost:1313/categories/Golang/">Golang</a><span>(5)</span></li><li><a href="http://localhost:1313/categories/%E6%8A%98%E8%85%BE/">折腾</a><span>(4)</span></li><li><a href="http://localhost:1313/categories/Android/">Android</a><span>(3)</span></li><li><a href="http://localhost:1313/categories/Docker/">Docker</a><span>(3)</span></li><li><a href="http://localhost:1313/categories/%E5%94%A0%E5%8F%A8/">唠叨</a><span>(3)</span></li><li><a href="http://localhost:1313/categories/Kubernetes/">Kubernetes</a><span>(2)</span></li><li><a href="http://localhost:1313/categories/Linux/">Linux</a><span>(2)</span></li><li><a href="http://localhost:1313/categories/%E5%B7%A5%E5%85%B7/">工具</a><span>(2)</span></li><li><a href="http://localhost:1313/categories/%E9%87%8F%E5%8C%96%E4%BA%A4%E6%98%93/">量化交易</a><span>(2)</span></li><li><a href="http://localhost:1313/categories/Flutter/">Flutter</a><span>(1)</span></li><li><a href="http://localhost:1313/categories/Google/">Google</a><span>(1)</span></li><li><a href="http://localhost:1313/categories/%E5%85%A5%E4%BE%B5%E6%A3%80%E6%B5%8B/">入侵检测</a><span>(1)</span></li><li><a href="http://localhost:1313/categories/%E5%85%BB%E7%94%9F/">养生</a><span>(1)</span></li><li><a href="http://localhost:1313/categories/%E5%AD%A6%E4%B9%A0%E8%B5%84%E6%96%99/">学习资料</a><span>(1)</span></li><li><a href="http://localhost:1313/categories/%E6%84%8F%E5%A4%96%E6%94%B6%E8%8E%B7/">意外收获</a><span>(1)</span></li><li><a href="http://localhost:1313/categories/%E6%95%88%E7%8E%87/">效率</a><span>(1)</span></li><li><a href="http://localhost:1313/categories/%E7%96%AB%E6%83%85/">疫情</a><span>(1)</span></li><li><a href="http://localhost:1313/categories/%E7%B3%BB%E7%BB%9F/">系统</a><span>(1)</span></li><li><a href="http://localhost:1313/categories/%E8%96%85%E7%BE%8A%E6%AF%9B/">薅羊毛</a><span>(1)</span></li><li><a href="http://localhost:1313/categories/%E8%96%9B%E5%AE%9A%E8%B0%94%E7%9A%84bug/">薛定谔的bug</a><span>(1)</span></li></ul>
+  </section>
+  <section class="widget">
+    <h3 class="widget-title"><svg class="site-icon" viewBox="0 0 22 22" aria-hidden="true" focusable="false"><path d="m12 2 3 6 7 .9-5 4.8 1.2 6.8L12 17l-6.2 3.5L7 13.7 2 8.9 9 8z" /></svg>
+ 标签</h3>
+    <div class="tag-list"><a href="http://localhost:1313/tags/Docker/">Docker(11)</a><a href="http://localhost:1313/tags/Golang/">Golang(7)</a><a href="http://localhost:1313/tags/Linux/">Linux(7)</a><a href="http://localhost:1313/tags/Android/">Android(6)</a><a href="http://localhost:1313/tags/%E7%BD%91%E7%BB%9C/">网络(4)</a><a href="http://localhost:1313/tags/HTTP/">HTTP(3)</a><a href="http://localhost:1313/tags/Windows/">Windows(3)</a><a href="http://localhost:1313/tags/%E5%BC%80%E5%8F%91%E5%B7%A5%E5%85%B7/">开发工具(3)</a><a href="http://localhost:1313/tags/%E8%99%9A%E6%8B%9F%E6%9C%BA/">虚拟机(3)</a><a href="http://localhost:1313/tags/Kafka/">Kafka(2)</a><a href="http://localhost:1313/tags/Kubernetes/">Kubernetes(2)</a><a href="http://localhost:1313/tags/Termux/">Termux(2)</a><a href="http://localhost:1313/tags/Ubuntu/">Ubuntu(2)</a><a href="http://localhost:1313/tags/%E4%B8%8B%E8%BD%BD%E5%99%A8/">下载器(2)</a><a href="http://localhost:1313/tags/%E4%BF%A1%E6%81%AF%E5%AE%89%E5%85%A8/">信息安全(2)</a><a href="http://localhost:1313/tags/%E5%8D%9A%E5%AE%A2/">博客(2)</a><a href="http://localhost:1313/tags/%E9%87%8F%E5%8C%96%E4%BA%A4%E6%98%93/">量化交易(2)</a><a href="http://localhost:1313/tags/Cloudflare/">Cloudflare(1)</a><a href="http://localhost:1313/tags/Flutter/">Flutter(1)</a><a href="http://localhost:1313/tags/Instagram/">Instagram(1)</a><a href="http://localhost:1313/tags/kodcloud/">Kodcloud(1)</a><a href="http://localhost:1313/tags/mDNS/">MDNS(1)</a><a href="http://localhost:1313/tags/SSH/">SSH(1)</a><a href="http://localhost:1313/tags/Tunnel/">Tunnel(1)</a><a href="http://localhost:1313/tags/YouTube/">YouTube(1)</a><a href="http://localhost:1313/tags/%E5%81%A5%E5%BA%B7/">健康(1)</a><a href="http://localhost:1313/tags/%E5%8F%8D%E5%90%91%E4%BB%A3%E7%90%86/">反向代理(1)</a><a href="http://localhost:1313/tags/%E5%9B%BE%E5%BA%8A/">图床(1)</a><a href="http://localhost:1313/tags/%E5%BE%AE%E6%9C%8D%E5%8A%A1/">微服务(1)</a><a href="http://localhost:1313/tags/%E6%95%B0%E6%8D%AE%E5%88%86%E6%9E%90/">数据分析(1)</a><a href="http://localhost:1313/tags/%E6%95%B0%E6%8D%AE%E5%BA%93/">数据库(1)</a><a href="http://localhost:1313/tags/%E6%96%B0%E5%86%A0/">新冠(1)</a><a href="http://localhost:1313/tags/%E7%A1%AC%E4%BB%B6/">硬件(1)</a><a href="http://localhost:1313/tags/%E8%87%AA%E5%8A%A8%E5%8C%96/">自动化(1)</a></div>
+  </section>
+  <section class="widget widget-recent-posts">
+    <h3 class="widget-title"><svg class="site-icon" viewBox="0 0 22 22" aria-hidden="true" focusable="false"><path d="M5 2h9l5 5v15H5zm8 2v5h5M8 13h8v2H8zm0 4h8v2H8z" /></svg>
+ 最近文章</h3>
+    <ul class="recent-list recent-posts"><li><a href="http://localhost:1313/2026/10/06/%E7%B3%BB%E7%BB%9F%E9%80%89%E5%9E%8B/" title="家庭NAS环境搭建 -- 系统选型">家庭NAS环境搭建 -- 系统选型</a></li><li><a href="http://localhost:1313/2026/10/06/Docker%E5%AE%89%E8%A3%85/" title="家庭NAS环境搭建 -- Docker安装">家庭NAS环境搭建 -- Docker安装</a></li><li><a href="http://localhost:1313/2026/10/07/%E5%86%85%E7%BD%91%E7%A9%BF%E9%80%8F/" title="家庭NAS环境搭建 -- 内网穿透">家庭NAS环境搭建 -- 内网穿透</a></li><li><a href="http://localhost:1313/2026/10/07/%E9%83%A8%E7%BD%B2KodCloud/" title="家庭NAS环境搭建 -- 部署KodCloud">家庭NAS环境搭建 -- 部署KodCloud</a></li><li><a href="http://localhost:1313/2026/10/09/%E9%83%A8%E7%BD%B2%E4%B8%8B%E8%BD%BD%E5%99%A8/" title="家庭NAS环境搭建 -- 部署下载器">家庭NAS环境搭建 -- 部署下载器</a></li><li><a href="http://localhost:1313/2026/10/12/%E9%83%A8%E7%BD%B2media-harbor%E7%94%A8%E4%BA%8E%E4%B8%8B%E8%BD%BDYouTube%E8%A7%86%E9%A2%91/" title="家庭NAS环境搭建 -- 部署media-harbor用于下载YouTube视频">家庭NAS环境搭建 -- 部署media-harbor用于下载YouTube视频</a></li><li><a href="http://localhost:1313/2026/10/14/%E9%83%A8%E7%BD%B2mDNS-Gateway%E7%BB%9F%E4%B8%80%E5%86%85%E7%BD%91%E6%9C%8D%E5%8A%A1%E5%85%A5%E5%8F%A3/" title="家庭NAS环境搭建 -- 部署mDNS Gateway统一内网服务入口">家庭NAS环境搭建 -- 部署mDNS Gateway统一内网服务入口</a></li><li><a href="http://localhost:1313/nas/gitlab-deployment/" title="家庭NAS环境搭建 -- GitLab部署">家庭NAS环境搭建 -- GitLab部署</a></li><li><a href="http://localhost:1313/2026/09/23/%E4%BB%8E-Hexo-%E8%BF%81%E7%A7%BB%E5%88%B0-Hugo.html" title="从 Hexo 迁移到 Hugo">从 Hexo 迁移到 Hugo</a></li><li><a href="http://localhost:1313/2022/03/30/http%E9%87%8D%E5%AE%9A%E5%90%91.html" title="http重定向">http重定向</a></li></ul>
+  </section>
+  <section class="widget widget-links">
+    <h3 class="widget-title"><svg class="site-icon" viewBox="0 0 22 22" aria-hidden="true" focusable="false"><path d="M14 3h7v7h-2V6.4l-9.3 9.3-1.4-1.4L17.6 5H14zM5 5h6v2H7v10h10v-4h2v6H5z" /></svg>
+<span>友情链接</span></h3>
+    <ul class="recent-list"><li><a href="https://leapsea.github.io/">我的小站</a></li><li><a href="https://fictiony.github.io/">F大</a></li></ul>
+  </section>
+</aside>
+
+  </div>
+
+    </main><script defer src="http://localhost:1313/js/shiki.682f9fad917c5d871fb7f8af3908d8651586309049cd1d887d955c0aa05f35fe38046772a029c64eeee1fa012332b40c.js" integrity="sha384-aC&#43;frZF8XYcft/ivOQjYZRWGMJBJzR2IfZVcCqBfNf44BGdyoCnGTu7h&#43;gEjMrQM"></script>
+    <footer class="site-footer">
+  <div class="site-footer-inner">
+    <p>Copyright © 2026 <a href="http://localhost:1313/">我的小站</a> · Powered by <a href="https://gohugo.io/">Hugo</a></p>
+  </div>
+</footer>
+
+  </body>
+</html>

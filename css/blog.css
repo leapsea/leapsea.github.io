@@ -486,6 +486,36 @@ a:focus {
   border-bottom: 1px solid #dce4eb;
 }
 
+/* 正文表格：明确行列边界，宽表格在自身区域滚动，避免撑破窄屏布局。 */
+.article-body table {
+  display: block;
+  max-width: 100%;
+  overflow-x: auto;
+  margin: 20px 0;
+  border-collapse: collapse;
+  border-spacing: 0;
+  font-size: 16px;
+  line-height: 1.6;
+}
+
+.article-body th,
+.article-body td {
+  padding: 8px 12px;
+  border: 1px solid #ddd;
+  vertical-align: top;
+}
+
+.article-body th {
+  background: #f2f4f6;
+  color: #444;
+  text-align: left;
+  white-space: nowrap;
+}
+
+.article-body tbody tr:nth-child(even) {
+  background: #fafafa;
+}
+
 .article-body blockquote {
   margin: 20px 0;
   padding: 7px 18px;
@@ -516,8 +546,8 @@ a:focus {
 }
 
 .article-tags {
-  padding: 18px 0;
-  border-top: 1px solid #eee;
+  /* 标签紧随文章元信息，分隔线统一由标题区域提供。 */
+  margin-top: 8px;
   color: #777;
   font-size: 13px;
 }

@@ -1,0 +1,537 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script>
+    <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="使用 Docker Compose 部署 mDNS Gateway，将家庭 NAS 服务映射为易记的 .local 地址，并配置 HTTP、WebSocket 和 SSH 转发。">
+<title>家庭NAS环境搭建 -- 部署mDNS Gateway统一内网服务入口 · 我的小站</title>
+
+<link rel="stylesheet" href="http://localhost:1313/css/blog.css?v=7">
+<link rel="stylesheet" href="http://localhost:1313/css/recent-posts.css?v=2">
+<link rel="stylesheet" href="http://localhost:1313/css/code-highlighting.css">
+
+<link rel="stylesheet" href="http://localhost:1313/css/collection.css?v=1">
+
+
+  </head>
+  <body class="">
+    <a class="skip-link" href="#main-content">跳到主要内容</a>
+    <header class="site-header">
+  <div class="header-inner">
+    <a class="brand" href="http://localhost:1313/" aria-label="我的小站 首页">
+      <span><strong>我的小站</strong><small>专注于Android、Kotlin、Go语言(golang)、移动互联网、项目管理、软件架构</small></span>
+    </a>
+    <nav class="site-nav" aria-label="主导航">
+      <a class="" href="http://localhost:1313/"><svg class="site-icon" viewBox="0 0 22 22" aria-hidden="true" focusable="false"><path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1z" /></svg>
+ 首页</a>
+      
+      
+        
+        
+        
+        
+        
+        
+        <a class="active" href="http://localhost:1313/collections/"><svg class="site-icon" viewBox="0 0 22 22" aria-hidden="true" focusable="false"><path d="M4 3h14a2 2 0 0 1 2 2v16H6a2 2 0 0 1-2-2zm3 3v2h10V6zm0 4v2h10v-2z" /></svg>
+ 合集</a>
+      
+        
+        
+        
+        
+        
+        
+        <a class="" href="http://localhost:1313/archives/"><svg class="site-icon" viewBox="0 0 22 22" aria-hidden="true" focusable="false"><path d="M3 4h18v4H3zm2 6h14v10H5zm4 3v2h6v-2z" /></svg>
+ 归档</a>
+      
+        
+        
+        
+        
+        
+        
+        <a class="" href="http://localhost:1313/tags/"><svg class="site-icon" viewBox="0 0 22 22" aria-hidden="true" focusable="false"><path d="M3 4h8l10 10-7 7L4 11zm5 3a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3" /></svg>
+ 标签</a>
+      
+        
+        
+        
+        
+        
+        
+        <a class="" href="http://localhost:1313/about/"><svg class="site-icon" viewBox="0 0 22 22" aria-hidden="true" focusable="false"><path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8m-8 9a8 8 0 0 1 16 0z" /></svg>
+ 关于</a>
+      
+        
+        
+        
+        
+        
+        
+        <a class="" href="http://localhost:1313/down/"><svg class="site-icon" viewBox="0 0 22 22" aria-hidden="true" focusable="false"><path d="M11 3h2v10l4-4 1.4 1.4L12 17l-6.4-6.6L7 9l4 4zm-6 16h14v2H5z" /></svg>
+ 下载</a>
+      
+        
+        
+        
+        
+        
+        
+        <a class="" href="http://localhost:1313/books/"><svg class="site-icon" viewBox="0 0 22 22" aria-hidden="true" focusable="false"><path d="M4 3h14a2 2 0 0 1 2 2v16H6a2 2 0 0 1-2-2zm3 3v2h10V6zm0 4v2h10v-2z" /></svg>
+ 电子书</a>
+      
+        
+        
+        
+        
+        
+        
+        
+      
+        
+        
+        
+        
+        
+        
+        
+      
+        
+        
+        
+        
+        
+        
+        
+      
+        
+        
+        
+        
+        
+        
+        
+      
+    </nav>
+  </div>
+</header>
+
+    <main id="main-content" class="site-shell">
+      
+  <div class="classic-layout article-grid">
+    <article class="article content-main">
+      
+
+
+  
+  <nav class="collection-directory" aria-label="合集目录">
+    <p class="collection-label">文章合集 · 8 篇</p>
+    <h2><a href="http://localhost:1313/nas/">家庭NAS环境搭建</a></h2>
+    <ol>
+      
+        <li><a href="http://localhost:1313/2026/10/06/%E7%B3%BB%E7%BB%9F%E9%80%89%E5%9E%8B/">系统选型</a></li>
+      
+        <li><a href="http://localhost:1313/2026/10/06/Docker%E5%AE%89%E8%A3%85/">Docker安装</a></li>
+      
+        <li><a href="http://localhost:1313/2026/10/07/%E5%86%85%E7%BD%91%E7%A9%BF%E9%80%8F/">内网穿透</a></li>
+      
+        <li><a href="http://localhost:1313/2026/10/07/%E9%83%A8%E7%BD%B2KodCloud/">部署KodCloud</a></li>
+      
+        <li><a href="http://localhost:1313/2026/10/09/%E9%83%A8%E7%BD%B2%E4%B8%8B%E8%BD%BD%E5%99%A8/">部署下载器</a></li>
+      
+        <li><a href="http://localhost:1313/2026/10/12/%E9%83%A8%E7%BD%B2media-harbor%E7%94%A8%E4%BA%8E%E4%B8%8B%E8%BD%BDYouTube%E8%A7%86%E9%A2%91/">部署media-harbor用于下载YouTube视频</a></li>
+      
+        <li><a href="http://localhost:1313/2026/10/14/%E9%83%A8%E7%BD%B2mDNS-Gateway%E7%BB%9F%E4%B8%80%E5%86%85%E7%BD%91%E6%9C%8D%E5%8A%A1%E5%85%A5%E5%8F%A3/" class="is-current" aria-current="page">部署mDNS Gateway统一内网服务入口<span>当前文章</span></a></li>
+      
+        <li><a href="http://localhost:1313/nas/gitlab-deployment/">GitLab部署</a></li>
+      
+    </ol>
+  </nav>
+
+
+      <header class="article-header">
+        <div class="article-kicker">POSTS</div>
+        <h1>家庭NAS环境搭建 -- 部署mDNS Gateway统一内网服务入口</h1>
+        <div class="post-meta">
+  <time datetime="2026-10-14">2026年10月14日</time>
+  <span class="meta-separator" aria-hidden="true">·</span><span>预计 5 分钟阅读</span>
+  
+    
+    
+    <span class="meta-separator" aria-hidden="true">·</span><a href="http://localhost:1313/categories/NAS/">NAS</a>
+  
+</div>
+
+        <div class="article-tags"><a href="http://localhost:1313/tags/Docker/">#Docker</a><a href="http://localhost:1313/tags/%E7%BD%91%E7%BB%9C/">#网络</a><a href="http://localhost:1313/tags/mDNS/">#mDNS</a><a href="http://localhost:1313/tags/%E5%8F%8D%E5%90%91%E4%BB%A3%E7%90%86/">#反向代理</a></div>
+
+      </header>
+      
+        <aside class="article-toc" aria-label="文章目录">
+          <p class="toc-title">目录</p>
+          <nav id="TableOfContents">
+  <ul>
+    <li><a href="#为什么使用-mdns-gateway">为什么使用 mDNS Gateway</a>
+      <ul>
+        <li><a href="#不用记住每个服务的端口">不用记住每个服务的端口</a></li>
+        <li><a href="#把名称解析和反向代理放在一起管理">把名称解析和反向代理放在一起管理</a></li>
+        <li><a href="#适合家庭内网的统一入口">适合家庭内网的统一入口</a></li>
+      </ul>
+    </li>
+    <li><a href="#部署前准备">部署前准备</a></li>
+    <li><a href="#准备目录">准备目录</a></li>
+    <li><a href="#创建配置文件">创建配置文件</a>
+      <ul>
+        <li><a href="#compose-配置">Compose 配置</a></li>
+        <li><a href="#环境变量">环境变量</a></li>
+      </ul>
+    </li>
+    <li><a href="#启动服务">启动服务</a></li>
+    <li><a href="#初始化管理员">初始化管理员</a></li>
+    <li><a href="#添加站点">添加站点</a>
+      <ul>
+        <li><a href="#http-服务">HTTP 服务</a></li>
+        <li><a href="#websocket-服务">WebSocket 服务</a></li>
+        <li><a href="#ssh-服务">SSH 服务</a></li>
+      </ul>
+    </li>
+    <li><a href="#验证访问">验证访问</a></li>
+    <li><a href="#维护与备份">维护与备份</a></li>
+  </ul>
+</nav>
+        </aside>
+      
+      <div class="article-body"><p>通过 <a href="https://github.com/leapsea/mdns-gateway" target="_blank" rel="noopener noreferrer"><strong>mDNS Gateway</strong></a>
+ 为家庭 NAS 中的服务配置容易记住的内网地址。例如，把可道云的 <code>http://192.168.50.30:2030</code> 改为通过 <code>http://media.local/</code> 访问，把 Media Harbor 的入口整理为 <code>http://harbor.local/</code>。</p>
+<p>本次继续使用 Ubuntu 上的 Docker Engine，配置文件与数据放在 SSD 上。部署方式参考项目的 <a href="https://github.com/leapsea/mdns-gateway/blob/main/README.md" target="_blank" rel="noopener noreferrer">README</a>
+ 和 <a href="https://github.com/leapsea/mdns-gateway/blob/main/deploy/compose.yml" target="_blank" rel="noopener noreferrer">Compose 示例</a>
+，使用发布镜像启动，不需要在 NAS 上编译源码。</p>
+<h2 id="为什么使用-mdns-gateway">为什么使用 mDNS Gateway</h2>
+<h3 id="不用记住每个服务的端口">不用记住每个服务的端口</h3>
+<p>前面已经部署了可道云、下载器和 Media Harbor。服务一多，访问入口也跟着变多。IP 地址虽然相同，端口却各不相同。</p>
+<p>使用 mDNS Gateway 后，可以给常用服务取一个直观的名字：</p>
+<table>
+	<thead>
+			<tr>
+					<th>服务</th>
+					<th>原来的入口</th>
+					<th>配置后的入口</th>
+			</tr>
+	</thead>
+	<tbody>
+			<tr>
+					<td>可道云</td>
+					<td><code>http://192.168.50.30:2030</code></td>
+					<td><code>http://media.local/</code></td>
+			</tr>
+			<tr>
+					<td>Media Harbor</td>
+					<td><code>http://192.168.50.30:2050</code></td>
+					<td><code>http://harbor.local/</code></td>
+			</tr>
+	</tbody>
+</table>
+<p>这里的地址是部署示例，实际使用时替换为自己的 NAS 地址与服务端口。</p>
+<h3 id="把名称解析和反向代理放在一起管理">把名称解析和反向代理放在一起管理</h3>
+<p>仅给 NAS 配置一个主机名，访问应用时仍然需要带上端口。这个项目同时管理 mDNS 和 OpenResty：客户端先把 <code>.local</code> 域名解析到网关，再由网关按域名将请求转发到对应的服务。</p>
+<pre class="shiki-source" data-shiki-language="text" data-shiki-code="浏览器访问 http://media.local/
+        ↓ mDNS 解析
+网关 192.168.50.30:80
+        ↓ OpenResty 转发
+可道云 192.168.50.30:2030"><code>浏览器访问 http://media.local/
+        ↓ mDNS 解析
+网关 192.168.50.30:80
+        ↓ OpenResty 转发
+可道云 192.168.50.30:2030</code></pre>
+<p>同一局域网中，支持 mDNS 的客户端通常不需要逐台修改 hosts，也不需要专门在路由器上维护这些名称。服务地址或端口变化时，只需在管理后台调整目标配置。</p>
+<h3 id="适合家庭内网的统一入口">适合家庭内网的统一入口</h3>
+<p>项目提供 Web 管理界面，支持 HTTP、WebSocket 和 SSH 转发。保存站点时会先验证代理配置，再发布生效，减少手工维护多份配置的工作。</p>
+<p>如果只部署一两个服务，继续使用 IP 和端口也很方便；当服务数量增加，或者希望家里的其他设备直接通过名称访问时，统一入口会更容易使用。</p>
+<p>需要区分的是：这里解决的是<strong>内网名称解析与服务转发</strong>。mDNS 主要在同一网络链路内传播，跨 VLAN、访客 Wi-Fi 或不同网段可能无法发现；外网访问仍然使用前面配置的 Cloudflare Tunnel 等方案。项目目前也不包含 HTTPS 和证书管理。</p>
+<h2 id="部署前准备">部署前准备</h2>
+<p>本例假设 NAS 的局域网 IPv4 为 <code>192.168.50.30</code>，管理后台使用 TCP <code>2051</code>。先查看真实网卡地址：</p>
+<pre class="shiki-source" data-shiki-language="bash" data-shiki-code="ip -4 -br addr"><code>ip -4 -br addr</code></pre>
+<p>选择与客户端同一局域网的网卡 IPv4，后面填入 <code>GATEWAY_IPV4</code>。不要填写 Docker bridge 地址，也不要把其他目标设备的 IP 当作网关地址。建议在路由器中保留 NAS 的 DHCP 地址，避免重启后变化。</p>
+<table>
+	<thead>
+			<tr>
+					<th>端口</th>
+					<th>用途</th>
+			</tr>
+	</thead>
+	<tbody>
+			<tr>
+					<td>TCP <code>80</code></td>
+					<td>HTTP 与 WebSocket 代理入口</td>
+			</tr>
+			<tr>
+					<td>TCP <code>2051</code></td>
+					<td>本例的 Web 管理后台</td>
+			</tr>
+			<tr>
+					<td>UDP <code>5353</code></td>
+					<td>mDNS 查询与应答</td>
+			</tr>
+			<tr>
+					<td>TCP <code>2222</code> 等</td>
+					<td>创建 SSH 站点时指定的独立转发端口</td>
+			</tr>
+	</tbody>
+</table>
+<p>TCP <code>80</code> 和管理端口需要未被其他服务占用。防火墙开启时，应按需允许局域网客户端访问这些端口。</p>
+<h2 id="准备目录">准备目录</h2>
+<p>拉取镜像，创建配置与数据目录：</p>
+<pre class="shiki-source" data-shiki-language="bash" data-shiki-code="docker pull ghcr.io/leapsea/mdns-gateway:latest
+
+mkdir -p /mnt/ssd/docker/compose/mdns-gateway
+mkdir -p /mnt/ssd/docker/data/mdns-gateway
+sudo chown 1000:2000 /mnt/ssd/docker/data/mdns-gateway"><code>docker pull ghcr.io/leapsea/mdns-gateway:latest
+
+mkdir -p /mnt/ssd/docker/compose/mdns-gateway
+mkdir -p /mnt/ssd/docker/data/mdns-gateway
+sudo chown 1000:2000 /mnt/ssd/docker/data/mdns-gateway</code></pre>
+<p><code>/data</code> 保存 SQLite 数据库 <code>gateway.db</code>、主密钥 <code>master.key</code> 和 OpenResty 配置发布记录。数据库与主密钥需要一起保留；丢失 <code>master.key</code> 后，已有的 TOTP 密文无法恢复。</p>
+<p>本例沿用项目镜像的默认运行身份，不额外设置 <code>user</code>，也不套用前文应用的 <code>1000:2000</code> 配置。数据目录包含认证信息，因此单独限制访问权限。</p>
+<h2 id="创建配置文件">创建配置文件</h2>
+<h3 id="compose-配置">Compose 配置</h3>
+<p>创建 <code>/mnt/ssd/docker/compose/mdns-gateway/compose.yaml</code>：</p>
+<pre class="shiki-source" data-shiki-language="yaml" data-shiki-code="services:
+  mdns-gateway:
+    image: ${IMAGE:-ghcr.io/leapsea/mdns-gateway:latest}
+    network_mode: host
+    restart: unless-stopped
+    volumes:
+      - ${DATA_PATH}:/data
+    environment:
+      GATEWAY_LISTEN: &#34;:${GATEWAY_HTTP_PORT:-2060}&#34;
+      GATEWAY_DATA_DIR: /data
+      GATEWAY_OPENRESTY_BIN: openresty
+      GATEWAY_IPV4: &#34;${GATEWAY_IPV4}&#34;
+    healthcheck:
+      test: [&#34;CMD-SHELL&#34;, &#34;wget -q -O - http://127.0.0.1:${GATEWAY_HTTP_PORT:-2060}/health || exit 1&#34;]
+      interval: 30s
+      timeout: 3s
+      start_period: 15s"><code>services:
+  mdns-gateway:
+    image: ${IMAGE:-ghcr.io/leapsea/mdns-gateway:latest}
+    network_mode: host
+    restart: unless-stopped
+    volumes:
+      - ${DATA_PATH}:/data
+    environment:
+      GATEWAY_LISTEN: &#34;:${GATEWAY_HTTP_PORT:-2060}&#34;
+      GATEWAY_DATA_DIR: /data
+      GATEWAY_OPENRESTY_BIN: openresty
+      GATEWAY_IPV4: &#34;${GATEWAY_IPV4}&#34;
+    healthcheck:
+      test: [&#34;CMD-SHELL&#34;, &#34;wget -q -O - http://127.0.0.1:${GATEWAY_HTTP_PORT:-2060}/health || exit 1&#34;]
+      interval: 30s
+      timeout: 3s
+      start_period: 15s</code></pre>
+<p>项目推荐原生 Linux 主机使用 <code>network_mode: host</code>，让 mDNS 组播通过真实网卡进入局域网。容器共享主机网络，因此这里没有 <code>ports</code> 映射，端口也直接占用宿主机端口。</p>
+<p>管理后台的端口可以调整，HTTP/WebSocket 代理入口仍然使用 <code>80</code>。镜像自带健康检查默认访问 <code>8080</code>，这里同步覆盖为本例的管理端口。</p>
+<h3 id="环境变量">环境变量</h3>
+<p>在同目录下创建 <code>.env</code>：</p>
+<pre class="shiki-source" data-shiki-language="bash" data-shiki-code="IMAGE=ghcr.io/leapsea/mdns-gateway:latest
+DATA_PATH=/mnt/ssd/docker/data/mdns-gateway
+
+GATEWAY_HTTP_PORT=2060
+# 所在服务器IP
+GATEWAY_IPV4=192.168.50.30"><code>IMAGE=ghcr.io/leapsea/mdns-gateway:latest
+DATA_PATH=/mnt/ssd/docker/data/mdns-gateway
+
+GATEWAY_HTTP_PORT=2060
+# 所在服务器IP
+GATEWAY_IPV4=192.168.50.30</code></pre>
+<p>按实际环境修改 <code>GATEWAY_IPV4</code>。多网卡主机尤其需要明确指定广播所使用的局域网 IPv4。</p>
+<h2 id="启动服务">启动服务</h2>
+<p>进入配置目录并启动：</p>
+<pre class="shiki-source" data-shiki-language="bash" data-shiki-code="cd /mnt/ssd/docker/compose/mdns-gateway
+docker compose up -d --wait
+docker compose logs --tail=100 mdns-gateway"><code>cd /mnt/ssd/docker/compose/mdns-gateway
+docker compose up -d --wait
+docker compose logs --tail=100 mdns-gateway</code></pre>
+<p>日志中的 <code>mdns interface selected</code> 应显示真实局域网网卡与填写的 IP。检查后台健康接口：</p>
+<pre class="shiki-source" data-shiki-language="bash" data-shiki-code="curl http://127.0.0.1:2060/health"><code>curl http://127.0.0.1:2060/health</code></pre>
+<p>然后在浏览器访问 <code>http://192.168.50.30:2060/</code>。</p>
+<h2 id="初始化管理员">初始化管理员</h2>
+<p>首次打开管理后台，按页面提示初始化管理员，并用验证器扫描 TOTP 二维码完成绑定。恢复码只显示一次，需要妥善保存。</p>
+<p>管理员认证用于保护网关的管理后台，不会自动给被代理的应用增加登录验证。可道云、Media Harbor 等服务仍需使用各自的访问控制。</p>
+<h2 id="添加站点">添加站点</h2>
+<h3 id="http-服务">HTTP 服务</h3>
+<p>在后台点击“添加站点”，以可道云为例填写：</p>
+<table>
+	<thead>
+			<tr>
+					<th>配置项</th>
+					<th>示例值</th>
+			</tr>
+	</thead>
+	<tbody>
+			<tr>
+					<td>名称</td>
+					<td>可道云</td>
+			</tr>
+			<tr>
+					<td>域名</td>
+					<td><code>media.local</code></td>
+			</tr>
+			<tr>
+					<td>目标主机</td>
+					<td><code>192.168.50.30</code></td>
+			</tr>
+			<tr>
+					<td>端口</td>
+					<td><code>2030</code></td>
+			</tr>
+			<tr>
+					<td>协议</td>
+					<td>HTTP</td>
+			</tr>
+			<tr>
+					<td>配置方式</td>
+					<td>自动生成</td>
+			</tr>
+			<tr>
+					<td>启用站点</td>
+					<td>勾选</td>
+			</tr>
+	</tbody>
+</table>
+<p>保存后，在同一局域网的客户端打开 <code>http://media.local/</code>。再用相同方式添加 <code>harbor.local</code>，目标端口填写 <code>2050</code>，即可访问前面部署的 Media Harbor。</p>
+<p>目标主机可以是网关所在的 NAS，也可以是网关能访问到的其他内网设备。<code>.local</code> 域名解析到的是网关，而不是直接解析到目标服务。</p>
+<h3 id="websocket-服务">WebSocket 服务</h3>
+<p>应用需要 WebSocket 长连接时，选择 WebSocket 协议。网关会生成对应的 Upgrade 转发配置，入口仍使用 TCP <code>80</code>，不需要额外设置网关监听端口。</p>
+<h3 id="ssh-服务">SSH 服务</h3>
+<p>SSH 使用独立的网关端口，不能像 HTTP 那样仅靠域名区分多个服务。以转发 NAS 自身的 SSH 为例：</p>
+<table>
+	<thead>
+			<tr>
+					<th>配置项</th>
+					<th>示例值</th>
+			</tr>
+	</thead>
+	<tbody>
+			<tr>
+					<td>名称</td>
+					<td>NAS SSH</td>
+			</tr>
+			<tr>
+					<td>域名</td>
+					<td><code>shell.local</code></td>
+			</tr>
+			<tr>
+					<td>目标主机</td>
+					<td><code>192.168.50.30</code></td>
+			</tr>
+			<tr>
+					<td>端口</td>
+					<td><code>22</code></td>
+			</tr>
+			<tr>
+					<td>协议</td>
+					<td>SSH</td>
+			</tr>
+			<tr>
+					<td>网关端口</td>
+					<td><code>2222</code></td>
+			</tr>
+	</tbody>
+</table>
+<p>SSH 站点使用自动生成配置，网关端口需要未被其他服务占用。保存后连接：</p>
+<pre class="shiki-source" data-shiki-language="bash" data-shiki-code="ssh -p 2222 ubuntu@shell.local"><code>ssh -p 2222 ubuntu@shell.local</code></pre>
+<p>账号、密钥和主机指纹仍由目标 SSH 服务提供，网关只负责转发连接。</p>
+<h2 id="验证访问">验证访问</h2>
+<p>在同一局域网的<strong>另一台客户端</strong>执行：</p>
+<pre class="shiki-source" data-shiki-language="bash" data-shiki-code="curl --noproxy &#39;*&#39; http://media.local/"><code>curl --noproxy &#39;*&#39; http://media.local/</code></pre>
+<p>如果无法访问，可以先绕过 mDNS 解析，只测试代理：</p>
+<pre class="shiki-source" data-shiki-language="bash" data-shiki-code="curl --noproxy &#39;*&#39; --resolve media.local:80:192.168.50.30 http://media.local/"><code>curl --noproxy &#39;*&#39; --resolve media.local:80:192.168.50.30 http://media.local/</code></pre>
+<p>如果第二条命令可以正常返回，而第一条失败，重点检查客户端的 mDNS 支持、UDP <code>5353</code>、访客网络与 AP 隔离。Ubuntu 客户端需要系统解析器支持 mDNS，跨网段访问需要额外的 mDNS 转发设施。</p>
+<p>如果代理请求本身也失败，再检查站点的目标地址、目标端口与网关日志。管理后台能打开、健康检查通过，都不能单独证明其他设备已经能够解析 <code>.local</code> 地址。</p>
+<h2 id="维护与备份">维护与备份</h2>
+<p>备份时先停止容器，再保存完整的 <code>/mnt/ssd/docker/data/mdns-gateway</code> 目录和部署配置，之后重新启动。数据库与 <code>master.key</code> 必须一起备份，不要只保留数据库。</p>
+<p>需要更新镜像时，在配置目录执行：</p>
+<pre class="shiki-source" data-shiki-language="bash" data-shiki-code="docker compose pull
+docker compose up -d --wait"><code>docker compose pull
+docker compose up -d --wait</code></pre>
+<p>升级前查看项目说明并备份数据。当前程序不会自动迁移旧数据库结构，不兼容时会明确报错；不要把更换镜像当作已完成数据升级。也不要让两个网关实例同时使用同一个数据目录。</p>
+<p>丢失验证器时，优先使用恢复码。需要通过 CLI 重置管理员验证器时执行：</p>
+<pre class="shiki-source" data-shiki-language="bash" data-shiki-code="docker compose exec mdns-gateway mdns-gateway user reset-2fa admin"><code>docker compose exec mdns-gateway mdns-gateway user reset-2fa admin</code></pre>
+<p>其中 <code>admin</code> 替换为实际管理员账户。重置后应立即在可信局域网中完成重新绑定；绑定完成前，知道账户名且能访问后台的人也可能抢先绑定。</p>
+</div>
+      
+        
+
+
+
+<nav class="collection-pagination" aria-label="合集章节导航">
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      <div class="collection-neighbors">
+        
+          <a href="http://localhost:1313/2026/10/12/%E9%83%A8%E7%BD%B2media-harbor%E7%94%A8%E4%BA%8E%E4%B8%8B%E8%BD%BDYouTube%E8%A7%86%E9%A2%91/"><span>← 上一篇</span>部署media-harbor用于下载YouTube视频</a>
+        
+        
+          <a class="next" href="http://localhost:1313/nas/gitlab-deployment/"><span>下一篇 →</span>GitLab部署</a>
+        
+      </div>
+    
+  
+    
+  
+  <a class="collection-overview-link" href="http://localhost:1313/nas/">查看完整合集：家庭NAS环境搭建 →</a>
+</nav>
+
+      
+    </article>
+    <aside class="sidebar">
+  <form class="site-search" role="search" action="http://localhost:1313/search/" method="get">
+    <label class="sr-only" for="site-search-input">搜索</label>
+    <input id="site-search-input" type="search" name="q" placeholder="Search" aria-label="搜索">
+    <button type="submit" aria-label="提交搜索"><svg class="site-icon" viewBox="0 0 22 22" aria-hidden="true" focusable="false"><path d="M10 3a7 7 0 1 0 4.4 12.4l5.3 5.3 1.4-1.4-5.3-5.3A7 7 0 0 0 10 3m0 2a5 5 0 1 1 0 10 5 5 0 0 1 0-10" /></svg>
+</button>
+  </form>
+  <section class="widget widget-category">
+    <h3 class="widget-title"><svg class="site-icon" viewBox="0 0 22 22" aria-hidden="true" focusable="false"><path d="M3 5h7l2 2h9v12H3zm2 4v8h14V9z" /></svg>
+<span>分类</span></h3>
+    <ul class="widget-list"><li><a href="http://localhost:1313/categories/NAS/">NAS</a><span>(7)</span></li><li><a href="http://localhost:1313/categories/Golang/">Golang</a><span>(5)</span></li><li><a href="http://localhost:1313/categories/%E6%8A%98%E8%85%BE/">折腾</a><span>(4)</span></li><li><a href="http://localhost:1313/categories/Android/">Android</a><span>(3)</span></li><li><a href="http://localhost:1313/categories/Docker/">Docker</a><span>(3)</span></li><li><a href="http://localhost:1313/categories/%E5%94%A0%E5%8F%A8/">唠叨</a><span>(3)</span></li><li><a href="http://localhost:1313/categories/Kubernetes/">Kubernetes</a><span>(2)</span></li><li><a href="http://localhost:1313/categories/Linux/">Linux</a><span>(2)</span></li><li><a href="http://localhost:1313/categories/%E5%B7%A5%E5%85%B7/">工具</a><span>(2)</span></li><li><a href="http://localhost:1313/categories/%E9%87%8F%E5%8C%96%E4%BA%A4%E6%98%93/">量化交易</a><span>(2)</span></li><li><a href="http://localhost:1313/categories/Flutter/">Flutter</a><span>(1)</span></li><li><a href="http://localhost:1313/categories/Google/">Google</a><span>(1)</span></li><li><a href="http://localhost:1313/categories/%E5%85%A5%E4%BE%B5%E6%A3%80%E6%B5%8B/">入侵检测</a><span>(1)</span></li><li><a href="http://localhost:1313/categories/%E5%85%BB%E7%94%9F/">养生</a><span>(1)</span></li><li><a href="http://localhost:1313/categories/%E5%AD%A6%E4%B9%A0%E8%B5%84%E6%96%99/">学习资料</a><span>(1)</span></li><li><a href="http://localhost:1313/categories/%E6%84%8F%E5%A4%96%E6%94%B6%E8%8E%B7/">意外收获</a><span>(1)</span></li><li><a href="http://localhost:1313/categories/%E6%95%88%E7%8E%87/">效率</a><span>(1)</span></li><li><a href="http://localhost:1313/categories/%E7%96%AB%E6%83%85/">疫情</a><span>(1)</span></li><li><a href="http://localhost:1313/categories/%E7%B3%BB%E7%BB%9F/">系统</a><span>(1)</span></li><li><a href="http://localhost:1313/categories/%E8%96%85%E7%BE%8A%E6%AF%9B/">薅羊毛</a><span>(1)</span></li><li><a href="http://localhost:1313/categories/%E8%96%9B%E5%AE%9A%E8%B0%94%E7%9A%84bug/">薛定谔的bug</a><span>(1)</span></li></ul>
+  </section>
+  <section class="widget">
+    <h3 class="widget-title"><svg class="site-icon" viewBox="0 0 22 22" aria-hidden="true" focusable="false"><path d="m12 2 3 6 7 .9-5 4.8 1.2 6.8L12 17l-6.2 3.5L7 13.7 2 8.9 9 8z" /></svg>
+ 标签</h3>
+    <div class="tag-list"><a href="http://localhost:1313/tags/Docker/">Docker(11)</a><a href="http://localhost:1313/tags/Golang/">Golang(7)</a><a href="http://localhost:1313/tags/Linux/">Linux(7)</a><a href="http://localhost:1313/tags/Android/">Android(6)</a><a href="http://localhost:1313/tags/%E7%BD%91%E7%BB%9C/">网络(4)</a><a href="http://localhost:1313/tags/HTTP/">HTTP(3)</a><a href="http://localhost:1313/tags/Windows/">Windows(3)</a><a href="http://localhost:1313/tags/%E5%BC%80%E5%8F%91%E5%B7%A5%E5%85%B7/">开发工具(3)</a><a href="http://localhost:1313/tags/%E8%99%9A%E6%8B%9F%E6%9C%BA/">虚拟机(3)</a><a href="http://localhost:1313/tags/Kafka/">Kafka(2)</a><a href="http://localhost:1313/tags/Kubernetes/">Kubernetes(2)</a><a href="http://localhost:1313/tags/Termux/">Termux(2)</a><a href="http://localhost:1313/tags/Ubuntu/">Ubuntu(2)</a><a href="http://localhost:1313/tags/%E4%B8%8B%E8%BD%BD%E5%99%A8/">下载器(2)</a><a href="http://localhost:1313/tags/%E4%BF%A1%E6%81%AF%E5%AE%89%E5%85%A8/">信息安全(2)</a><a href="http://localhost:1313/tags/%E5%8D%9A%E5%AE%A2/">博客(2)</a><a href="http://localhost:1313/tags/%E9%87%8F%E5%8C%96%E4%BA%A4%E6%98%93/">量化交易(2)</a><a href="http://localhost:1313/tags/Cloudflare/">Cloudflare(1)</a><a href="http://localhost:1313/tags/Flutter/">Flutter(1)</a><a href="http://localhost:1313/tags/Instagram/">Instagram(1)</a><a href="http://localhost:1313/tags/kodcloud/">Kodcloud(1)</a><a href="http://localhost:1313/tags/mDNS/">MDNS(1)</a><a href="http://localhost:1313/tags/SSH/">SSH(1)</a><a href="http://localhost:1313/tags/Tunnel/">Tunnel(1)</a><a href="http://localhost:1313/tags/YouTube/">YouTube(1)</a><a href="http://localhost:1313/tags/%E5%81%A5%E5%BA%B7/">健康(1)</a><a href="http://localhost:1313/tags/%E5%8F%8D%E5%90%91%E4%BB%A3%E7%90%86/">反向代理(1)</a><a href="http://localhost:1313/tags/%E5%9B%BE%E5%BA%8A/">图床(1)</a><a href="http://localhost:1313/tags/%E5%BE%AE%E6%9C%8D%E5%8A%A1/">微服务(1)</a><a href="http://localhost:1313/tags/%E6%95%B0%E6%8D%AE%E5%88%86%E6%9E%90/">数据分析(1)</a><a href="http://localhost:1313/tags/%E6%95%B0%E6%8D%AE%E5%BA%93/">数据库(1)</a><a href="http://localhost:1313/tags/%E6%96%B0%E5%86%A0/">新冠(1)</a><a href="http://localhost:1313/tags/%E7%A1%AC%E4%BB%B6/">硬件(1)</a><a href="http://localhost:1313/tags/%E8%87%AA%E5%8A%A8%E5%8C%96/">自动化(1)</a></div>
+  </section>
+  <section class="widget widget-recent-posts">
+    <h3 class="widget-title"><svg class="site-icon" viewBox="0 0 22 22" aria-hidden="true" focusable="false"><path d="M5 2h9l5 5v15H5zm8 2v5h5M8 13h8v2H8zm0 4h8v2H8z" /></svg>
+ 最近文章</h3>
+    <ul class="recent-list recent-posts"><li><a href="http://localhost:1313/2026/10/06/%E7%B3%BB%E7%BB%9F%E9%80%89%E5%9E%8B/" title="家庭NAS环境搭建 -- 系统选型">家庭NAS环境搭建 -- 系统选型</a></li><li><a href="http://localhost:1313/2026/10/06/Docker%E5%AE%89%E8%A3%85/" title="家庭NAS环境搭建 -- Docker安装">家庭NAS环境搭建 -- Docker安装</a></li><li><a href="http://localhost:1313/2026/10/07/%E5%86%85%E7%BD%91%E7%A9%BF%E9%80%8F/" title="家庭NAS环境搭建 -- 内网穿透">家庭NAS环境搭建 -- 内网穿透</a></li><li><a href="http://localhost:1313/2026/10/07/%E9%83%A8%E7%BD%B2KodCloud/" title="家庭NAS环境搭建 -- 部署KodCloud">家庭NAS环境搭建 -- 部署KodCloud</a></li><li><a href="http://localhost:1313/2026/10/09/%E9%83%A8%E7%BD%B2%E4%B8%8B%E8%BD%BD%E5%99%A8/" title="家庭NAS环境搭建 -- 部署下载器">家庭NAS环境搭建 -- 部署下载器</a></li><li><a href="http://localhost:1313/2026/10/12/%E9%83%A8%E7%BD%B2media-harbor%E7%94%A8%E4%BA%8E%E4%B8%8B%E8%BD%BDYouTube%E8%A7%86%E9%A2%91/" title="家庭NAS环境搭建 -- 部署media-harbor用于下载YouTube视频">家庭NAS环境搭建 -- 部署media-harbor用于下载YouTube视频</a></li><li><a href="http://localhost:1313/2026/10/14/%E9%83%A8%E7%BD%B2mDNS-Gateway%E7%BB%9F%E4%B8%80%E5%86%85%E7%BD%91%E6%9C%8D%E5%8A%A1%E5%85%A5%E5%8F%A3/" title="家庭NAS环境搭建 -- 部署mDNS Gateway统一内网服务入口">家庭NAS环境搭建 -- 部署mDNS Gateway统一内网服务入口</a></li><li><a href="http://localhost:1313/nas/gitlab-deployment/" title="家庭NAS环境搭建 -- GitLab部署">家庭NAS环境搭建 -- GitLab部署</a></li><li><a href="http://localhost:1313/2026/09/23/%E4%BB%8E-Hexo-%E8%BF%81%E7%A7%BB%E5%88%B0-Hugo.html" title="从 Hexo 迁移到 Hugo">从 Hexo 迁移到 Hugo</a></li><li><a href="http://localhost:1313/2022/03/30/http%E9%87%8D%E5%AE%9A%E5%90%91.html" title="http重定向">http重定向</a></li></ul>
+  </section>
+  <section class="widget widget-links">
+    <h3 class="widget-title"><svg class="site-icon" viewBox="0 0 22 22" aria-hidden="true" focusable="false"><path d="M14 3h7v7h-2V6.4l-9.3 9.3-1.4-1.4L17.6 5H14zM5 5h6v2H7v10h10v-4h2v6H5z" /></svg>
+<span>友情链接</span></h3>
+    <ul class="recent-list"><li><a href="https://leapsea.github.io/">我的小站</a></li><li><a href="https://fictiony.github.io/">F大</a></li></ul>
+  </section>
+</aside>
+
+  </div>
+
+    </main><script defer src="http://localhost:1313/js/shiki.682f9fad917c5d871fb7f8af3908d8651586309049cd1d887d955c0aa05f35fe38046772a029c64eeee1fa012332b40c.js" integrity="sha384-aC&#43;frZF8XYcft/ivOQjYZRWGMJBJzR2IfZVcCqBfNf44BGdyoCnGTu7h&#43;gEjMrQM"></script>
+    <footer class="site-footer">
+  <div class="site-footer-inner">
+    <p>Copyright © 2026 <a href="http://localhost:1313/">我的小站</a> · Powered by <a href="https://gohugo.io/">Hugo</a></p>
+  </div>
+</footer>
+
+  </body>
+</html>

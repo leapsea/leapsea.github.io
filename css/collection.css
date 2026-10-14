@@ -1,0 +1,109 @@
+/* 样式仅在合集页面加载，延续现有主题的颜色和内容宽度。 */
+.collection-directory {
+  margin: 0 0 32px;
+  padding: 24px;
+  border: 1px solid #dce4eb;
+  border-radius: 4px;
+  background: #fafbfc;
+  font-size: 16px;
+}
+
+.collection-label {
+  margin: 0 0 8px;
+  color: #777;
+  font-size: 14px;
+}
+
+.collection-directory h2 {
+  margin: 0 0 16px;
+  font-size: 24px;
+  line-height: 1.5;
+}
+
+.collection-directory ol {
+  margin: 0;
+  padding-left: 24px;
+}
+
+.collection-directory li {
+  padding-left: 4px;
+}
+
+.collection-directory li + li {
+  margin-top: 4px;
+}
+
+.collection-directory li a {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 4px 8px;
+  border-radius: 4px;
+}
+
+.collection-directory li a span {
+  font-size: 14px;
+}
+
+.collection-directory a.is-current {
+  background: #e9eff5;
+  color: #3d5f84;
+  font-weight: 600;
+}
+
+.collection-directory a:hover,
+.collection-pagination a:hover {
+  color: #b54b42;
+  text-decoration: underline;
+}
+
+.collection-directory a:active,
+.collection-pagination a:active {
+  color: #923c35;
+}
+
+.collection-directory a:focus-visible,
+.collection-pagination a:focus-visible {
+  outline: 2px solid #4e7198;
+  outline-offset: 4px;
+}
+
+.collection-pagination {
+  padding-top: 24px;
+  border-top: 1px solid #eee;
+  font-size: 16px;
+}
+
+.collection-neighbors {
+  display: flex;
+  justify-content: space-between;
+  gap: 24px;
+  margin-bottom: 16px;
+}
+
+.collection-neighbors a span {
+  display: block;
+  font-size: 14px;
+}
+
+.collection-neighbors .next {
+  margin-left: auto;
+  text-align: right;
+}
+
+.collection-boundary {
+  color: #777;
+  font-size: 14px;
+}
+
+@media (max-width: 480px) {
+  .collection-directory {
+    padding: 16px;
+  }
+
+  .collection-neighbors {
+    gap: 16px;
+  }
+}
