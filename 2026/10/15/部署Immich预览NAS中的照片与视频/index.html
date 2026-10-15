@@ -1,0 +1,534 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="使用 Docker Compose 部署 Immich，以只读外部资源库索引 NAS 中的照片与视频，并配置目录权限、扫描和浏览方式。">
+<title>家庭NAS环境搭建 -- 部署Immich预览NAS中的照片与视频 · 我的小站</title>
+
+<link rel="stylesheet" href="https://leapsea.github.io/css/blog.css?v=7">
+<link rel="stylesheet" href="https://leapsea.github.io/css/recent-posts.css?v=2">
+<link rel="stylesheet" href="https://leapsea.github.io/css/code-highlighting.css">
+
+<link rel="stylesheet" href="https://leapsea.github.io/css/collection.css?v=1">
+
+
+  </head>
+  <body class="">
+    <a class="skip-link" href="#main-content">跳到主要内容</a>
+    <header class="site-header">
+  <div class="header-inner">
+    <a class="brand" href="https://leapsea.github.io/" aria-label="我的小站 首页">
+      <span><strong>我的小站</strong><small>专注于Android、Kotlin、Go语言(golang)、移动互联网、项目管理、软件架构</small></span>
+    </a>
+    <nav class="site-nav" aria-label="主导航">
+      <a class="" href="https://leapsea.github.io/"><svg class="site-icon" viewBox="0 0 22 22" aria-hidden="true" focusable="false"><path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1z" /></svg>
+ 首页</a>
+      
+      
+        
+        
+        
+        
+        
+        
+        <a class="active" href="https://leapsea.github.io/collections/"><svg class="site-icon" viewBox="0 0 22 22" aria-hidden="true" focusable="false"><path d="M4 3h14a2 2 0 0 1 2 2v16H6a2 2 0 0 1-2-2zm3 3v2h10V6zm0 4v2h10v-2z" /></svg>
+ 合集</a>
+      
+        
+        
+        
+        
+        
+        
+        <a class="" href="https://leapsea.github.io/archives/"><svg class="site-icon" viewBox="0 0 22 22" aria-hidden="true" focusable="false"><path d="M3 4h18v4H3zm2 6h14v10H5zm4 3v2h6v-2z" /></svg>
+ 归档</a>
+      
+        
+        
+        
+        
+        
+        
+        <a class="" href="https://leapsea.github.io/tags/"><svg class="site-icon" viewBox="0 0 22 22" aria-hidden="true" focusable="false"><path d="M3 4h8l10 10-7 7L4 11zm5 3a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3" /></svg>
+ 标签</a>
+      
+        
+        
+        
+        
+        
+        
+        <a class="" href="https://leapsea.github.io/about/"><svg class="site-icon" viewBox="0 0 22 22" aria-hidden="true" focusable="false"><path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8m-8 9a8 8 0 0 1 16 0z" /></svg>
+ 关于</a>
+      
+        
+        
+        
+        
+        
+        
+        <a class="" href="https://leapsea.github.io/down/"><svg class="site-icon" viewBox="0 0 22 22" aria-hidden="true" focusable="false"><path d="M11 3h2v10l4-4 1.4 1.4L12 17l-6.4-6.6L7 9l4 4zm-6 16h14v2H5z" /></svg>
+ 下载</a>
+      
+        
+        
+        
+        
+        
+        
+        <a class="" href="https://leapsea.github.io/books/"><svg class="site-icon" viewBox="0 0 22 22" aria-hidden="true" focusable="false"><path d="M4 3h14a2 2 0 0 1 2 2v16H6a2 2 0 0 1-2-2zm3 3v2h10V6zm0 4v2h10v-2z" /></svg>
+ 电子书</a>
+      
+        
+        
+        
+        
+        
+        
+        
+      
+        
+        
+        
+        
+        
+        
+        
+      
+        
+        
+        
+        
+        
+        
+        
+      
+        
+        
+        
+        
+        
+        
+        
+      
+    </nav>
+  </div>
+</header>
+
+    <main id="main-content" class="site-shell">
+      
+  <div class="classic-layout article-grid">
+    <article class="article content-main">
+      
+
+
+  
+  <nav class="collection-directory" aria-label="合集目录">
+    <p class="collection-label">文章合集 · 9 篇</p>
+    <h2><a href="https://leapsea.github.io/nas/">家庭NAS环境搭建</a></h2>
+    <ol>
+      
+        <li><a href="https://leapsea.github.io/2026/10/06/%E7%B3%BB%E7%BB%9F%E9%80%89%E5%9E%8B/">系统选型</a></li>
+      
+        <li><a href="https://leapsea.github.io/2026/10/06/Docker%E5%AE%89%E8%A3%85/">Docker安装</a></li>
+      
+        <li><a href="https://leapsea.github.io/2026/10/07/%E5%86%85%E7%BD%91%E7%A9%BF%E9%80%8F/">内网穿透</a></li>
+      
+        <li><a href="https://leapsea.github.io/2026/10/07/%E9%83%A8%E7%BD%B2KodCloud/">部署KodCloud</a></li>
+      
+        <li><a href="https://leapsea.github.io/2026/10/09/%E9%83%A8%E7%BD%B2%E4%B8%8B%E8%BD%BD%E5%99%A8/">部署下载器</a></li>
+      
+        <li><a href="https://leapsea.github.io/2026/10/12/%E9%83%A8%E7%BD%B2media-harbor%E7%94%A8%E4%BA%8E%E4%B8%8B%E8%BD%BDYouTube%E8%A7%86%E9%A2%91/">部署media-harbor用于下载YouTube视频</a></li>
+      
+        <li><a href="https://leapsea.github.io/2026/10/14/%E9%83%A8%E7%BD%B2mDNS-Gateway%E7%BB%9F%E4%B8%80%E5%86%85%E7%BD%91%E6%9C%8D%E5%8A%A1%E5%85%A5%E5%8F%A3/">部署mDNS Gateway统一内网服务入口</a></li>
+      
+        <li><a href="https://leapsea.github.io/2026/10/15/%E9%83%A8%E7%BD%B2Immich%E9%A2%84%E8%A7%88NAS%E4%B8%AD%E7%9A%84%E7%85%A7%E7%89%87%E4%B8%8E%E8%A7%86%E9%A2%91/" class="is-current" aria-current="page">部署Immich预览NAS中的照片与视频<span>当前文章</span></a></li>
+      
+        <li><a href="https://leapsea.github.io/nas/gitlab-deployment/">GitLab部署</a></li>
+      
+    </ol>
+  </nav>
+
+
+      <header class="article-header">
+        <div class="article-kicker">POSTS</div>
+        <h1>家庭NAS环境搭建 -- 部署Immich预览NAS中的照片与视频</h1>
+        <div class="post-meta">
+  <time datetime="2026-10-15">2026年10月15日</time>
+  <span class="meta-separator" aria-hidden="true">·</span><span>预计 5 分钟阅读</span>
+  
+    
+    
+    <span class="meta-separator" aria-hidden="true">·</span><a href="https://leapsea.github.io/categories/NAS/">NAS</a>
+  
+</div>
+
+        <div class="article-tags"><a href="https://leapsea.github.io/tags/Docker/">#Docker</a><a href="https://leapsea.github.io/tags/Immich/">#Immich</a><a href="https://leapsea.github.io/tags/%E7%9B%B8%E5%86%8C/">#相册</a><a href="https://leapsea.github.io/tags/%E8%A7%86%E9%A2%91/">#视频</a></div>
+
+      </header>
+      
+        <aside class="article-toc" aria-label="文章目录">
+          <p class="toc-title">目录</p>
+          <nav id="TableOfContents">
+  <ul>
+    <li><a href="#为什么选择-immich">为什么选择 Immich</a>
+      <ul>
+        <li><a href="#目录结构与界面展示的区别">目录结构与界面展示的区别</a></li>
+      </ul>
+    </li>
+    <li><a href="#准备目录">准备目录</a></li>
+    <li><a href="#创建配置文件">创建配置文件</a>
+      <ul>
+        <li><a href="#compose-配置">Compose 配置</a></li>
+        <li><a href="#环境变量">环境变量</a></li>
+      </ul>
+    </li>
+    <li><a href="#启动服务">启动服务</a></li>
+    <li><a href="#添加外部资源库">添加外部资源库</a></li>
+    <li><a href="#日常浏览与更新">日常浏览与更新</a>
+      <ul>
+        <li><a href="#照片与文件夹">照片与文件夹</a></li>
+        <li><a href="#视频播放">视频播放</a></li>
+        <li><a href="#新增文件">新增文件</a></li>
+      </ul>
+    </li>
+    <li><a href="#使用中发现的问题">使用中发现的问题</a>
+      <ul>
+        <li><a href="#部分图片格式识别异常">部分图片格式识别异常</a></li>
+        <li><a href="#视频预览的方向键行为不符合预期">视频预览的方向键行为不符合预期</a></li>
+      </ul>
+    </li>
+    <li><a href="#数据保留与升级">数据保留与升级</a></li>
+  </ul>
+</nav>
+        </aside>
+      
+      <div class="article-body"><p>NAS 中的照片和视频已经按目录保存，但逐层打开文件夹查看并不方便。这次使用 <a href="https://immich.app/" target="_blank" rel="noopener noreferrer"><strong>Immich</strong></a>
+ 提供统一的浏览入口：原文件继续留在挂载分区中，通过外部资源库建立索引，在页面中查看照片和播放视频。</p>
+<p>部署沿用前文的目录规划，应用数据与数据库放在 SSD 上，已有媒体目录以只读方式挂载。<code>immich-server</code> 使用 UID <code>1000</code>、GID <code>2000</code> 运行，与 <code>docker-nas</code> 共享组对应。</p>
+<h2 id="为什么选择-immich">为什么选择 Immich</h2>
+<p>这里需要的是照片与视频的浏览体验，而不只是文件列表。Immich 可以扫描已有媒体、提取元数据、生成缩略图，并按时间线展示内容；视频还可以生成用于播放的转码版本，具体兼容性取决于源文件、浏览器与转码配置。</p>
+<p>Immich 需要数据库、后台任务和额外的缩略图空间，并不是最轻量的文件浏览器。本例以现有配置为基础，只部署服务端、Valkey 和 PostgreSQL，不部署机器学习服务。</p>
+<h3 id="目录结构与界面展示的区别">目录结构与界面展示的区别</h3>
+<p>已有文件可能按下面的方式归档：</p>
+<pre class="shiki-source" data-shiki-language="text" data-shiki-code="图片/
+└── 用户A/
+    ├── 2025/
+    │   └── 12/
+    │       └── 图片1.jpg
+    └── 2026/
+        └── 10/
+            └── 图片2.jpg"><code>图片/
+└── 用户A/
+    ├── 2025/
+    │   └── 12/
+    │       └── 图片1.jpg
+    └── 2026/
+        └── 10/
+            └── 图片2.jpg</code></pre>
+<p>把“用户A”作为外部资源库的导入路径，可以递归索引下方的年月目录，原文件不需要移动。</p>
+<p>Immich 官方目前没有将外部资源库目录自动转换为相册的机制。因此，无法自动化实现期望的功能。需要手动创建相册，也可以在扫描完成后手动整理。参见 <a href="https://docs.immich.app/FAQ/#can-i-add-an-external-library-while-keeping-the-existing-album-structure" target="_blank" rel="noopener noreferrer">外部资源库与相册的官方说明</a>
+。</p>
+<h2 id="准备目录">准备目录</h2>
+<pre class="shiki-source" data-shiki-language="bash" data-shiki-code="mkdir -p /mnt/ssd/docker/compose/immich
+mkdir -p /mnt/ssd/docker/data/immich/{data,postgres}
+sudo chown -R 1000:2000 /mnt/ssd/docker/data/immich/data"><code>mkdir -p /mnt/ssd/docker/compose/immich
+mkdir -p /mnt/ssd/docker/data/immich/{data,postgres}
+sudo chown -R 1000:2000 /mnt/ssd/docker/data/immich/data</code></pre>
+<table>
+	<thead>
+			<tr>
+					<th>宿主机目录</th>
+					<th>容器目录</th>
+					<th>用途</th>
+			</tr>
+	</thead>
+	<tbody>
+			<tr>
+					<td><code>/mnt/ssd/docker/data/immich/data</code></td>
+					<td><code>/data</code></td>
+					<td>上传文件、缩略图、转码文件等应用数据</td>
+			</tr>
+			<tr>
+					<td><code>/mnt/ssd/docker/data/immich/postgres</code></td>
+					<td><code>/var/lib/postgresql/data</code></td>
+					<td>数据库，保存账户、索引与相册等信息</td>
+			</tr>
+			<tr>
+					<td><code>/mnt/hdd/</code></td>
+					<td><code>/mnt/media</code></td>
+					<td>已有照片与视频，挂载为只读</td>
+			</tr>
+	</tbody>
+</table>
+<p>已有媒体目录需要允许 UID <code>1000</code> 或 GID <code>2000</code> 读取文件、进入各级目录。这里不批量修改原文件的所有者，按前文的共享组权限配置即可。</p>
+<p><code>1000:2000</code> 只用于 <code>immich-server</code>，不要直接套用到 PostgreSQL。数据库镜像使用自身的运行身份管理数据目录；数据库应保存在本地、支持 Linux 权限的文件系统中，不使用 SMB/NFS 网络共享。</p>
+<h2 id="创建配置文件">创建配置文件</h2>
+<h3 id="compose-配置">Compose 配置</h3>
+<p>创建 <code>/mnt/ssd/docker/compose/immich/compose.yaml</code>：</p>
+<pre class="shiki-source" data-shiki-language="yaml" data-shiki-code="name: immich
+
+services:
+  immich-server:
+    container_name: immich_server
+    image: ghcr.io/immich-app/immich-server:release
+    # 使用前文配置的共享组访问媒体目录。
+    user: &#39;1000:2000&#39;
+    env_file:
+      - .env
+    volumes:
+      # 可写目录：上传文件、缩略图与转码产物。
+      - ${UPLOAD_LOCATION}:/data
+      # 只读目录：已有照片与视频。
+      - ${STORAGE_DIR}:/mnt/media:ro
+      - /etc/localtime:/etc/localtime:ro
+    ports:
+      - 2070:2283
+    depends_on:
+      - redis
+      - database
+    restart: always
+    healthcheck:
+      disable: false
+
+  redis:
+    container_name: immich_redis
+    image: docker.io/valkey/valkey:9@sha256:418652cfb58ef879d4978c33553735d7147016032d5aefaa14c828e611eb9dfd
+    healthcheck:
+      test: redis-cli ping | grep -q PONG || exit 1
+    restart: always
+
+  database:
+    container_name: immich_postgres
+    image: ghcr.io/immich-app/postgres:14-vectorchord0.4.3-pgvectors0.2.0@sha256:bcf63357191b76a916ae5eb93464d65c07511da41e3bf7a8416db519b40b1c23
+    environment:
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_DB: ${DB_DATABASE_NAME}
+      POSTGRES_INITDB_ARGS: &#39;--data-checksums&#39;
+      # 数据库放在 SSD 上，保留默认存储类型。
+      # DB_STORAGE_TYPE: &#39;HDD&#39;
+    volumes:
+      # PostgreSQL 数据目录单独持久化。
+      - ${DB_DATA_LOCATION}:/var/lib/postgresql/data
+    shm_size: 128mb
+    restart: always
+    healthcheck:
+      disable: false"><code>name: immich
+
+services:
+  immich-server:
+    container_name: immich_server
+    image: ghcr.io/immich-app/immich-server:release
+    # 使用前文配置的共享组访问媒体目录。
+    user: &#39;1000:2000&#39;
+    env_file:
+      - .env
+    volumes:
+      # 可写目录：上传文件、缩略图与转码产物。
+      - ${UPLOAD_LOCATION}:/data
+      # 只读目录：已有照片与视频。
+      - ${STORAGE_DIR}:/mnt/media:ro
+      - /etc/localtime:/etc/localtime:ro
+    ports:
+      - 2070:2283
+    depends_on:
+      - redis
+      - database
+    restart: always
+    healthcheck:
+      disable: false
+
+  redis:
+    container_name: immich_redis
+    image: docker.io/valkey/valkey:9@sha256:418652cfb58ef879d4978c33553735d7147016032d5aefaa14c828e611eb9dfd
+    healthcheck:
+      test: redis-cli ping | grep -q PONG || exit 1
+    restart: always
+
+  database:
+    container_name: immich_postgres
+    image: ghcr.io/immich-app/postgres:14-vectorchord0.4.3-pgvectors0.2.0@sha256:bcf63357191b76a916ae5eb93464d65c07511da41e3bf7a8416db519b40b1c23
+    environment:
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_DB: ${DB_DATABASE_NAME}
+      POSTGRES_INITDB_ARGS: &#39;--data-checksums&#39;
+      # 数据库放在 SSD 上，保留默认存储类型。
+      # DB_STORAGE_TYPE: &#39;HDD&#39;
+    volumes:
+      # PostgreSQL 数据目录单独持久化。
+      - ${DB_DATA_LOCATION}:/var/lib/postgresql/data
+    shm_size: 128mb
+    restart: always
+    healthcheck:
+      disable: false</code></pre>
+<p><code>env_file</code> 将 <code>.env</code> 中的数据库连接参数传入服务端。仅把 <code>.env</code> 放在 Compose 目录中，只会参与 Compose 变量替换，不会自动把所有变量传给容器。</p>
+<p>外部媒体挂载保留 <code>:ro</code>，避免应用修改或删除原文件；<code>/data</code> 与数据库目录仍然需要可写。非 root 运行方式可参考 <a href="https://docs.immich.app/FAQ/#how-can-i-run-immich-as-a-non-root-user" target="_blank" rel="noopener noreferrer">Immich 官方 FAQ</a>
+。</p>
+<h3 id="环境变量">环境变量</h3>
+<p>在同目录下创建 <code>.env</code>：</p>
+<pre class="shiki-source" data-shiki-language="bash" data-shiki-code="UPLOAD_LOCATION=/mnt/ssd/docker/data/immich/data
+DB_DATA_LOCATION=/mnt/ssd/docker/data/immich/postgres
+STORAGE_DIR=/mnt/hdd/
+
+# 替换为自己的随机密码，仅使用字母和数字。
+DB_PASSWORD=ChangeThisToYourRandomPassword123
+DB_USERNAME=postgres
+DB_DATABASE_NAME=immich"><code>UPLOAD_LOCATION=/mnt/ssd/docker/data/immich/data
+DB_DATA_LOCATION=/mnt/ssd/docker/data/immich/postgres
+STORAGE_DIR=/mnt/hdd/
+
+# 替换为自己的随机密码，仅使用字母和数字。
+DB_PASSWORD=ChangeThisToYourRandomPassword123
+DB_USERNAME=postgres
+DB_DATABASE_NAME=immich</code></pre>
+<p><code>STORAGE_DIR</code> 是宿主机上的媒体根目录。后台添加外部资源库时，需要填写映射后的容器路径 <code>/mnt/media/...</code>。</p>
+<p>文中保留草稿中的服务与依赖镜像配置。Immich 的服务端和数据库扩展需要配套使用，首次部署或升级时，应对照 <a href="https://github.com/immich-app/immich/releases/latest/download/docker-compose.yml" target="_blank" rel="noopener noreferrer">对应发行版的 Compose 文件</a>
+，不要单独替换数据库大版本或扩展镜像。官方安装步骤见 <a href="https://docs.immich.app/install/docker-compose/" target="_blank" rel="noopener noreferrer">Docker Compose 部署文档</a>
+。</p>
+<h2 id="启动服务">启动服务</h2>
+<pre class="shiki-source" data-shiki-language="bash" data-shiki-code="cd /mnt/ssd/docker/compose/immich
+docker compose pull
+docker compose up -d
+docker compose logs --tail=100 immich-server"><code>cd /mnt/ssd/docker/compose/immich
+docker compose pull
+docker compose up -d
+docker compose logs --tail=100 immich-server</code></pre>
+<p>在浏览器访问 <code>http://服务器IP:2070</code>，按页面提示创建管理员账户。</p>
+<p>本例没有部署机器学习容器，初始化后在管理设置中关闭机器学习相关任务。首次索引时的缩略图生成与视频转码仍会占用 CPU 和 SSD 空间，先扫描少量文件确认浏览、播放正常，再扩大扫描范围。</p>
+<h2 id="添加外部资源库">添加外部资源库</h2>
+<p>以宿主机目录 <code>/mnt/hdd/图片/用户A</code> 为例：</p>
+<ol>
+<li>使用管理员账户进入“管理 → 外部库”。</li>
+<li>创建资源库，选择所属账户，并将图库命名为“用户A”。</li>
+<li>添加导入路径 <code>/mnt/media/图片/用户A</code>。</li>
+<li>保存后执行扫描，等待索引和缩略图任务完成。</li>
+<li>返回照片时间线，查看已识别的照片与视频。</li>
+</ol>
+<p>配置方法参考 <a href="https://docs.immich.app/guides/external-library/" target="_blank" rel="noopener noreferrer">官方外部资源库指南</a>
+。导入路径必须使用容器内路径，不填写宿主机的 <code>/mnt/hdd/...</code>。只添加需要展示的子目录，避免把整个挂载分区作为扫描范围。</p>
+<p>外部资源库用于索引原位置上的媒体，不需要通过上传方式再复制一份原文件；缩略图和转码产物会占用额外空间。每个外部资源库归属一个账户，目录名称“用户A”本身不会自动建立账户或访问隔离。</p>
+<h2 id="日常浏览与更新">日常浏览与更新</h2>
+<h3 id="照片与文件夹">照片与文件夹</h3>
+<p>时间线适合按拍摄日期查看媒体。希望保留文件夹浏览入口时，可在账户设置的功能选项中开启文件夹视图。</p>
+<p>需要独立展示“用户A”的内容时，可以分配给对应账户，或手动整理相册。</p>
+<h3 id="视频播放">视频播放</h3>
+<p>扫描后等待视频相关任务完成，再测试页面播放。播放不兼容或转码较慢时，检查管理后台的转码设置与任务日志。本例未开启硬件加速，使用 CPU 处理；N100 的硬件转码需要另外配置，不在这份 Compose 中默认启用。</p>
+<h3 id="新增文件">新增文件</h3>
+<p>通过共享目录添加照片或视频后，需要重新扫描，才能更新索引。可以手动执行，也可以在管理设置中配置外部资源库的扫描周期。</p>
+<p>只读挂载限制对原文件的写入，不会阻止数据库索引和缩略图生成。若在 Immich 之外移动或重命名文件，重新扫描后可能被识别为新条目，原条目上的相册关联等信息也可能丢失。使用方式与限制见 <a href="https://docs.immich.app/features/libraries/" target="_blank" rel="noopener noreferrer">外部资源库文档</a>
+。</p>
+<h2 id="使用中发现的问题">使用中发现的问题</h2>
+<p>以下是本次使用中的实际现象，未确认具体原因。</p>
+<h3 id="部分图片格式识别异常">部分图片格式识别异常</h3>
+<p>挂载额外存储并添加为外部资源库后，发现部分图片格式识别存在问题（不显示封面图、展示比例不对）。</p>
+<h3 id="视频预览的方向键行为不符合预期">视频预览的方向键行为不符合预期</h3>
+<p>在大图预览界面中查看视频时，按键盘左、右方向键，实际会切换到上一个或下一个媒体条目，而不是控制当前视频的播放进度。</p>
+<table>
+	<thead>
+			<tr>
+					<th>按键</th>
+					<th>期望行为</th>
+					<th>实际行为</th>
+			</tr>
+	</thead>
+	<tbody>
+			<tr>
+					<td>左方向键</td>
+					<td>当前视频快退</td>
+					<td>切换到上一个媒体条目</td>
+			</tr>
+			<tr>
+					<td>右方向键</td>
+					<td>当前视频快进</td>
+					<td>切换到下一个媒体条目</td>
+			</tr>
+	</tbody>
+</table>
+<p>这一交互与视频播放器的使用预期不一致，影响连续观看体验。</p>
+<h2 id="数据保留与升级">数据保留与升级</h2>
+<p>应用数据、数据库和原始媒体需要分别备份。只保留 <code>/mnt/hdd/</code> 中的原文件，不能恢复账户、相册和应用设置；只备份数据库，也不能代替原文件备份。</p>
+<p>升级前查看发行说明和官方 Compose 变更，确认服务端、数据库及相关扩展的兼容关系。备份方法参考 <a href="https://docs.immich.app/administration/backup-and-restore/" target="_blank" rel="noopener noreferrer">Immich 备份与恢复文档</a>
+。</p>
+</div>
+      
+        
+
+
+
+<nav class="collection-pagination" aria-label="合集章节导航">
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      <div class="collection-neighbors">
+        
+          <a href="https://leapsea.github.io/2026/10/14/%E9%83%A8%E7%BD%B2mDNS-Gateway%E7%BB%9F%E4%B8%80%E5%86%85%E7%BD%91%E6%9C%8D%E5%8A%A1%E5%85%A5%E5%8F%A3/"><span>← 上一篇</span>部署mDNS Gateway统一内网服务入口</a>
+        
+        
+          <a class="next" href="https://leapsea.github.io/nas/gitlab-deployment/"><span>下一篇 →</span>GitLab部署</a>
+        
+      </div>
+    
+  
+    
+  
+  <a class="collection-overview-link" href="https://leapsea.github.io/nas/">查看完整合集：家庭NAS环境搭建 →</a>
+</nav>
+
+      
+    </article>
+    <aside class="sidebar">
+  <form class="site-search" role="search" action="https://leapsea.github.io/search/" method="get">
+    <label class="sr-only" for="site-search-input">搜索</label>
+    <input id="site-search-input" type="search" name="q" placeholder="Search" aria-label="搜索">
+    <button type="submit" aria-label="提交搜索"><svg class="site-icon" viewBox="0 0 22 22" aria-hidden="true" focusable="false"><path d="M10 3a7 7 0 1 0 4.4 12.4l5.3 5.3 1.4-1.4-5.3-5.3A7 7 0 0 0 10 3m0 2a5 5 0 1 1 0 10 5 5 0 0 1 0-10" /></svg>
+</button>
+  </form>
+  <section class="widget widget-category">
+    <h3 class="widget-title"><svg class="site-icon" viewBox="0 0 22 22" aria-hidden="true" focusable="false"><path d="M3 5h7l2 2h9v12H3zm2 4v8h14V9z" /></svg>
+<span>分类</span></h3>
+    <ul class="widget-list"><li><a href="https://leapsea.github.io/categories/NAS/">NAS</a><span>(8)</span></li><li><a href="https://leapsea.github.io/categories/Golang/">Golang</a><span>(5)</span></li><li><a href="https://leapsea.github.io/categories/%E6%8A%98%E8%85%BE/">折腾</a><span>(4)</span></li><li><a href="https://leapsea.github.io/categories/Android/">Android</a><span>(3)</span></li><li><a href="https://leapsea.github.io/categories/Docker/">Docker</a><span>(3)</span></li><li><a href="https://leapsea.github.io/categories/%E5%94%A0%E5%8F%A8/">唠叨</a><span>(3)</span></li><li><a href="https://leapsea.github.io/categories/Kubernetes/">Kubernetes</a><span>(2)</span></li><li><a href="https://leapsea.github.io/categories/Linux/">Linux</a><span>(2)</span></li><li><a href="https://leapsea.github.io/categories/%E5%B7%A5%E5%85%B7/">工具</a><span>(2)</span></li><li><a href="https://leapsea.github.io/categories/%E9%87%8F%E5%8C%96%E4%BA%A4%E6%98%93/">量化交易</a><span>(2)</span></li><li><a href="https://leapsea.github.io/categories/Flutter/">Flutter</a><span>(1)</span></li><li><a href="https://leapsea.github.io/categories/Google/">Google</a><span>(1)</span></li><li><a href="https://leapsea.github.io/categories/%E5%85%A5%E4%BE%B5%E6%A3%80%E6%B5%8B/">入侵检测</a><span>(1)</span></li><li><a href="https://leapsea.github.io/categories/%E5%85%BB%E7%94%9F/">养生</a><span>(1)</span></li><li><a href="https://leapsea.github.io/categories/%E5%AD%A6%E4%B9%A0%E8%B5%84%E6%96%99/">学习资料</a><span>(1)</span></li><li><a href="https://leapsea.github.io/categories/%E6%84%8F%E5%A4%96%E6%94%B6%E8%8E%B7/">意外收获</a><span>(1)</span></li><li><a href="https://leapsea.github.io/categories/%E6%95%88%E7%8E%87/">效率</a><span>(1)</span></li><li><a href="https://leapsea.github.io/categories/%E7%96%AB%E6%83%85/">疫情</a><span>(1)</span></li><li><a href="https://leapsea.github.io/categories/%E7%B3%BB%E7%BB%9F/">系统</a><span>(1)</span></li><li><a href="https://leapsea.github.io/categories/%E8%96%85%E7%BE%8A%E6%AF%9B/">薅羊毛</a><span>(1)</span></li><li><a href="https://leapsea.github.io/categories/%E8%96%9B%E5%AE%9A%E8%B0%94%E7%9A%84bug/">薛定谔的bug</a><span>(1)</span></li><li><a href="https://leapsea.github.io/categories/%E9%87%91%E8%9E%8D/">金融</a><span>(1)</span></li></ul>
+  </section>
+  <section class="widget">
+    <h3 class="widget-title"><svg class="site-icon" viewBox="0 0 22 22" aria-hidden="true" focusable="false"><path d="m12 2 3 6 7 .9-5 4.8 1.2 6.8L12 17l-6.2 3.5L7 13.7 2 8.9 9 8z" /></svg>
+ 标签</h3>
+    <div class="tag-list"><a href="https://leapsea.github.io/tags/Docker/">Docker(12)</a><a href="https://leapsea.github.io/tags/Golang/">Golang(7)</a><a href="https://leapsea.github.io/tags/Linux/">Linux(7)</a><a href="https://leapsea.github.io/tags/Android/">Android(6)</a><a href="https://leapsea.github.io/tags/%E7%BD%91%E7%BB%9C/">网络(4)</a><a href="https://leapsea.github.io/tags/HTTP/">HTTP(3)</a><a href="https://leapsea.github.io/tags/Windows/">Windows(3)</a><a href="https://leapsea.github.io/tags/%E5%BC%80%E5%8F%91%E5%B7%A5%E5%85%B7/">开发工具(3)</a><a href="https://leapsea.github.io/tags/%E8%99%9A%E6%8B%9F%E6%9C%BA/">虚拟机(3)</a><a href="https://leapsea.github.io/tags/Kafka/">Kafka(2)</a><a href="https://leapsea.github.io/tags/Kubernetes/">Kubernetes(2)</a><a href="https://leapsea.github.io/tags/Termux/">Termux(2)</a><a href="https://leapsea.github.io/tags/Ubuntu/">Ubuntu(2)</a><a href="https://leapsea.github.io/tags/%E4%B8%8B%E8%BD%BD%E5%99%A8/">下载器(2)</a><a href="https://leapsea.github.io/tags/%E4%BF%A1%E6%81%AF%E5%AE%89%E5%85%A8/">信息安全(2)</a><a href="https://leapsea.github.io/tags/%E5%8D%9A%E5%AE%A2/">博客(2)</a><a href="https://leapsea.github.io/tags/%E9%87%8F%E5%8C%96%E4%BA%A4%E6%98%93/">量化交易(2)</a><a href="https://leapsea.github.io/tags/Cloudflare/">Cloudflare(1)</a><a href="https://leapsea.github.io/tags/Flutter/">Flutter(1)</a><a href="https://leapsea.github.io/tags/Immich/">Immich(1)</a><a href="https://leapsea.github.io/tags/Instagram/">Instagram(1)</a><a href="https://leapsea.github.io/tags/kodcloud/">Kodcloud(1)</a><a href="https://leapsea.github.io/tags/mDNS/">MDNS(1)</a><a href="https://leapsea.github.io/tags/SSH/">SSH(1)</a><a href="https://leapsea.github.io/tags/Tunnel/">Tunnel(1)</a><a href="https://leapsea.github.io/tags/YouTube/">YouTube(1)</a><a href="https://leapsea.github.io/tags/%E5%81%A5%E5%BA%B7/">健康(1)</a><a href="https://leapsea.github.io/tags/%E5%8F%8D%E5%90%91%E4%BB%A3%E7%90%86/">反向代理(1)</a><a href="https://leapsea.github.io/tags/%E5%9B%BD%E4%BC%81%E6%94%B9%E9%9D%A9/">国企改革(1)</a><a href="https://leapsea.github.io/tags/%E5%9B%BD%E6%9C%89%E8%B5%84%E6%9C%AC/">国有资本(1)</a><a href="https://leapsea.github.io/tags/%E5%9B%BE%E5%BA%8A/">图床(1)</a><a href="https://leapsea.github.io/tags/%E5%BE%AE%E6%9C%8D%E5%8A%A1/">微服务(1)</a><a href="https://leapsea.github.io/tags/%E6%95%B0%E6%8D%AE%E5%88%86%E6%9E%90/">数据分析(1)</a><a href="https://leapsea.github.io/tags/%E6%95%B0%E6%8D%AE%E5%BA%93/">数据库(1)</a><a href="https://leapsea.github.io/tags/%E6%96%B0%E5%86%A0/">新冠(1)</a><a href="https://leapsea.github.io/tags/%E7%9B%B8%E5%86%8C/">相册(1)</a><a href="https://leapsea.github.io/tags/%E7%A1%AC%E4%BB%B6/">硬件(1)</a><a href="https://leapsea.github.io/tags/%E8%87%AA%E5%8A%A8%E5%8C%96/">自动化(1)</a><a href="https://leapsea.github.io/tags/%E8%A7%86%E9%A2%91/">视频(1)</a></div>
+  </section>
+  <section class="widget widget-recent-posts">
+    <h3 class="widget-title"><svg class="site-icon" viewBox="0 0 22 22" aria-hidden="true" focusable="false"><path d="M5 2h9l5 5v15H5zm8 2v5h5M8 13h8v2H8zm0 4h8v2H8z" /></svg>
+ 最近文章</h3>
+    <ul class="recent-list recent-posts"><li><a href="https://leapsea.github.io/2026/10/06/%E7%B3%BB%E7%BB%9F%E9%80%89%E5%9E%8B/" title="家庭NAS环境搭建 -- 系统选型">家庭NAS环境搭建 -- 系统选型</a></li><li><a href="https://leapsea.github.io/2026/10/06/Docker%E5%AE%89%E8%A3%85/" title="家庭NAS环境搭建 -- Docker安装">家庭NAS环境搭建 -- Docker安装</a></li><li><a href="https://leapsea.github.io/2026/10/07/%E5%86%85%E7%BD%91%E7%A9%BF%E9%80%8F/" title="家庭NAS环境搭建 -- 内网穿透">家庭NAS环境搭建 -- 内网穿透</a></li><li><a href="https://leapsea.github.io/2026/10/07/%E9%83%A8%E7%BD%B2KodCloud/" title="家庭NAS环境搭建 -- 部署KodCloud">家庭NAS环境搭建 -- 部署KodCloud</a></li><li><a href="https://leapsea.github.io/2026/10/09/%E9%83%A8%E7%BD%B2%E4%B8%8B%E8%BD%BD%E5%99%A8/" title="家庭NAS环境搭建 -- 部署下载器">家庭NAS环境搭建 -- 部署下载器</a></li><li><a href="https://leapsea.github.io/2026/10/12/%E9%83%A8%E7%BD%B2media-harbor%E7%94%A8%E4%BA%8E%E4%B8%8B%E8%BD%BDYouTube%E8%A7%86%E9%A2%91/" title="家庭NAS环境搭建 -- 部署media-harbor用于下载YouTube视频">家庭NAS环境搭建 -- 部署media-harbor用于下载YouTube视频</a></li><li><a href="https://leapsea.github.io/2026/10/14/%E9%83%A8%E7%BD%B2mDNS-Gateway%E7%BB%9F%E4%B8%80%E5%86%85%E7%BD%91%E6%9C%8D%E5%8A%A1%E5%85%A5%E5%8F%A3/" title="家庭NAS环境搭建 -- 部署mDNS Gateway统一内网服务入口">家庭NAS环境搭建 -- 部署mDNS Gateway统一内网服务入口</a></li><li><a href="https://leapsea.github.io/2026/10/15/%E9%83%A8%E7%BD%B2Immich%E9%A2%84%E8%A7%88NAS%E4%B8%AD%E7%9A%84%E7%85%A7%E7%89%87%E4%B8%8E%E8%A7%86%E9%A2%91/" title="家庭NAS环境搭建 -- 部署Immich预览NAS中的照片与视频">家庭NAS环境搭建 -- 部署Immich预览NAS中的照片与视频</a></li><li><a href="https://leapsea.github.io/nas/gitlab-deployment/" title="家庭NAS环境搭建 -- GitLab部署">家庭NAS环境搭建 -- GitLab部署</a></li><li><a href="https://leapsea.github.io/2026/10/15/%E4%B8%AD%E5%9B%BD%E9%87%91%E8%9E%8D%E8%88%AA%E6%AF%8D%E5%BB%BA%E8%AE%BE%E8%BF%9B%E5%BA%A6%E5%9B%BD%E6%9C%89%E8%B5%84%E6%9C%AC%E6%8A%95%E8%B5%84%E8%BF%90%E8%90%A5%E4%BD%93%E7%B3%BB%E8%B7%9F%E8%B8%AA.html" title="中国金融航母建设进度：国有资本投资运营体系跟踪">中国金融航母建设进度：国有资本投资运营体系跟踪</a></li></ul>
+  </section>
+  <section class="widget widget-links">
+    <h3 class="widget-title"><svg class="site-icon" viewBox="0 0 22 22" aria-hidden="true" focusable="false"><path d="M14 3h7v7h-2V6.4l-9.3 9.3-1.4-1.4L17.6 5H14zM5 5h6v2H7v10h10v-4h2v6H5z" /></svg>
+<span>友情链接</span></h3>
+    <ul class="recent-list"><li><a href="https://leapsea.github.io/">我的小站</a></li><li><a href="https://fictiony.github.io/">F大</a></li></ul>
+  </section>
+</aside>
+
+  </div>
+
+    </main><script defer src="https://leapsea.github.io/js/shiki.682f9fad917c5d871fb7f8af3908d8651586309049cd1d887d955c0aa05f35fe38046772a029c64eeee1fa012332b40c.js" integrity="sha384-aC&#43;frZF8XYcft/ivOQjYZRWGMJBJzR2IfZVcCqBfNf44BGdyoCnGTu7h&#43;gEjMrQM"></script>
+    <footer class="site-footer">
+  <div class="site-footer-inner">
+    <p>Copyright © 2026 <a href="https://leapsea.github.io/">我的小站</a> · Powered by <a href="https://gohugo.io/">Hugo</a></p>
+  </div>
+</footer>
+
+  </body>
+</html>
