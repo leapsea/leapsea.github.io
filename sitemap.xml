@@ -41,28 +41,46 @@
     <loc>https://leapsea.github.io/nas/gitlab-deployment/</loc>
     <lastmod>2026-10-06T23:35:01+08:00</lastmod>
   </url><url>
-    <loc>https://leapsea.github.io/tags/adb/</loc>
-    <lastmod>2026-10-20T16:15:22+08:00</lastmod>
+    <loc>https://leapsea.github.io/2026/10/21/2026-10-21-%E6%8E%92%E6%9F%A5%E7%94%B5%E8%A7%86App%E6%92%AD%E6%94%BE%E8%BF%87%E7%A8%8Bcrash.html</loc>
+    <lastmod>2026-10-21T10:00:00+08:00</lastmod>
   </url><url>
-    <loc>https://leapsea.github.io/categories/Android/</loc>
-    <lastmod>2026-10-20T16:15:22+08:00</lastmod>
+    <loc>https://leapsea.github.io/tags/adb/</loc>
+    <lastmod>2026-10-21T10:00:00+08:00</lastmod>
+  </url><url>
+    <loc>https://leapsea.github.io/tags/Android/</loc>
+    <lastmod>2026-10-21T10:00:00+08:00</lastmod>
+  </url><url>
+    <loc>https://leapsea.github.io/categories/</loc>
+    <lastmod>2026-10-21T10:00:00+08:00</lastmod>
+  </url><url>
+    <loc>https://leapsea.github.io/tags/ExoPlayer/</loc>
+    <lastmod>2026-10-21T10:00:00+08:00</lastmod>
+  </url><url>
+    <loc>https://leapsea.github.io/tags/HLS/</loc>
+    <lastmod>2026-10-21T10:00:00+08:00</lastmod>
+  </url><url>
+    <loc>https://leapsea.github.io/tags/Media3/</loc>
+    <lastmod>2026-10-21T10:00:00+08:00</lastmod>
+  </url><url>
+    <loc>https://leapsea.github.io/posts/</loc>
+    <lastmod>2026-10-21T10:00:00+08:00</lastmod>
+  </url><url>
+    <loc>https://leapsea.github.io/tags/</loc>
+    <lastmod>2026-10-21T10:00:00+08:00</lastmod>
+  </url><url>
+    <loc>https://leapsea.github.io/</loc>
+    <lastmod>2026-10-21T10:00:00+08:00</lastmod>
+  </url><url>
+    <loc>https://leapsea.github.io/tags/%E6%8E%92%E6%9F%A5%E8%AE%B0%E5%BD%95/</loc>
+    <lastmod>2026-10-21T10:00:00+08:00</lastmod>
+  </url><url>
+    <loc>https://leapsea.github.io/categories/%E9%97%AE%E9%A2%98%E6%8E%92%E6%9F%A5/</loc>
+    <lastmod>2026-10-21T10:00:00+08:00</lastmod>
   </url><url>
     <loc>https://leapsea.github.io/tags/bug/</loc>
     <lastmod>2026-10-20T16:15:22+08:00</lastmod>
   </url><url>
-    <loc>https://leapsea.github.io/categories/</loc>
-    <lastmod>2026-10-20T16:15:22+08:00</lastmod>
-  </url><url>
-    <loc>https://leapsea.github.io/posts/</loc>
-    <lastmod>2026-10-20T16:15:22+08:00</lastmod>
-  </url><url>
-    <loc>https://leapsea.github.io/tags/</loc>
-    <lastmod>2026-10-20T16:15:22+08:00</lastmod>
-  </url><url>
     <loc>https://leapsea.github.io/2026/10/20/%E4%B8%80%E4%B8%AA%E5%A5%87%E6%80%AA%E7%9A%84bugadb%E6%8F%90%E7%A4%BANo-route-to-host.html</loc>
-    <lastmod>2026-10-20T16:15:22+08:00</lastmod>
-  </url><url>
-    <loc>https://leapsea.github.io/</loc>
     <lastmod>2026-10-20T16:15:22+08:00</lastmod>
   </url><url>
     <loc>https://leapsea.github.io/tags/Docker/</loc>
@@ -170,9 +188,6 @@
     <loc>https://leapsea.github.io/categories/%E8%96%85%E7%BE%8A%E6%AF%9B/</loc>
     <lastmod>2021-11-13T16:59:19+00:00</lastmod>
   </url><url>
-    <loc>https://leapsea.github.io/tags/Android/</loc>
-    <lastmod>2021-10-24T09:35:11+00:00</lastmod>
-  </url><url>
     <loc>https://leapsea.github.io/categories/Linux/</loc>
     <lastmod>2021-10-24T09:35:11+00:00</lastmod>
   </url><url>
@@ -202,6 +217,9 @@
   </url><url>
     <loc>https://leapsea.github.io/categories/%E6%95%88%E7%8E%87/</loc>
     <lastmod>2021-08-06T11:20:50+00:00</lastmod>
+  </url><url>
+    <loc>https://leapsea.github.io/categories/Android/</loc>
+    <lastmod>2021-07-31T18:34:40+00:00</lastmod>
   </url><url>
     <loc>https://leapsea.github.io/2021/07/31/Android%E7%B3%BB%E7%BB%9F%E7%9A%84%E6%95%B0%E6%8D%AE%E5%A4%87%E4%BB%BD%E4%B8%8E%E8%BF%98%E5%8E%9F.html</loc>
     <lastmod>2021-07-31T18:34:40+00:00</lastmod>
